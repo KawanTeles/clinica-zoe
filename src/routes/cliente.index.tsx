@@ -34,7 +34,7 @@ import { Loader2, CalendarDays, LogOut, Bell, UserCircle2 } from "lucide-react";
 import { STATUS_COLOR, STATUS_LABEL, addMinutes, fmtHora, todayISO } from "@/lib/agenda-utils";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/cliente")({
+export const Route = createFileRoute("/cliente/")({
   head: () => ({
     meta: [
       { title: "Área do Cliente — Clínica Zoe" },

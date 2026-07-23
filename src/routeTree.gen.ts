@@ -14,11 +14,11 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ProfissionaisRouteImport } from './routes/profissionais'
 import { Route as EspecialidadesRouteImport } from './routes/especialidades'
 import { Route as ContatoRouteImport } from './routes/contato'
-import { Route as ClienteRouteImport } from './routes/cliente'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AgendamentoRouteImport } from './routes/agendamento'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ClienteIndexRouteImport } from './routes/cliente.index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as ClienteLoginRouteImport } from './routes/cliente.login'
 import { Route as AppUsuariosRouteImport } from './routes/app.usuarios'
@@ -58,11 +58,6 @@ const ContatoRoute = ContatoRouteImport.update({
   path: '/contato',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ClienteRoute = ClienteRouteImport.update({
-  id: '/cliente',
-  path: '/cliente',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -83,15 +78,20 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ClienteIndexRoute = ClienteIndexRouteImport.update({
+  id: '/cliente/',
+  path: '/cliente/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
 const ClienteLoginRoute = ClienteLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => ClienteRoute,
+  id: '/cliente/login',
+  path: '/cliente/login',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AppUsuariosRoute = AppUsuariosRouteImport.update({
   id: '/usuarios',
@@ -154,7 +154,6 @@ export interface FileRoutesByFullPath {
   '/agendamento': typeof AgendamentoRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
-  '/cliente': typeof ClienteRouteWithChildren
   '/contato': typeof ContatoRoute
   '/especialidades': typeof EspecialidadesRoute
   '/profissionais': typeof ProfissionaisRoute
@@ -173,12 +172,12 @@ export interface FileRoutesByFullPath {
   '/app/usuarios': typeof AppUsuariosRoute
   '/cliente/login': typeof ClienteLoginRoute
   '/app/': typeof AppIndexRoute
+  '/cliente/': typeof ClienteIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/agendamento': typeof AgendamentoRoute
   '/auth': typeof AuthRoute
-  '/cliente': typeof ClienteRouteWithChildren
   '/contato': typeof ContatoRoute
   '/especialidades': typeof EspecialidadesRoute
   '/profissionais': typeof ProfissionaisRoute
@@ -197,6 +196,7 @@ export interface FileRoutesByTo {
   '/app/usuarios': typeof AppUsuariosRoute
   '/cliente/login': typeof ClienteLoginRoute
   '/app': typeof AppIndexRoute
+  '/cliente': typeof ClienteIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -204,7 +204,6 @@ export interface FileRoutesById {
   '/agendamento': typeof AgendamentoRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
-  '/cliente': typeof ClienteRouteWithChildren
   '/contato': typeof ContatoRoute
   '/especialidades': typeof EspecialidadesRoute
   '/profissionais': typeof ProfissionaisRoute
@@ -223,6 +222,7 @@ export interface FileRoutesById {
   '/app/usuarios': typeof AppUsuariosRoute
   '/cliente/login': typeof ClienteLoginRoute
   '/app/': typeof AppIndexRoute
+  '/cliente/': typeof ClienteIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -231,7 +231,6 @@ export interface FileRouteTypes {
     | '/agendamento'
     | '/app'
     | '/auth'
-    | '/cliente'
     | '/contato'
     | '/especialidades'
     | '/profissionais'
@@ -250,12 +249,12 @@ export interface FileRouteTypes {
     | '/app/usuarios'
     | '/cliente/login'
     | '/app/'
+    | '/cliente/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/agendamento'
     | '/auth'
-    | '/cliente'
     | '/contato'
     | '/especialidades'
     | '/profissionais'
@@ -274,13 +273,13 @@ export interface FileRouteTypes {
     | '/app/usuarios'
     | '/cliente/login'
     | '/app'
+    | '/cliente'
   id:
     | '__root__'
     | '/'
     | '/agendamento'
     | '/app'
     | '/auth'
-    | '/cliente'
     | '/contato'
     | '/especialidades'
     | '/profissionais'
@@ -299,6 +298,7 @@ export interface FileRouteTypes {
     | '/app/usuarios'
     | '/cliente/login'
     | '/app/'
+    | '/cliente/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -306,12 +306,13 @@ export interface RootRouteChildren {
   AgendamentoRoute: typeof AgendamentoRoute
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
-  ClienteRoute: typeof ClienteRouteWithChildren
   ContatoRoute: typeof ContatoRoute
   EspecialidadesRoute: typeof EspecialidadesRoute
   ProfissionaisRoute: typeof ProfissionaisRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SobreRoute: typeof SobreRoute
+  ClienteLoginRoute: typeof ClienteLoginRoute
+  ClienteIndexRoute: typeof ClienteIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -351,13 +352,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContatoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/cliente': {
-      id: '/cliente'
-      path: '/cliente'
-      fullPath: '/cliente'
-      preLoaderRoute: typeof ClienteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -386,6 +380,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cliente/': {
+      id: '/cliente/'
+      path: '/cliente'
+      fullPath: '/cliente/'
+      preLoaderRoute: typeof ClienteIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/': {
       id: '/app/'
       path: '/'
@@ -395,10 +396,10 @@ declare module '@tanstack/react-router' {
     }
     '/cliente/login': {
       id: '/cliente/login'
-      path: '/login'
+      path: '/cliente/login'
       fullPath: '/cliente/login'
       preLoaderRoute: typeof ClienteLoginRouteImport
-      parentRoute: typeof ClienteRoute
+      parentRoute: typeof rootRouteImport
     }
     '/app/usuarios': {
       id: '/app/usuarios'
@@ -512,28 +513,18 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
-interface ClienteRouteChildren {
-  ClienteLoginRoute: typeof ClienteLoginRoute
-}
-
-const ClienteRouteChildren: ClienteRouteChildren = {
-  ClienteLoginRoute: ClienteLoginRoute,
-}
-
-const ClienteRouteWithChildren =
-  ClienteRoute._addFileChildren(ClienteRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AgendamentoRoute: AgendamentoRoute,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
-  ClienteRoute: ClienteRouteWithChildren,
   ContatoRoute: ContatoRoute,
   EspecialidadesRoute: EspecialidadesRoute,
   ProfissionaisRoute: ProfissionaisRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SobreRoute: SobreRoute,
+  ClienteLoginRoute: ClienteLoginRoute,
+  ClienteIndexRoute: ClienteIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
