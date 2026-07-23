@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ProfissionaisRouteImport } from './routes/profissionais'
 import { Route as EspecialidadesRouteImport } from './routes/especialidades'
 import { Route as ContatoRouteImport } from './routes/contato'
@@ -34,6 +35,11 @@ import { Route as AppAgendaRouteImport } from './routes/app.agenda'
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
   path: '/sobre',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfissionaisRoute = ProfissionaisRouteImport.update({
@@ -146,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/contato': typeof ContatoRoute
   '/especialidades': typeof EspecialidadesRoute
   '/profissionais': typeof ProfissionaisRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre': typeof SobreRoute
   '/app/agenda': typeof AppAgendaRoute
   '/app/configuracoes': typeof AppConfiguracoesRoute
@@ -168,6 +175,7 @@ export interface FileRoutesByTo {
   '/contato': typeof ContatoRoute
   '/especialidades': typeof EspecialidadesRoute
   '/profissionais': typeof ProfissionaisRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre': typeof SobreRoute
   '/app/agenda': typeof AppAgendaRoute
   '/app/configuracoes': typeof AppConfiguracoesRoute
@@ -192,6 +200,7 @@ export interface FileRoutesById {
   '/contato': typeof ContatoRoute
   '/especialidades': typeof EspecialidadesRoute
   '/profissionais': typeof ProfissionaisRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre': typeof SobreRoute
   '/app/agenda': typeof AppAgendaRoute
   '/app/configuracoes': typeof AppConfiguracoesRoute
@@ -217,6 +226,7 @@ export interface FileRouteTypes {
     | '/contato'
     | '/especialidades'
     | '/profissionais'
+    | '/sitemap.xml'
     | '/sobre'
     | '/app/agenda'
     | '/app/configuracoes'
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/contato'
     | '/especialidades'
     | '/profissionais'
+    | '/sitemap.xml'
     | '/sobre'
     | '/app/agenda'
     | '/app/configuracoes'
@@ -262,6 +273,7 @@ export interface FileRouteTypes {
     | '/contato'
     | '/especialidades'
     | '/profissionais'
+    | '/sitemap.xml'
     | '/sobre'
     | '/app/agenda'
     | '/app/configuracoes'
@@ -286,6 +298,7 @@ export interface RootRouteChildren {
   ContatoRoute: typeof ContatoRoute
   EspecialidadesRoute: typeof EspecialidadesRoute
   ProfissionaisRoute: typeof ProfissionaisRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SobreRoute: typeof SobreRoute
 }
 
@@ -296,6 +309,13 @@ declare module '@tanstack/react-router' {
       path: '/sobre'
       fullPath: '/sobre'
       preLoaderRoute: typeof SobreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profissionais': {
@@ -482,6 +502,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContatoRoute: ContatoRoute,
   EspecialidadesRoute: EspecialidadesRoute,
   ProfissionaisRoute: ProfissionaisRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SobreRoute: SobreRoute,
 }
 export const routeTree = rootRouteImport

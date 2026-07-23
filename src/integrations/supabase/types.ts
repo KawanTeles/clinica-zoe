@@ -79,6 +79,13 @@ export type Database = {
             referencedRelation: "profissionais"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "agendamentos_profissional_id_fkey"
+            columns: ["profissional_id"]
+            isOneToOne: false
+            referencedRelation: "profissionais_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       especialidades: {
@@ -163,6 +170,13 @@ export type Database = {
             columns: ["profissional_id"]
             isOneToOne: false
             referencedRelation: "profissionais"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financeiro_profissional_id_fkey"
+            columns: ["profissional_id"]
+            isOneToOne: false
+            referencedRelation: "profissionais_public"
             referencedColumns: ["id"]
           },
         ]
@@ -396,6 +410,13 @@ export type Database = {
             referencedRelation: "profissionais"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "profissional_bloqueio_profissional_id_fkey"
+            columns: ["profissional_id"]
+            isOneToOne: false
+            referencedRelation: "profissionais_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       profissional_disponibilidade: {
@@ -429,6 +450,13 @@ export type Database = {
             columns: ["profissional_id"]
             isOneToOne: false
             referencedRelation: "profissionais"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profissional_disponibilidade_profissional_id_fkey"
+            columns: ["profissional_id"]
+            isOneToOne: false
+            referencedRelation: "profissionais_public"
             referencedColumns: ["id"]
           },
         ]
@@ -489,7 +517,53 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      profissionais_public: {
+        Row: {
+          created_at: string | null
+          descricao: string | null
+          duracao_consulta_min: number | null
+          especialidade_id: string | null
+          foto_url: string | null
+          id: string | null
+          nome: string | null
+          status: Database["public"]["Enums"]["profissional_status"] | null
+          valor_consulta_avista: number | null
+          valor_consulta_cartao: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          descricao?: string | null
+          duracao_consulta_min?: number | null
+          especialidade_id?: string | null
+          foto_url?: string | null
+          id?: string | null
+          nome?: string | null
+          status?: Database["public"]["Enums"]["profissional_status"] | null
+          valor_consulta_avista?: number | null
+          valor_consulta_cartao?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          descricao?: string | null
+          duracao_consulta_min?: number | null
+          especialidade_id?: string | null
+          foto_url?: string | null
+          id?: string | null
+          nome?: string | null
+          status?: Database["public"]["Enums"]["profissional_status"] | null
+          valor_consulta_avista?: number | null
+          valor_consulta_cartao?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profissionais_especialidade_id_fkey"
+            columns: ["especialidade_id"]
+            isOneToOne: false
+            referencedRelation: "especialidades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       current_user_has_role: {
