@@ -138,7 +138,7 @@ export function AgendaView({
   }, [data]);
 
   const statusMut = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+    mutationFn: async ({ id, status }: { id: string; status: "PENDENTE" | "APROVADO" | "RECUSADO" | "CANCELADO" | "REMARCADO" | "FINALIZADO" }) => {
       const { error } = await supabase.from("agendamentos").update({ status }).eq("id", id);
       if (error) throw error;
     },
