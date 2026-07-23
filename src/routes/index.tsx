@@ -221,13 +221,13 @@ function ProfissionaisSection() {
   const { data } = useQuery({
     queryKey: ["site-profissionais-destaque"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profissionais_public" as never)
+      const { data, error } = await (supabase as any)
+        .from("profissionais_public")
         .select("id, nome, foto_url, descricao, valor_consulta_avista, especialidade:especialidades(nome)")
         .order("nome")
         .limit(4);
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as any[];
     },
   });
 
