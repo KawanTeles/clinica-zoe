@@ -19,6 +19,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AgendamentoRouteImport } from './routes/agendamento'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ClienteIndexRouteImport } from './routes/cliente.index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as ClienteLoginRouteImport } from './routes/cliente.login'
 import { Route as AppUsuariosRouteImport } from './routes/app.usuarios'
@@ -82,6 +83,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ClienteIndexRoute = ClienteIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ClienteRoute,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
@@ -173,12 +179,12 @@ export interface FileRoutesByFullPath {
   '/app/usuarios': typeof AppUsuariosRoute
   '/cliente/login': typeof ClienteLoginRoute
   '/app/': typeof AppIndexRoute
+  '/cliente/': typeof ClienteIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/agendamento': typeof AgendamentoRoute
   '/auth': typeof AuthRoute
-  '/cliente': typeof ClienteRouteWithChildren
   '/contato': typeof ContatoRoute
   '/especialidades': typeof EspecialidadesRoute
   '/profissionais': typeof ProfissionaisRoute
@@ -197,6 +203,7 @@ export interface FileRoutesByTo {
   '/app/usuarios': typeof AppUsuariosRoute
   '/cliente/login': typeof ClienteLoginRoute
   '/app': typeof AppIndexRoute
+  '/cliente': typeof ClienteIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -223,6 +230,7 @@ export interface FileRoutesById {
   '/app/usuarios': typeof AppUsuariosRoute
   '/cliente/login': typeof ClienteLoginRoute
   '/app/': typeof AppIndexRoute
+  '/cliente/': typeof ClienteIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -250,12 +258,12 @@ export interface FileRouteTypes {
     | '/app/usuarios'
     | '/cliente/login'
     | '/app/'
+    | '/cliente/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/agendamento'
     | '/auth'
-    | '/cliente'
     | '/contato'
     | '/especialidades'
     | '/profissionais'
@@ -274,6 +282,7 @@ export interface FileRouteTypes {
     | '/app/usuarios'
     | '/cliente/login'
     | '/app'
+    | '/cliente'
   id:
     | '__root__'
     | '/'
@@ -299,6 +308,7 @@ export interface FileRouteTypes {
     | '/app/usuarios'
     | '/cliente/login'
     | '/app/'
+    | '/cliente/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -385,6 +395,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/cliente/': {
+      id: '/cliente/'
+      path: '/'
+      fullPath: '/cliente/'
+      preLoaderRoute: typeof ClienteIndexRouteImport
+      parentRoute: typeof ClienteRoute
     }
     '/app/': {
       id: '/app/'
@@ -514,10 +531,12 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface ClienteRouteChildren {
   ClienteLoginRoute: typeof ClienteLoginRoute
+  ClienteIndexRoute: typeof ClienteIndexRoute
 }
 
 const ClienteRouteChildren: ClienteRouteChildren = {
   ClienteLoginRoute: ClienteLoginRoute,
+  ClienteIndexRoute: ClienteIndexRoute,
 }
 
 const ClienteRouteWithChildren =
