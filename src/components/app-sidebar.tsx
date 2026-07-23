@@ -38,7 +38,7 @@ const items: Item[] = [
   { title: "Notificações", url: "/app/notificacoes", icon: Bell, roles: ["RECEPCIONISTA"] },
   { title: "Minha Agenda", url: "/app/minha-agenda", icon: CalendarDays, roles: ["PROFISSIONAL"] },
   { title: "Meus Pacientes", url: "/app/meus-pacientes", icon: Users, roles: ["PROFISSIONAL"] },
-  { title: "Solicitações", url: "/app/solicitacoes", icon: ClipboardList, roles: ["PROFISSIONAL"] },
+  { title: "Solicitações", url: "/app/solicitacoes", icon: ClipboardList, roles: ["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"] },
   { title: "Meu Perfil", url: "/app/meu-perfil", icon: UserCircle2, roles: ["PROFISSIONAL"] },
 ];
 
