@@ -69,7 +69,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
           </nav>
 
           <div className="ml-auto flex items-center gap-2 md:ml-2">
-            <Link to={session ? "/cliente" : "/auth"} className="hidden sm:inline-flex">
+            <Link to={session ? "/cliente" : "/cliente/login"} className="hidden sm:inline-flex">
               <Button variant="ghost" size="sm">
                 {session ? "Área do Cliente" : "Entrar"}
               </Button>
