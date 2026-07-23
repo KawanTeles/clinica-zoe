@@ -49,12 +49,17 @@ export const Route = createFileRoute("/cliente")({
 });
 
 function ClientePage() {
-  const { session, loading, user, nome, signOut } = useAuth();
+  const { session, loading, user, nome, signOut, hasAnyRole } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && !session) navigate({ to: "/auth" });
-  }, [loading, session, navigate]);
+    if (loading) return;
+    if (!session) {
+      navigate({ to: "/cliente/login" });
+    } else if (hasAnyRole(["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"])) {
+      navigate({ to: "/app" });
+    }
+  }, [loading, session, hasAnyRole, navigate]);
 
   if (loading || !session || !user) {
     return (
