@@ -27,13 +27,16 @@ const passSchema = z.string().min(6, "Senha deve ter no mínimo 6 caracteres").m
 const nomeSchema = z.string().trim().min(2, "Informe o nome").max(120);
 
 function AuthPage() {
-  const { session, loading } = useAuth();
+  const { session, loading, hasAnyRole } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<"login" | "signup">("login");
 
   useEffect(() => {
-    if (!loading && session) navigate({ to: "/app" });
-  }, [loading, session, navigate]);
+    if (!loading && session) {
+      const staff = hasAnyRole(["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"]);
+      navigate({ to: staff ? "/app" : "/cliente" });
+    }
+  }, [loading, session, hasAnyRole, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-surface-muted to-secondary px-4 py-10">
