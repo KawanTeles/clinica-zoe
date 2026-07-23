@@ -28,12 +28,15 @@ export const Route = createFileRoute("/app")({
 });
 
 function AppLayout() {
-  const { loading, session, nome, roles, signOut } = useAuth();
+  const { loading, session, nome, roles, hasAnyRole, signOut } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!loading && !session) navigate({ to: "/auth" });
-  }, [loading, session, navigate]);
+    else if (!loading && session && roles.length && !hasAnyRole(["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"])) {
+      navigate({ to: "/cliente" });
+    }
+  }, [loading, session, roles, hasAnyRole, navigate]);
 
   if (loading || !session) {
     return (
