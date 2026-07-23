@@ -465,6 +465,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      resolve_valor_consulta: {
+        Args: { _forma_pagamento: string; _profissional_id: string }
+        Returns: number
+      }
     }
     Enums: {
       agendamento_status:

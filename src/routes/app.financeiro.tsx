@@ -86,6 +86,11 @@ function brl(n: number) {
   return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+function valorLancamento(row: any) {
+  const valorCongelado = row?.agendamento?.valor;
+  return valorCongelado == null ? Number(row?.valor ?? 0) : Number(valorCongelado) || 0;
+}
+
 function FinanceiroPage() {
   const { loading, user, hasRole, hasAnyRole } = useAuth();
   const navigate = useNavigate();
@@ -135,7 +140,7 @@ function FinanceiroPage() {
       let q = supabase
         .from("financeiro")
         .select(
-          "id, valor, status_pagamento, forma_pagamento, pago_em, created_at, agendamento:agendamentos(id, data, hora_inicio, hora_fim, especialidade_id), paciente:pacientes(id, nome), profissional:profissionais(id, nome, especialidade_id, especialidade:especialidades(id, nome))",
+          "id, valor, status_pagamento, forma_pagamento, pago_em, created_at, agendamento:agendamentos(id, data, hora_inicio, hora_fim, especialidade_id, valor), paciente:pacientes(id, nome), profissional:profissionais(id, nome, especialidade_id, especialidade:especialidades(id, nome))",
         )
         .order("created_at", { ascending: false });
       if (status !== "TODOS") q = q.eq("status_pagamento", status as any);
@@ -192,7 +197,7 @@ function FinanceiroPage() {
     const hoje = todayISO();
     const mesRef = firstDayOfMonthISO().slice(0, 7);
     for (const r of rows ?? []) {
-      const v = Number((r as any).valor) || 0;
+      const v = valorLancamento(r);
       const s = (r as any).status_pagamento;
       const pagoEm = (r as any).pago_em ? String((r as any).pago_em).slice(0, 10) : null;
       if (s === "PAGO") {
@@ -215,7 +220,7 @@ function FinanceiroPage() {
     const porProf = new Map<string, { nome: string; pago: number; aberto: number; qtd: number }>();
     const porEsp = new Map<string, { nome: string; pago: number; aberto: number; qtd: number }>();
     for (const r of rows ?? []) {
-      const v = Number((r as any).valor) || 0;
+      const v = valorLancamento(r);
       const s = (r as any).status_pagamento;
       const prof = (r as any).profissional;
       const esp = (r as any).profissional?.especialidade;
@@ -396,7 +401,7 @@ function FinanceiroPage() {
                       <DollarSign className="h-5 w-5" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold">{brl(Number(r.valor) || 0)}</p>
+                      <p className="text-sm font-semibold">{brl(valorLancamento(r))}</p>
                       <p className="text-xs text-muted-foreground">
                         {r.forma_pagamento ? FORMA_LABEL[r.forma_pagamento] ?? r.forma_pagamento : "Forma não definida"}
                       </p>

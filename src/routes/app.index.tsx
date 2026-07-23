@@ -5,6 +5,11 @@ import { useAuth } from "@/lib/auth-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarDays, Users, Stethoscope, DollarSign, Clock } from "lucide-react";
 
+function valorLancamento(row: any) {
+  const valorCongelado = row?.agendamento?.valor;
+  return valorCongelado == null ? Number(row?.valor ?? 0) : Number(valorCongelado) || 0;
+}
+
 export const Route = createFileRoute("/app/")({
   head: () => ({
     meta: [
@@ -32,9 +37,9 @@ function Dashboard() {
         supabase.from("pacientes").select("id", { count: "exact", head: true }),
         supabase.from("agendamentos").select("id", { count: "exact", head: true }).eq("data", today),
         supabase.from("agendamentos").select("id", { count: "exact", head: true }).eq("status", "PENDENTE"),
-        supabase.from("financeiro").select("valor").eq("status_pagamento", "ABERTO"),
+        supabase.from("financeiro").select("valor, agendamento:agendamentos(valor)").eq("status_pagamento", "ABERTO"),
       ]);
-      const totalAberto = (finAberto.data ?? []).reduce((s, r: any) => s + Number(r.valor ?? 0), 0);
+      const totalAberto = (finAberto.data ?? []).reduce((s, r: any) => s + valorLancamento(r), 0);
       return {
         profissionais: profs.count ?? 0,
         pacientes: pacs.count ?? 0,
