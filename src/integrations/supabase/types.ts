@@ -516,6 +516,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      horarios_disponiveis: {
+        Args: { p_data: string; p_profissional_id: string }
+        Returns: {
+          hora_fim: string
+          hora_inicio: string
+        }[]
+      }
       resolve_valor_consulta: {
         Args: { _forma_pagamento: string; _profissional_id: string }
         Returns: number
