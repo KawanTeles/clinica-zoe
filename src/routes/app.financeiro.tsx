@@ -159,7 +159,7 @@ function FinanceiroPage() {
       });
       if (especialidadeId !== "TODAS") {
         list = list.filter(
-          (r: any) => r.agendamento?.especialidade_id === especialidadeId || r.profissional?.especialidade_id === especialidadeId,
+          (r: any) => r.profissional?.especialidade_id === especialidadeId,
         );
       }
       return list;
