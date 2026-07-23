@@ -97,9 +97,10 @@ export const processarFilaNotificacoes = createServerFn({ method: "POST" })
       .order("created_at", { ascending: true })
       .limit(data.limit);
     if (error) throw new Error(error.message);
-    const results = [];
+    const results: Array<{ id: string; ok: boolean; error?: string; providerId?: string }> = [];
     for (const row of pend ?? []) {
-      results.push({ id: row.id, ...(await processOne(row.id)) });
+      const r = await processOne(row.id);
+      results.push({ id: row.id, ok: r.ok, error: r.error, providerId: r.providerId });
     }
     return { processed: results.length, results };
   });
