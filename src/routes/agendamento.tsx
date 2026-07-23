@@ -74,11 +74,12 @@ function AgendamentoPage() {
   useEffect(() => {
     if (!loading && !session) {
       navigate({
-        to: "/auth",
+        to: "/cliente/login",
         search: { redirect: "/agendamento" } as any,
       });
     }
   }, [loading, session, navigate]);
+
 
   const { data: especialidades } = useQuery({
     queryKey: ["site-agendamento-esp"],
