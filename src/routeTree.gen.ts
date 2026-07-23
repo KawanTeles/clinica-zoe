@@ -30,6 +30,7 @@ import { Route as AppMeuPerfilRouteImport } from './routes/app.meu-perfil'
 import { Route as AppFinanceiroRouteImport } from './routes/app.financeiro'
 import { Route as AppConfiguracoesRouteImport } from './routes/app.configuracoes'
 import { Route as AppAgendaRouteImport } from './routes/app.agenda'
+import { Route as ApiSitemapDotxmlRouteImport } from './routes/api/sitemap[.]xml'
 
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
@@ -136,6 +137,11 @@ const AppAgendaRoute = AppAgendaRouteImport.update({
   path: '/agenda',
   getParentRoute: () => AppRoute,
 } as any)
+const ApiSitemapDotxmlRoute = ApiSitemapDotxmlRouteImport.update({
+  id: '/api/sitemap.xml',
+  path: '/api/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -147,6 +153,7 @@ export interface FileRoutesByFullPath {
   '/especialidades': typeof EspecialidadesRoute
   '/profissionais': typeof ProfissionaisRoute
   '/sobre': typeof SobreRoute
+  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/app/agenda': typeof AppAgendaRoute
   '/app/configuracoes': typeof AppConfiguracoesRoute
   '/app/financeiro': typeof AppFinanceiroRoute
@@ -169,6 +176,7 @@ export interface FileRoutesByTo {
   '/especialidades': typeof EspecialidadesRoute
   '/profissionais': typeof ProfissionaisRoute
   '/sobre': typeof SobreRoute
+  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/app/agenda': typeof AppAgendaRoute
   '/app/configuracoes': typeof AppConfiguracoesRoute
   '/app/financeiro': typeof AppFinanceiroRoute
@@ -193,6 +201,7 @@ export interface FileRoutesById {
   '/especialidades': typeof EspecialidadesRoute
   '/profissionais': typeof ProfissionaisRoute
   '/sobre': typeof SobreRoute
+  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/app/agenda': typeof AppAgendaRoute
   '/app/configuracoes': typeof AppConfiguracoesRoute
   '/app/financeiro': typeof AppFinanceiroRoute
@@ -218,6 +227,7 @@ export interface FileRouteTypes {
     | '/especialidades'
     | '/profissionais'
     | '/sobre'
+    | '/api/sitemap.xml'
     | '/app/agenda'
     | '/app/configuracoes'
     | '/app/financeiro'
@@ -240,6 +250,7 @@ export interface FileRouteTypes {
     | '/especialidades'
     | '/profissionais'
     | '/sobre'
+    | '/api/sitemap.xml'
     | '/app/agenda'
     | '/app/configuracoes'
     | '/app/financeiro'
@@ -263,6 +274,7 @@ export interface FileRouteTypes {
     | '/especialidades'
     | '/profissionais'
     | '/sobre'
+    | '/api/sitemap.xml'
     | '/app/agenda'
     | '/app/configuracoes'
     | '/app/financeiro'
@@ -287,6 +299,7 @@ export interface RootRouteChildren {
   EspecialidadesRoute: typeof EspecialidadesRoute
   ProfissionaisRoute: typeof ProfissionaisRoute
   SobreRoute: typeof SobreRoute
+  ApiSitemapDotxmlRoute: typeof ApiSitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -438,6 +451,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAgendaRouteImport
       parentRoute: typeof AppRoute
     }
+    '/api/sitemap.xml': {
+      id: '/api/sitemap.xml'
+      path: '/api/sitemap.xml'
+      fullPath: '/api/sitemap.xml'
+      preLoaderRoute: typeof ApiSitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -483,6 +503,7 @@ const rootRouteChildren: RootRouteChildren = {
   EspecialidadesRoute: EspecialidadesRoute,
   ProfissionaisRoute: ProfissionaisRoute,
   SobreRoute: SobreRoute,
+  ApiSitemapDotxmlRoute: ApiSitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

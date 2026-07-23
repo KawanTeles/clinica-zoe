@@ -19,7 +19,7 @@ const entries: SitemapEntry[] = [
   { path: "/contato", changefreq: "monthly", priority: "0.6" },
 ];
 
-export const Route = createFileRoute("/api/sitemap.xml")({
+export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
