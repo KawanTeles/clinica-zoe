@@ -54,9 +54,10 @@ function ClienteLoginPage() {
             <p className="text-xs font-semibold uppercase tracking-widest text-primary">Bem-vindo(a)</p>
             <h1 className="mt-2 text-2xl font-bold tracking-tight">Área do Paciente</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Acompanhe suas consultas, remarque e cuide da sua saúde em um só lugar.
+              Entre ou crie sua conta para agendar consultas e acompanhar em tempo real se foram <span className="font-medium text-foreground">confirmadas</span> ou <span className="font-medium text-foreground">recusadas</span>.
             </p>
           </div>
+
 
           <Tabs value={tab} onValueChange={(v) => setTab(v as "login" | "signup")}>
             <TabsList className="grid w-full grid-cols-2">
