@@ -222,9 +222,8 @@ function ProfissionaisSection() {
     queryKey: ["site-profissionais-destaque"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("profissionais")
+        .from("profissionais_public" as never)
         .select("id, nome, foto_url, descricao, valor_consulta_avista, especialidade:especialidades(nome)")
-        .eq("status", "ATIVO")
         .order("nome")
         .limit(4);
       if (error) throw error;

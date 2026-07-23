@@ -27,11 +27,10 @@ function ProfissionaisPublicos() {
     queryKey: ["site-profissionais-all"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("profissionais")
+        .from("profissionais_public" as never)
         .select(
           "id, nome, foto_url, descricao, valor_consulta_avista, valor_consulta_cartao, especialidade:especialidades(nome)",
         )
-        .eq("status", "ATIVO")
         .order("nome");
       if (error) throw error;
       return data ?? [];

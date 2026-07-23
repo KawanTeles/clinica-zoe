@@ -96,11 +96,10 @@ function AgendamentoPage() {
     queryKey: ["site-agendamento-prof", especialidadeId],
     queryFn: async () => {
       let q = supabase
-        .from("profissionais")
+        .from("profissionais_public" as never)
         .select(
           "id, nome, duracao_consulta_min, valor_consulta_avista, valor_consulta_cartao, especialidade_id, especialidade:especialidades(nome)",
         )
-        .eq("status", "ATIVO")
         .order("nome");
       if (especialidadeId) q = q.eq("especialidade_id", especialidadeId);
       const { data, error } = await q;
