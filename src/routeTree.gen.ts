@@ -20,6 +20,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as AgendamentoRouteImport } from './routes/agendamento'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as ClienteLoginRouteImport } from './routes/cliente.login'
 import { Route as AppUsuariosRouteImport } from './routes/app.usuarios'
 import { Route as AppSolicitacoesRouteImport } from './routes/app.solicitacoes'
 import { Route as AppProfissionaisRouteImport } from './routes/app.profissionais'
@@ -87,6 +88,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const ClienteLoginRoute = ClienteLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => ClienteRoute,
+} as any)
 const AppUsuariosRoute = AppUsuariosRouteImport.update({
   id: '/usuarios',
   path: '/usuarios',
@@ -148,7 +154,7 @@ export interface FileRoutesByFullPath {
   '/agendamento': typeof AgendamentoRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
-  '/cliente': typeof ClienteRoute
+  '/cliente': typeof ClienteRouteWithChildren
   '/contato': typeof ContatoRoute
   '/especialidades': typeof EspecialidadesRoute
   '/profissionais': typeof ProfissionaisRoute
@@ -165,13 +171,14 @@ export interface FileRoutesByFullPath {
   '/app/profissionais': typeof AppProfissionaisRoute
   '/app/solicitacoes': typeof AppSolicitacoesRoute
   '/app/usuarios': typeof AppUsuariosRoute
+  '/cliente/login': typeof ClienteLoginRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/agendamento': typeof AgendamentoRoute
   '/auth': typeof AuthRoute
-  '/cliente': typeof ClienteRoute
+  '/cliente': typeof ClienteRouteWithChildren
   '/contato': typeof ContatoRoute
   '/especialidades': typeof EspecialidadesRoute
   '/profissionais': typeof ProfissionaisRoute
@@ -188,6 +195,7 @@ export interface FileRoutesByTo {
   '/app/profissionais': typeof AppProfissionaisRoute
   '/app/solicitacoes': typeof AppSolicitacoesRoute
   '/app/usuarios': typeof AppUsuariosRoute
+  '/cliente/login': typeof ClienteLoginRoute
   '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
@@ -196,7 +204,7 @@ export interface FileRoutesById {
   '/agendamento': typeof AgendamentoRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
-  '/cliente': typeof ClienteRoute
+  '/cliente': typeof ClienteRouteWithChildren
   '/contato': typeof ContatoRoute
   '/especialidades': typeof EspecialidadesRoute
   '/profissionais': typeof ProfissionaisRoute
@@ -213,6 +221,7 @@ export interface FileRoutesById {
   '/app/profissionais': typeof AppProfissionaisRoute
   '/app/solicitacoes': typeof AppSolicitacoesRoute
   '/app/usuarios': typeof AppUsuariosRoute
+  '/cliente/login': typeof ClienteLoginRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
@@ -239,6 +248,7 @@ export interface FileRouteTypes {
     | '/app/profissionais'
     | '/app/solicitacoes'
     | '/app/usuarios'
+    | '/cliente/login'
     | '/app/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/app/profissionais'
     | '/app/solicitacoes'
     | '/app/usuarios'
+    | '/cliente/login'
     | '/app'
   id:
     | '__root__'
@@ -286,6 +297,7 @@ export interface FileRouteTypes {
     | '/app/profissionais'
     | '/app/solicitacoes'
     | '/app/usuarios'
+    | '/cliente/login'
     | '/app/'
   fileRoutesById: FileRoutesById
 }
@@ -294,7 +306,7 @@ export interface RootRouteChildren {
   AgendamentoRoute: typeof AgendamentoRoute
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
-  ClienteRoute: typeof ClienteRoute
+  ClienteRoute: typeof ClienteRouteWithChildren
   ContatoRoute: typeof ContatoRoute
   EspecialidadesRoute: typeof EspecialidadesRoute
   ProfissionaisRoute: typeof ProfissionaisRoute
@@ -380,6 +392,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/'
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/cliente/login': {
+      id: '/cliente/login'
+      path: '/login'
+      fullPath: '/cliente/login'
+      preLoaderRoute: typeof ClienteLoginRouteImport
+      parentRoute: typeof ClienteRoute
     }
     '/app/usuarios': {
       id: '/app/usuarios'
@@ -493,12 +512,23 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface ClienteRouteChildren {
+  ClienteLoginRoute: typeof ClienteLoginRoute
+}
+
+const ClienteRouteChildren: ClienteRouteChildren = {
+  ClienteLoginRoute: ClienteLoginRoute,
+}
+
+const ClienteRouteWithChildren =
+  ClienteRoute._addFileChildren(ClienteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AgendamentoRoute: AgendamentoRoute,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
-  ClienteRoute: ClienteRoute,
+  ClienteRoute: ClienteRouteWithChildren,
   ContatoRoute: ContatoRoute,
   EspecialidadesRoute: EspecialidadesRoute,
   ProfissionaisRoute: ProfissionaisRoute,
