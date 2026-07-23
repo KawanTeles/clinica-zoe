@@ -140,7 +140,7 @@ function FinanceiroPage() {
       let q = supabase
         .from("financeiro")
         .select(
-          "id, valor, status_pagamento, forma_pagamento, pago_em, created_at, agendamento:agendamentos(id, data, hora_inicio, hora_fim, especialidade_id, valor), paciente:pacientes(id, nome), profissional:profissionais(id, nome, especialidade_id, especialidade:especialidades(id, nome))",
+          "id, valor, status_pagamento, forma_pagamento, pago_em, created_at, agendamento:agendamentos(id, data, hora_inicio, hora_fim, valor), paciente:pacientes(id, nome), profissional:profissionais(id, nome, especialidade_id, especialidade:especialidades(id, nome))",
         )
         .order("created_at", { ascending: false });
       if (status !== "TODOS") q = q.eq("status_pagamento", status as any);
