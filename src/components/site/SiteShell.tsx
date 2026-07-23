@@ -102,7 +102,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
                 </Link>
               ))}
               <div className="mt-2 flex gap-2">
-                <Link to={session ? "/cliente" : "/auth"} className="flex-1">
+                <Link to={session ? "/cliente" : "/cliente/login"} className="flex-1">
                   <Button variant="outline" className="w-full">
                     {session ? "Área do Cliente" : "Entrar"}
                   </Button>
