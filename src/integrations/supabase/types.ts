@@ -169,33 +169,71 @@ export type Database = {
       }
       notificacoes: {
         Row: {
+          agendamento_id: string | null
+          canal: Database["public"]["Enums"]["notif_canal"]
           created_at: string
+          destinatario_email: string | null
+          destinatario_telefone: string | null
+          enviado_em: string | null
+          evento: Database["public"]["Enums"]["notif_evento"] | null
           id: string
           lida: boolean
           mensagem: string
+          status_envio: Database["public"]["Enums"]["notif_status_envio"]
+          tentativas: number
           tipo: string
           titulo: string
+          ultimo_erro: string | null
+          updated_at: string
           usuario_id: string
         }
         Insert: {
+          agendamento_id?: string | null
+          canal?: Database["public"]["Enums"]["notif_canal"]
           created_at?: string
+          destinatario_email?: string | null
+          destinatario_telefone?: string | null
+          enviado_em?: string | null
+          evento?: Database["public"]["Enums"]["notif_evento"] | null
           id?: string
           lida?: boolean
           mensagem: string
+          status_envio?: Database["public"]["Enums"]["notif_status_envio"]
+          tentativas?: number
           tipo?: string
           titulo: string
+          ultimo_erro?: string | null
+          updated_at?: string
           usuario_id: string
         }
         Update: {
+          agendamento_id?: string | null
+          canal?: Database["public"]["Enums"]["notif_canal"]
           created_at?: string
+          destinatario_email?: string | null
+          destinatario_telefone?: string | null
+          enviado_em?: string | null
+          evento?: Database["public"]["Enums"]["notif_evento"] | null
           id?: string
           lida?: boolean
           mensagem?: string
+          status_envio?: Database["public"]["Enums"]["notif_status_envio"]
+          tentativas?: number
           tipo?: string
           titulo?: string
+          ultimo_erro?: string | null
+          updated_at?: string
           usuario_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "notificacoes_agendamento_id_fkey"
+            columns: ["agendamento_id"]
+            isOneToOne: false
+            referencedRelation: "agendamentos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pacientes: {
         Row: {
@@ -458,6 +496,19 @@ export type Database = {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: boolean
       }
+      enqueue_notificacao: {
+        Args: {
+          _agendamento_id?: string
+          _canal?: Database["public"]["Enums"]["notif_canal"]
+          _email?: string
+          _evento: Database["public"]["Enums"]["notif_evento"]
+          _mensagem: string
+          _telefone?: string
+          _titulo: string
+          _usuario_id: string
+        }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -486,6 +537,21 @@ export type Database = {
         | "CARTAO_DEBITO"
         | "CARTAO_CREDITO"
         | "OUTRO"
+      notif_canal: "WHATSAPP" | "EMAIL" | "INTERNO"
+      notif_evento:
+        | "SOLICITACAO_NOVA"
+        | "CONSULTA_APROVADA"
+        | "CONSULTA_RECUSADA"
+        | "CONSULTA_CANCELADA"
+        | "CONSULTA_REMARCADA"
+        | "LEMBRETE_24H"
+        | "PAGAMENTO_CONFIRMADO"
+      notif_status_envio:
+        | "PENDENTE"
+        | "ENVIANDO"
+        | "ENVIADA"
+        | "ERRO"
+        | "CANCELADA"
       profissional_status: "ATIVO" | "INATIVO"
       wa_status: "PENDENTE" | "ENVIADO" | "FALHOU"
     }
@@ -631,6 +697,23 @@ export const Constants = {
         "CARTAO_DEBITO",
         "CARTAO_CREDITO",
         "OUTRO",
+      ],
+      notif_canal: ["WHATSAPP", "EMAIL", "INTERNO"],
+      notif_evento: [
+        "SOLICITACAO_NOVA",
+        "CONSULTA_APROVADA",
+        "CONSULTA_RECUSADA",
+        "CONSULTA_CANCELADA",
+        "CONSULTA_REMARCADA",
+        "LEMBRETE_24H",
+        "PAGAMENTO_CONFIRMADO",
+      ],
+      notif_status_envio: [
+        "PENDENTE",
+        "ENVIANDO",
+        "ENVIADA",
+        "ERRO",
+        "CANCELADA",
       ],
       profissional_status: ["ATIVO", "INATIVO"],
       wa_status: ["PENDENTE", "ENVIADO", "FALHOU"],
