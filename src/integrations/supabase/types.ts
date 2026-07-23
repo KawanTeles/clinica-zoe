@@ -322,6 +322,79 @@ export type Database = {
           },
         ]
       }
+      profissional_bloqueio: {
+        Row: {
+          created_at: string
+          data: string
+          hora_fim: string
+          hora_inicio: string
+          id: string
+          motivo: string | null
+          profissional_id: string
+        }
+        Insert: {
+          created_at?: string
+          data: string
+          hora_fim: string
+          hora_inicio: string
+          id?: string
+          motivo?: string | null
+          profissional_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          hora_fim?: string
+          hora_inicio?: string
+          id?: string
+          motivo?: string | null
+          profissional_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profissional_bloqueio_profissional_id_fkey"
+            columns: ["profissional_id"]
+            isOneToOne: false
+            referencedRelation: "profissionais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profissional_disponibilidade: {
+        Row: {
+          created_at: string
+          dia_semana: number
+          hora_fim: string
+          hora_inicio: string
+          id: string
+          profissional_id: string
+        }
+        Insert: {
+          created_at?: string
+          dia_semana: number
+          hora_fim: string
+          hora_inicio: string
+          id?: string
+          profissional_id: string
+        }
+        Update: {
+          created_at?: string
+          dia_semana?: number
+          hora_fim?: string
+          hora_inicio?: string
+          id?: string
+          profissional_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profissional_disponibilidade_profissional_id_fkey"
+            columns: ["profissional_id"]
+            isOneToOne: false
+            referencedRelation: "profissionais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
