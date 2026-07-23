@@ -100,9 +100,14 @@ function Hero() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <Link to="/auth">
+            <Link to="/cliente/login">
               <Button size="lg" variant="outline" className="rounded-full px-6">
-                Entrar
+                Entrar na área do cliente
+              </Button>
+            </Link>
+            <Link to="/auth">
+              <Button size="lg" variant="ghost" className="rounded-full px-6">
+                Entrar na equipe
               </Button>
             </Link>
           </div>
