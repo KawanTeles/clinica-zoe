@@ -79,7 +79,8 @@ export const reenviarNotificacao = createServerFn({ method: "POST" })
   .inputValidator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
-    return processOne(data.id);
+    const r = await processOne(data.id);
+    return { ok: r.ok, error: r.error, providerId: r.providerId };
   });
 
 export const processarFilaNotificacoes = createServerFn({ method: "POST" })
