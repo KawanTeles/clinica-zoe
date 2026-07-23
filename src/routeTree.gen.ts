@@ -9,38 +9,224 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppUsuariosRouteImport } from './routes/app.usuarios'
+import { Route as AppSolicitacoesRouteImport } from './routes/app.solicitacoes'
+import { Route as AppProfissionaisRouteImport } from './routes/app.profissionais'
+import { Route as AppPacientesRouteImport } from './routes/app.pacientes'
+import { Route as AppNotificacoesRouteImport } from './routes/app.notificacoes'
+import { Route as AppMinhaAgendaRouteImport } from './routes/app.minha-agenda'
+import { Route as AppMeusPacientesRouteImport } from './routes/app.meus-pacientes'
+import { Route as AppMeuPerfilRouteImport } from './routes/app.meu-perfil'
+import { Route as AppFinanceiroRouteImport } from './routes/app.financeiro'
+import { Route as AppConfiguracoesRouteImport } from './routes/app.configuracoes'
+import { Route as AppAgendaRouteImport } from './routes/app.agenda'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppUsuariosRoute = AppUsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSolicitacoesRoute = AppSolicitacoesRouteImport.update({
+  id: '/solicitacoes',
+  path: '/solicitacoes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfissionaisRoute = AppProfissionaisRouteImport.update({
+  id: '/profissionais',
+  path: '/profissionais',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPacientesRoute = AppPacientesRouteImport.update({
+  id: '/pacientes',
+  path: '/pacientes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNotificacoesRoute = AppNotificacoesRouteImport.update({
+  id: '/notificacoes',
+  path: '/notificacoes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMinhaAgendaRoute = AppMinhaAgendaRouteImport.update({
+  id: '/minha-agenda',
+  path: '/minha-agenda',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMeusPacientesRoute = AppMeusPacientesRouteImport.update({
+  id: '/meus-pacientes',
+  path: '/meus-pacientes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMeuPerfilRoute = AppMeuPerfilRouteImport.update({
+  id: '/meu-perfil',
+  path: '/meu-perfil',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFinanceiroRoute = AppFinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppConfiguracoesRoute = AppConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAgendaRoute = AppAgendaRouteImport.update({
+  id: '/agenda',
+  path: '/agenda',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/app/agenda': typeof AppAgendaRoute
+  '/app/configuracoes': typeof AppConfiguracoesRoute
+  '/app/financeiro': typeof AppFinanceiroRoute
+  '/app/meu-perfil': typeof AppMeuPerfilRoute
+  '/app/meus-pacientes': typeof AppMeusPacientesRoute
+  '/app/minha-agenda': typeof AppMinhaAgendaRoute
+  '/app/notificacoes': typeof AppNotificacoesRoute
+  '/app/pacientes': typeof AppPacientesRoute
+  '/app/profissionais': typeof AppProfissionaisRoute
+  '/app/solicitacoes': typeof AppSolicitacoesRoute
+  '/app/usuarios': typeof AppUsuariosRoute
+  '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/app/agenda': typeof AppAgendaRoute
+  '/app/configuracoes': typeof AppConfiguracoesRoute
+  '/app/financeiro': typeof AppFinanceiroRoute
+  '/app/meu-perfil': typeof AppMeuPerfilRoute
+  '/app/meus-pacientes': typeof AppMeusPacientesRoute
+  '/app/minha-agenda': typeof AppMinhaAgendaRoute
+  '/app/notificacoes': typeof AppNotificacoesRoute
+  '/app/pacientes': typeof AppPacientesRoute
+  '/app/profissionais': typeof AppProfissionaisRoute
+  '/app/solicitacoes': typeof AppSolicitacoesRoute
+  '/app/usuarios': typeof AppUsuariosRoute
+  '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/app/agenda': typeof AppAgendaRoute
+  '/app/configuracoes': typeof AppConfiguracoesRoute
+  '/app/financeiro': typeof AppFinanceiroRoute
+  '/app/meu-perfil': typeof AppMeuPerfilRoute
+  '/app/meus-pacientes': typeof AppMeusPacientesRoute
+  '/app/minha-agenda': typeof AppMinhaAgendaRoute
+  '/app/notificacoes': typeof AppNotificacoesRoute
+  '/app/pacientes': typeof AppPacientesRoute
+  '/app/profissionais': typeof AppProfissionaisRoute
+  '/app/solicitacoes': typeof AppSolicitacoesRoute
+  '/app/usuarios': typeof AppUsuariosRoute
+  '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/auth'
+    | '/app/agenda'
+    | '/app/configuracoes'
+    | '/app/financeiro'
+    | '/app/meu-perfil'
+    | '/app/meus-pacientes'
+    | '/app/minha-agenda'
+    | '/app/notificacoes'
+    | '/app/pacientes'
+    | '/app/profissionais'
+    | '/app/solicitacoes'
+    | '/app/usuarios'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/app/agenda'
+    | '/app/configuracoes'
+    | '/app/financeiro'
+    | '/app/meu-perfil'
+    | '/app/meus-pacientes'
+    | '/app/minha-agenda'
+    | '/app/notificacoes'
+    | '/app/pacientes'
+    | '/app/profissionais'
+    | '/app/solicitacoes'
+    | '/app/usuarios'
+    | '/app'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/auth'
+    | '/app/agenda'
+    | '/app/configuracoes'
+    | '/app/financeiro'
+    | '/app/meu-perfil'
+    | '/app/meus-pacientes'
+    | '/app/minha-agenda'
+    | '/app/notificacoes'
+    | '/app/pacientes'
+    | '/app/profissionais'
+    | '/app/solicitacoes'
+    | '/app/usuarios'
+    | '/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +234,130 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/usuarios': {
+      id: '/app/usuarios'
+      path: '/usuarios'
+      fullPath: '/app/usuarios'
+      preLoaderRoute: typeof AppUsuariosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/solicitacoes': {
+      id: '/app/solicitacoes'
+      path: '/solicitacoes'
+      fullPath: '/app/solicitacoes'
+      preLoaderRoute: typeof AppSolicitacoesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/profissionais': {
+      id: '/app/profissionais'
+      path: '/profissionais'
+      fullPath: '/app/profissionais'
+      preLoaderRoute: typeof AppProfissionaisRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/pacientes': {
+      id: '/app/pacientes'
+      path: '/pacientes'
+      fullPath: '/app/pacientes'
+      preLoaderRoute: typeof AppPacientesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/notificacoes': {
+      id: '/app/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/app/notificacoes'
+      preLoaderRoute: typeof AppNotificacoesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/minha-agenda': {
+      id: '/app/minha-agenda'
+      path: '/minha-agenda'
+      fullPath: '/app/minha-agenda'
+      preLoaderRoute: typeof AppMinhaAgendaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/meus-pacientes': {
+      id: '/app/meus-pacientes'
+      path: '/meus-pacientes'
+      fullPath: '/app/meus-pacientes'
+      preLoaderRoute: typeof AppMeusPacientesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/meu-perfil': {
+      id: '/app/meu-perfil'
+      path: '/meu-perfil'
+      fullPath: '/app/meu-perfil'
+      preLoaderRoute: typeof AppMeuPerfilRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/financeiro': {
+      id: '/app/financeiro'
+      path: '/financeiro'
+      fullPath: '/app/financeiro'
+      preLoaderRoute: typeof AppFinanceiroRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/configuracoes': {
+      id: '/app/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/app/configuracoes'
+      preLoaderRoute: typeof AppConfiguracoesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/agenda': {
+      id: '/app/agenda'
+      path: '/agenda'
+      fullPath: '/app/agenda'
+      preLoaderRoute: typeof AppAgendaRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppAgendaRoute: typeof AppAgendaRoute
+  AppConfiguracoesRoute: typeof AppConfiguracoesRoute
+  AppFinanceiroRoute: typeof AppFinanceiroRoute
+  AppMeuPerfilRoute: typeof AppMeuPerfilRoute
+  AppMeusPacientesRoute: typeof AppMeusPacientesRoute
+  AppMinhaAgendaRoute: typeof AppMinhaAgendaRoute
+  AppNotificacoesRoute: typeof AppNotificacoesRoute
+  AppPacientesRoute: typeof AppPacientesRoute
+  AppProfissionaisRoute: typeof AppProfissionaisRoute
+  AppSolicitacoesRoute: typeof AppSolicitacoesRoute
+  AppUsuariosRoute: typeof AppUsuariosRoute
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAgendaRoute: AppAgendaRoute,
+  AppConfiguracoesRoute: AppConfiguracoesRoute,
+  AppFinanceiroRoute: AppFinanceiroRoute,
+  AppMeuPerfilRoute: AppMeuPerfilRoute,
+  AppMeusPacientesRoute: AppMeusPacientesRoute,
+  AppMinhaAgendaRoute: AppMinhaAgendaRoute,
+  AppNotificacoesRoute: AppNotificacoesRoute,
+  AppPacientesRoute: AppPacientesRoute,
+  AppProfissionaisRoute: AppProfissionaisRoute,
+  AppSolicitacoesRoute: AppSolicitacoesRoute,
+  AppUsuariosRoute: AppUsuariosRoute,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
