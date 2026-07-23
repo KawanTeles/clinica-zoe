@@ -34,14 +34,22 @@ const nomeSchema = z.string().trim().min(2, "Informe o nome").max(120);
 function ClienteLoginPage() {
   const { session, loading, hasAnyRole } = useAuth();
   const navigate = useNavigate();
+  const { redirect } = Route.useSearch();
   const [tab, setTab] = useState<"login" | "signup">("login");
 
   useEffect(() => {
     if (!loading && session) {
       const staff = hasAnyRole(["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"]);
-      navigate({ to: staff ? "/app" : "/cliente" });
+      if (staff) {
+        navigate({ to: "/app" });
+      } else if (redirect && redirect.startsWith("/") && !redirect.startsWith("//")) {
+        navigate({ to: redirect });
+      } else {
+        navigate({ to: "/cliente" });
+      }
     }
-  }, [loading, session, hasAnyRole, navigate]);
+  }, [loading, session, hasAnyRole, navigate, redirect]);
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-secondary via-background to-surface-muted px-4 py-10">
