@@ -11,6 +11,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { HeartPulse, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/cliente/login")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Área do Paciente — Clínica Zoe" },
@@ -22,6 +25,7 @@ export const Route = createFileRoute("/cliente/login")({
   }),
   component: ClienteLoginPage,
 });
+
 
 const emailSchema = z.string().trim().email("Email inválido").max(255);
 const passSchema = z.string().min(6, "Senha deve ter no mínimo 6 caracteres").max(100);
