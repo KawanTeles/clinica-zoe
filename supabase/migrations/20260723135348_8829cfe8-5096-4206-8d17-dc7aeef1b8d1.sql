@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.horarios_disponiveis(uuid, date) TO anon, authenticated;
