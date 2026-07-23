@@ -43,7 +43,7 @@ function ClienteLoginPage() {
       if (staff) {
         navigate({ to: "/app" });
       } else if (redirect && redirect.startsWith("/") && !redirect.startsWith("//")) {
-        navigate({ to: redirect });
+        navigate({ to: redirect as any });
       } else {
         navigate({ to: "/cliente" });
       }
