@@ -28,10 +28,10 @@ export const Route = createFileRoute("/")({
         content:
           "Clínica Zoe: agenda inteligente, profissionais qualificados e uma experiência clínica premium. Agende sua consulta em minutos.",
       },
-      { property: "og:title", content: "Clínica Zoe — Cuidado clínico premium" },
+      { property: "og:title", content: "Clínica Zoe — Painel Administrativo" },
       {
         property: "og:description",
-        content: "Agende sua consulta e conheça nossos profissionais e especialidades.",
+        content: "Clínica Zoe: agenda inteligente, profissionais qualificados e uma experiência clínica premium. Agende sua consulta em minutos.",
       },
       { property: "og:type", content: "website" },
     ],
