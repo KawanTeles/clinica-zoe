@@ -32,7 +32,7 @@ const items: Item[] = [
   { title: "Profissionais", url: "/app/profissionais", icon: Stethoscope, roles: ["ADMIN"] },
   { title: "Pacientes", url: "/app/pacientes", icon: Users, roles: ["ADMIN", "RECEPCIONISTA"] },
   { title: "Agenda", url: "/app/agenda", icon: CalendarDays, roles: ["ADMIN", "RECEPCIONISTA"] },
-  { title: "Financeiro", url: "/app/financeiro", icon: DollarSign, roles: ["ADMIN"] },
+  { title: "Financeiro", url: "/app/financeiro", icon: DollarSign, roles: ["ADMIN", "PROFISSIONAL"] },
   { title: "Usuários", url: "/app/usuarios", icon: UserCog, roles: ["ADMIN"] },
   { title: "Configurações", url: "/app/configuracoes", icon: Settings, roles: ["ADMIN"] },
   { title: "Notificações", url: "/app/notificacoes", icon: Bell, roles: ["RECEPCIONISTA"] },
