@@ -35,7 +35,7 @@ const items: Item[] = [
   { title: "Financeiro", url: "/app/financeiro", icon: DollarSign, roles: ["ADMIN", "PROFISSIONAL"] },
   { title: "Usuários", url: "/app/usuarios", icon: UserCog, roles: ["ADMIN"] },
   { title: "Configurações", url: "/app/configuracoes", icon: Settings, roles: ["ADMIN"] },
-  { title: "Notificações", url: "/app/notificacoes", icon: Bell, roles: ["RECEPCIONISTA"] },
+  { title: "Notificações", url: "/app/notificacoes", icon: Bell, roles: ["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"] },
   { title: "Minha Agenda", url: "/app/minha-agenda", icon: CalendarDays, roles: ["PROFISSIONAL"] },
   { title: "Meus Pacientes", url: "/app/meus-pacientes", icon: Users, roles: ["PROFISSIONAL"] },
   { title: "Solicitações", url: "/app/solicitacoes", icon: ClipboardList, roles: ["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"] },
