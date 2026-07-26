@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { Menu, X, Sparkles, MapPin, Phone, Mail, LayoutDashboard, LogOut } from "lucide-react";
+import { Menu, X, Sparkles, MapPin, Phone, Mail, LayoutDashboard, LogOut, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { useClinicSettings, whatsappHref } from "@/lib/clinic-settings";
@@ -146,11 +146,20 @@ export function SiteShell({ children }: { children: ReactNode }) {
               </Button>
             )}
 
-            <Link to="/agendamento" className="hidden sm:inline-flex">
-              <Button size="sm" className="rounded-full px-4 shadow-soft">
-                Agendar consulta
-              </Button>
-            </Link>
+            {mode === "client" ? (
+              <Link to="/cliente" className="hidden sm:inline-flex">
+                <Button size="sm" className="rounded-full px-4 shadow-soft">
+                  <UserRound className="h-4 w-4" /> Minha Área
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/agendamento" className="hidden sm:inline-flex">
+                <Button size="sm" className="rounded-full px-4 shadow-soft">
+                  Agendar consulta
+                </Button>
+              </Link>
+            )}
+
             <button
               className="grid h-10 w-10 place-items-center rounded-lg text-foreground md:hidden"
               onClick={() => setOpen((v) => !v)}
@@ -201,9 +210,18 @@ export function SiteShell({ children }: { children: ReactNode }) {
                     <LogOut className="h-4 w-4" /> Sair
                   </Button>
                 )}
-                <Link to="/agendamento">
-                  <Button className="w-full rounded-full">Agendar consulta</Button>
-                </Link>
+                {mode === "client" ? (
+                  <Link to="/cliente">
+                    <Button className="w-full justify-center gap-2 rounded-full">
+                      <UserRound className="h-4 w-4" /> Minha Área
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link to="/agendamento">
+                    <Button className="w-full rounded-full">Agendar consulta</Button>
+                  </Link>
+                )}
+
               </div>
 
             </div>
