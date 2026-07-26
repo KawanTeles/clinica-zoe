@@ -59,11 +59,19 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  --color-cta: var(--cta);
+  --color-cta-foreground: var(--cta-foreground);
+
   --shadow-elegant: 0 10px 30px -12px oklch(0.35 0.05 180 / 0.18);
   --shadow-soft: 0 2px 8px -2px oklch(0.35 0.05 180 / 0.08);
   --gradient-primary: linear-gradient(135deg, oklch(0.58 0.08 185), oklch(0.68 0.10 180));
   --gradient-surface: linear-gradient(180deg, oklch(0.99 0.005 180), oklch(0.985 0.008 180));
 }
+
+@utility bg-cta-gradient {
+  background-image: var(--gradient-cta);
+}
+
 
 :root {
   --radius: 0.875rem;
