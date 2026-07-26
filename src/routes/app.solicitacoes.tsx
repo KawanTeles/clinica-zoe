@@ -17,6 +17,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarDays, CheckCircle2, XCircle, Loader2, Clock, User, Stethoscope, CreditCard } from "lucide-react";
 import { STATUS_COLOR, STATUS_LABEL, fmtHora } from "@/lib/agenda-utils";
+import { PersonAvatar } from "@/lib/avatar";
 
 export const Route = createFileRoute("/app/solicitacoes")({
   head: () => ({

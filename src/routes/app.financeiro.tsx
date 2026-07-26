@@ -40,6 +40,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { fmtHora } from "@/lib/agenda-utils";
+import { PersonAvatar } from "@/lib/avatar";
 
 export const Route = createFileRoute("/app/financeiro")({
   head: () => ({

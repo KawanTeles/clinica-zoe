@@ -49,6 +49,7 @@ import {
   fmtHora,
   todayISO,
 } from "@/lib/agenda-utils";
+import { PersonAvatar } from "@/lib/avatar";
 
 type Props = {
   /** Escopo do profissional: quando definido, trava a agenda ao próprio profissional (view PROFISSIONAL) */
