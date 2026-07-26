@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteShell, Reveal } from "@/components/site/SiteShell";
 import { Button } from "@/components/ui/button";
-import { CLINIC_INFO, directionsHref, mapsEmbedUrl, whatsappHref } from "@/lib/clinic-info";
+import { useClinicSettings, directionsHref, mapsEmbedUrl, whatsappHref } from "@/lib/clinic-settings";
 import { MapPin, Phone, Mail, Clock, Navigation, MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/contato")({
@@ -22,6 +22,7 @@ export const Route = createFileRoute("/contato")({
 });
 
 function ContatoPage() {
+  const { settings } = useClinicSettings();
   return (
     <SiteShell>
       <section className="border-b border-border bg-linear-to-br from-secondary via-background to-surface-muted py-20">
@@ -44,26 +45,26 @@ function ContatoPage() {
         <div className="mx-auto grid max-w-6xl gap-6 px-4 sm:px-6 lg:grid-cols-2">
           <Reveal>
             <div className="space-y-5 rounded-2xl border border-border bg-surface p-6 shadow-soft">
-              <Row icon={MapPin} label="Endereço" value={CLINIC_INFO.endereco} />
-              <Row icon={Phone} label="Telefone" value={CLINIC_INFO.telefone} />
+              <Row icon={MapPin} label="Endereço" value={settings.endereco} />
+              <Row icon={Phone} label="Telefone" value={settings.telefone} />
               <Row
                 icon={MessageCircle}
                 label="WhatsApp"
-                value={CLINIC_INFO.whatsapp}
-                href={whatsappHref()}
+                value={settings.whatsapp}
+                href={whatsappHref(settings, )}
               />
               <Row
                 icon={Mail}
                 label="Email"
-                value={CLINIC_INFO.email}
-                href={`mailto:${CLINIC_INFO.email}`}
+                value={settings.email}
+                href={`mailto:${settings.email}`}
               />
               <div className="rounded-xl bg-secondary/60 p-4">
                 <div className="flex items-center gap-2 text-sm font-semibold text-primary-dark">
                   <Clock className="h-4 w-4" /> Horários
                 </div>
                 <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-                  {CLINIC_INFO.horarios.map((h) => (
+                  {settings.horarios.map((h) => (
                     <li key={h.dias} className="flex justify-between">
                       <span>{h.dias}</span>
                       <span className="font-medium text-foreground">{h.horario}</span>
@@ -72,7 +73,7 @@ function ContatoPage() {
                 </ul>
               </div>
               <div className="flex flex-wrap gap-2 pt-2">
-                <a href={directionsHref()} target="_blank" rel="noreferrer">
+                <a href={directionsHref(settings)} target="_blank" rel="noreferrer">
                   <Button className="rounded-full">
                     <Navigation className="mr-2 h-4 w-4" /> Como chegar
                   </Button>
@@ -87,7 +88,7 @@ function ContatoPage() {
             <div className="overflow-hidden rounded-2xl border border-border shadow-soft">
               <iframe
                 title="Localização da Clínica Zoe"
-                src={mapsEmbedUrl()}
+                src={mapsEmbedUrl(settings)}
                 loading="lazy"
                 className="h-[460px] w-full"
               />
