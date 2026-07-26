@@ -146,11 +146,20 @@ export function SiteShell({ children }: { children: ReactNode }) {
               </Button>
             )}
 
-            <Link to="/agendamento" className="hidden sm:inline-flex">
-              <Button size="sm" className="rounded-full px-4 shadow-soft">
-                Agendar consulta
-              </Button>
-            </Link>
+            {mode === "client" ? (
+              <Link to="/cliente" className="hidden sm:inline-flex">
+                <Button size="sm" className="rounded-full px-4 shadow-soft">
+                  <UserRound className="h-4 w-4" /> Minha Área
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/agendamento" className="hidden sm:inline-flex">
+                <Button size="sm" className="rounded-full px-4 shadow-soft">
+                  Agendar consulta
+                </Button>
+              </Link>
+            )}
+
             <button
               className="grid h-10 w-10 place-items-center rounded-lg text-foreground md:hidden"
               onClick={() => setOpen((v) => !v)}
