@@ -39,15 +39,16 @@ export function SiteShell({ children }: { children: ReactNode }) {
             : "bg-transparent",
         )}
       >
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-primary-foreground shadow-soft">
+        <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6 md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+          <Link to="/" className="flex min-w-0 items-center gap-2">
+            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-soft">
               <Sparkles className="h-5 w-5" />
             </div>
-            <span className="text-base font-semibold tracking-tight">{CLINIC_INFO.nome}</span>
+            <span className="truncate text-base font-semibold tracking-tight">{CLINIC_INFO.nome}</span>
           </Link>
 
-          <nav className="ml-auto hidden items-center gap-1 md:flex">
+          <nav className="hidden items-center justify-center gap-1 md:flex">
+
             {NAV.map((item) => {
               const active =
                 item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
