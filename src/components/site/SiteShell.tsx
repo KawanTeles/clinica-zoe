@@ -117,19 +117,40 @@ export function SiteShell({ children }: { children: ReactNode }) {
 
           <div className="ml-auto flex items-center gap-2 md:ml-0 md:justify-self-end">
             <ThemeToggle />
-            {hasStaffSession && (
+
+            {mode === "staff" && (
               // navegação entre áreas usa carregamento completo (sessões isoladas)
               <a href={staffTo} className="hidden sm:inline-flex">
-                <Button variant="ghost" size="sm" className="gap-1.5">
-                  <ShieldCheck className="h-4 w-4 text-primary" /> Painel da equipe
+                <Button variant="outline" size="sm" className={softButton}>
+                  <LayoutDashboard className="h-4 w-4 text-primary" /> Painel da Equipe
                 </Button>
               </a>
             )}
-            <Link to={areaTo} className="hidden sm:inline-flex">
-              <Button variant="ghost" size="sm">
-                {areaLabel}
+            {mode === "client" && (
+              <Link to="/cliente" className="hidden sm:inline-flex">
+                <Button variant="outline" size="sm" className={softButton}>
+                  <UserRound className="h-4 w-4 text-primary" /> Minha Área
+                </Button>
+              </Link>
+            )}
+            {mode === "guest" && (
+              <Link to="/cliente/login" className="hidden sm:inline-flex">
+                <Button variant="ghost" size="sm" className="rounded-full px-3.5">
+                  Entrar
+                </Button>
+              </Link>
+            )}
+            {mode !== "guest" && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="hidden gap-1.5 rounded-full px-3.5 text-muted-foreground hover:text-foreground sm:inline-flex"
+                onClick={() => (mode === "staff" ? signOutStaff() : signOut())}
+              >
+                <LogOut className="h-4 w-4" /> Sair
               </Button>
-            </Link>
+            )}
+
             <Link to="/agendamento" className="hidden sm:inline-flex">
               <Button size="sm" className="rounded-full px-4 shadow-soft">
                 Agendar consulta
@@ -143,6 +164,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
+
         </div>
 
         {open && (
