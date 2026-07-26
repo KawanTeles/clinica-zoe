@@ -75,6 +75,7 @@ function CountBadge({ count, tone }: { count: number; tone: NonNullable<Item["ba
 
 export function AppSidebar() {
   const { roles } = useAuth();
+  const badges = useSidebarBadges();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const visible = items.filter((i) => i.roles.some((r) => roles.includes(r)));
 
@@ -99,17 +100,23 @@ export function AppSidebar() {
               {visible.map((item) => {
                 const active =
                   item.url === "/app" ? pathname === "/app" : pathname === item.url || pathname.startsWith(item.url + "/");
+                const count = item.badge ? badges[item.badge] : 0;
                 return (
-                  <SidebarMenuItem key={item.url}>
-                    <SidebarMenuButton asChild isActive={active}>
+                  <SidebarMenuItem key={item.url} className="relative">
+                    <SidebarMenuButton asChild isActive={active} tooltip={count > 0 ? `${item.title} (${count})` : item.title}>
                       <Link to={item.url} className="flex items-center gap-2">
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
+                        <item.icon className="h-4 w-4 shrink-0" />
+                        <span className="truncate">{item.title}</span>
+                        {count > 0 && <CountBadge count={count} tone={item.badgeTone ?? "danger"} />}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
               })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
