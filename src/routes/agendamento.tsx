@@ -219,7 +219,7 @@ function AgendamentoPage() {
 
   return (
     <SiteShell>
-      <section className="border-b border-border bg-gradient-to-br from-secondary via-background to-surface-muted py-14">
+      <section className="border-b border-border bg-linear-to-br from-secondary via-background to-surface-muted py-14">
         <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
           <Reveal>
             <p className="text-xs font-semibold uppercase tracking-widest text-primary">Agendamento</p>

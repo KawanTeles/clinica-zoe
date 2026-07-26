@@ -60,7 +60,7 @@ function Hero() {
     <section className="relative overflow-hidden">
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-gradient-to-br from-secondary via-background to-surface-muted"
+        className="absolute inset-0 -z-10 bg-linear-to-br from-secondary via-background to-surface-muted"
       />
       <div
         aria-hidden
@@ -81,7 +81,7 @@ function Hero() {
         <Reveal delay={80}>
           <h1 className="mt-6 max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
             Sua saúde merece um{" "}
-            <span className="bg-gradient-to-r from-primary via-primary-light to-primary-dark bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-primary via-primary-light to-primary-dark bg-clip-text text-transparent">
               cuidado premium
             </span>
           </h1>
@@ -503,7 +503,7 @@ function CTAFinal() {
     <section className="relative overflow-hidden border-t border-border">
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-gradient-to-br from-primary via-primary-light to-primary-dark opacity-95"
+        className="absolute inset-0 -z-10 bg-linear-to-br from-primary via-primary-light to-primary-dark opacity-95"
       />
       <div className="mx-auto max-w-5xl px-4 py-20 text-center sm:px-6">
         <Reveal>

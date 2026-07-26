@@ -24,7 +24,7 @@ export const Route = createFileRoute("/contato")({
 function ContatoPage() {
   return (
     <SiteShell>
-      <section className="border-b border-border bg-gradient-to-br from-secondary via-background to-surface-muted py-20">
+      <section className="border-b border-border bg-linear-to-br from-secondary via-background to-surface-muted py-20">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
           <Reveal>
             <p className="text-xs font-semibold uppercase tracking-widest text-primary">Contato</p>
