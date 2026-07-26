@@ -527,7 +527,7 @@ function CTAFinal() {
               <Button
                 size="lg"
                 variant="outline"
-                className="rounded-full border-white/60 bg-transparent px-6 text-primary-foreground hover:bg-white/10"
+                className="rounded-full border-primary-foreground/60 bg-transparent px-6 text-primary-foreground hover:bg-primary-foreground/10"
               >
                 Falar no WhatsApp
               </Button>

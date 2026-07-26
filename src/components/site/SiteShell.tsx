@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { CLINIC_INFO, whatsappHref } from "@/lib/clinic-info";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const NAV = [
   { to: "/", label: "Início" },
@@ -69,6 +70,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
           </nav>
 
           <div className="ml-auto flex items-center gap-2 md:ml-2">
+            <ThemeToggle />
             <Link to={session ? "/cliente" : "/cliente/login"} className="hidden sm:inline-flex">
               <Button variant="ghost" size="sm">
                 {session ? "Área do Cliente" : "Entrar"}
@@ -101,6 +103,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
                   {item.label}
                 </Link>
               ))}
+              <ThemeToggle showLabel className="justify-start px-3" />
               <div className="mt-2 flex gap-2">
                 <Link to={session ? "/cliente" : "/cliente/login"} className="flex-1">
                   <Button variant="outline" className="w-full">
