@@ -53,14 +53,17 @@ function AppLayout() {
             <SidebarTrigger />
             <div className="ml-auto flex items-center gap-2 sm:gap-3">
               <Button
+                asChild
                 variant="outline"
                 size="sm"
                 className="gap-2"
-                onClick={() => navigate({ to: "/" })}
               >
-                <Globe className="h-4 w-4" />
-                <span className="hidden sm:inline">Ver Site</span>
+                <a href="/">
+                  <Globe className="h-4 w-4" />
+                  <span className="hidden sm:inline">Ver Site</span>
+                </a>
               </Button>
+
               <ThemeToggle />
               <span className="hidden text-xs font-medium text-muted-foreground sm:inline">
                 {primaryRole}
