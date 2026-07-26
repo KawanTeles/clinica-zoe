@@ -1,10 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { Menu, X, Sparkles, MapPin, Phone, Mail } from "lucide-react";
+import { Menu, X, Sparkles, MapPin, Phone, Mail, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { useClinicSettings, whatsappHref } from "@/lib/clinic-settings";
 import { useAvatarUrl } from "@/lib/avatar";
+import { useStaffSession } from "@/lib/staff-session";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -61,6 +62,8 @@ export function SiteShell({ children }: { children: ReactNode }) {
   // O site público pertence à sessão do paciente (isolada da sessão da equipe).
   const areaTo = ready && session ? "/cliente" : "/cliente/login";
   const areaLabel = ready && session ? "Minha Área" : "Entrar";
+  const { hasStaffSession } = useStaffSession();
+  const staffTo = hasStaffSession ? "/app" : "/auth";
 
 
   return (
@@ -104,6 +107,13 @@ export function SiteShell({ children }: { children: ReactNode }) {
 
           <div className="ml-auto flex items-center gap-2 md:ml-0 md:justify-self-end">
             <ThemeToggle />
+            {hasStaffSession && (
+              <Link to={staffTo} className="hidden sm:inline-flex">
+                <Button variant="ghost" size="sm" className="gap-1.5">
+                  <ShieldCheck className="h-4 w-4 text-primary" /> Painel da equipe
+                </Button>
+              </Link>
+            )}
             <Link to={areaTo} className="hidden sm:inline-flex">
               <Button variant="ghost" size="sm">
                 {areaLabel}
@@ -137,6 +147,14 @@ export function SiteShell({ children }: { children: ReactNode }) {
                 </Link>
               ))}
               <ThemeToggle showLabel className="justify-start px-3" />
+              {hasStaffSession && (
+                <Link
+                  to={staffTo}
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-primary hover:bg-secondary"
+                >
+                  <ShieldCheck className="h-4 w-4" /> Painel da equipe
+                </Link>
+              )}
               <div className="mt-2 flex gap-2">
                 <Link to={areaTo} className="flex-1">
                   <Button variant="outline" className="w-full">
@@ -188,6 +206,11 @@ export function SiteShell({ children }: { children: ReactNode }) {
                   <Link to={n.to} className="hover:text-foreground">{n.label}</Link>
                 </li>
               ))}
+              <li>
+                <Link to={staffTo} className="hover:text-foreground">
+                  Acesso da equipe
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
