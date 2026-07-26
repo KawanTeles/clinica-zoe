@@ -175,7 +175,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
         </div>
 
         {open && (
-          <div className="border-t border-border bg-background/95 backdrop-blur md:hidden">
+          <div className="border-t border-border bg-background/95 backdrop-blur lg:hidden">
             <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-3">
               {NAV.map((item) => (
                 <Link
