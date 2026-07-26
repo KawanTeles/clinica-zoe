@@ -75,7 +75,7 @@ function SolicitacoesPage() {
       let q = supabase
         .from("agendamentos")
         .select(
-          "id, data, hora_inicio, hora_fim, status, valor, forma_pagamento, observacoes, profissional_id, paciente:pacientes(id,nome,telefone), profissional:profissionais(id,nome,especialidade:especialidades(nome))",
+          "id, data, hora_inicio, hora_fim, status, valor, forma_pagamento, observacoes, profissional_id, paciente:pacientes(id,nome,telefone,foto_url), profissional:profissionais(id,nome,foto_url,especialidade:especialidades(nome))",
         )
         .order("data", { ascending: true })
         .order("hora_inicio", { ascending: true });

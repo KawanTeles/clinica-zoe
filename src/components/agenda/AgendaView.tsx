@@ -95,7 +95,7 @@ export function AgendaView({
       let q = supabase
         .from("agendamentos")
         .select(
-          "id, data, hora_inicio, hora_fim, status, valor, forma_pagamento, observacoes, paciente:pacientes(id,nome,telefone), profissional:profissionais(id,nome,especialidade:especialidades(nome))",
+          "id, data, hora_inicio, hora_fim, status, valor, forma_pagamento, observacoes, paciente:pacientes(id,nome,telefone,foto_url), profissional:profissionais(id,nome,foto_url,especialidade:especialidades(nome))",
         )
         .eq("data", data)
         .order("hora_inicio");

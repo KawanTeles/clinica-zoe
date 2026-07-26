@@ -140,7 +140,7 @@ function ConsultasSection({ userId }: { userId: string }) {
       const { data, error } = await supabase
         .from("agendamentos")
         .select(
-          "id, data, hora_inicio, hora_fim, status, valor, forma_pagamento, observacoes, profissional:profissionais(id, nome, duracao_consulta_min, especialidade:especialidades(nome))",
+          "id, data, hora_inicio, hora_fim, status, valor, forma_pagamento, observacoes, profissional:profissionais(id, nome, foto_url, duracao_consulta_min, especialidade:especialidades(nome))",
         )
         .eq("cliente_user_id", userId)
         .order("data", { ascending: false })
