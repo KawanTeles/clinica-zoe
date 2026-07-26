@@ -506,7 +506,17 @@ function PerfilSection({ userId }: { userId: string }) {
 
   return (
     <div className="max-w-xl space-y-4 rounded-2xl border border-border bg-surface p-6 shadow-soft">
+      <div className="flex justify-center border-b border-border pb-6">
+        <AvatarUploader
+          bucket="clientes"
+          value={data?.prof?.foto_url ?? data?.pac?.foto_url ?? null}
+          onChange={salvarFoto}
+          nome={nome || data?.prof?.nome}
+          size="xl"
+        />
+      </div>
       <div className="space-y-2">
+
         <Label>Nome</Label>
         <Input value={nome} onChange={(e) => setNome(e.target.value)} />
       </div>
