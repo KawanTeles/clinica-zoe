@@ -100,11 +100,12 @@ function ClienteLoginPage() {
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          É colaborador(a) da clínica?{" "}
-          <Link to="/auth" className="font-medium text-primary hover:underline">
-            Acessar painel da equipe
+          Precisa de ajuda?{" "}
+          <Link to="/contato" className="font-medium text-primary hover:underline">
+            Fale com a clínica
           </Link>
         </p>
+
       </div>
     </div>
   );
