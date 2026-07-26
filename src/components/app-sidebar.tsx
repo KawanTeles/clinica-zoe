@@ -24,26 +24,58 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useAuth, type AppRole } from "@/lib/auth-context";
+import { useSidebarBadges, type SidebarBadges } from "@/lib/sidebar-badges";
+import { cn } from "@/lib/utils";
 
-type Item = { title: string; url: string; icon: React.ComponentType<{ className?: string }>; roles: AppRole[] };
+type BadgeKey = keyof SidebarBadges;
+type Item = {
+  title: string;
+  url: string;
+  icon: React.ComponentType<{ className?: string }>;
+  roles: AppRole[];
+  badge?: BadgeKey;
+  badgeTone?: "danger" | "warning" | "primary";
+};
 
 const items: Item[] = [
   { title: "Dashboard", url: "/app", icon: LayoutDashboard, roles: ["ADMIN"] },
   { title: "Profissionais", url: "/app/profissionais", icon: Stethoscope, roles: ["ADMIN"] },
   { title: "Pacientes", url: "/app/pacientes", icon: Users, roles: ["ADMIN", "RECEPCIONISTA"] },
-  { title: "Agenda", url: "/app/agenda", icon: CalendarDays, roles: ["ADMIN", "RECEPCIONISTA"] },
-  { title: "Financeiro", url: "/app/financeiro", icon: DollarSign, roles: ["ADMIN", "PROFISSIONAL"] },
+  { title: "Agenda", url: "/app/agenda", icon: CalendarDays, roles: ["ADMIN", "RECEPCIONISTA"], badge: "agenda", badgeTone: "primary" },
+  { title: "Financeiro", url: "/app/financeiro", icon: DollarSign, roles: ["ADMIN", "PROFISSIONAL"], badge: "financeiro", badgeTone: "warning" },
   { title: "Usuários", url: "/app/usuarios", icon: UserCog, roles: ["ADMIN"] },
   { title: "Configurações", url: "/app/configuracoes", icon: Settings, roles: ["ADMIN"] },
-  { title: "Notificações", url: "/app/notificacoes", icon: Bell, roles: ["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"] },
-  { title: "Minha Agenda", url: "/app/minha-agenda", icon: CalendarDays, roles: ["PROFISSIONAL"] },
+  { title: "Notificações", url: "/app/notificacoes", icon: Bell, roles: ["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"], badge: "notificacoes", badgeTone: "danger" },
+  { title: "Minha Agenda", url: "/app/minha-agenda", icon: CalendarDays, roles: ["PROFISSIONAL"], badge: "agenda", badgeTone: "primary" },
   { title: "Meus Pacientes", url: "/app/meus-pacientes", icon: Users, roles: ["PROFISSIONAL"] },
-  { title: "Solicitações", url: "/app/solicitacoes", icon: ClipboardList, roles: ["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"] },
+  { title: "Solicitações", url: "/app/solicitacoes", icon: ClipboardList, roles: ["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"], badge: "solicitacoes", badgeTone: "danger" },
   { title: "Meu Perfil", url: "/app/meu-perfil", icon: UserCircle2, roles: ["PROFISSIONAL"] },
 ];
 
+const TONE: Record<NonNullable<Item["badgeTone"]>, string> = {
+  danger: "bg-[hsl(0_84%_60%)] text-white",
+  warning: "bg-[hsl(38_92%_50%)] text-black/80",
+  primary: "bg-primary text-primary-foreground",
+};
+
+function CountBadge({ count, tone }: { count: number; tone: NonNullable<Item["badgeTone"]> }) {
+  return (
+    <span
+      aria-label={`${count} pendente(s)`}
+      className={cn(
+        "ml-auto grid h-5 min-w-[1.25rem] shrink-0 animate-scale-in place-items-center rounded-full px-1.5 text-[11px] font-semibold leading-none tabular-nums shadow-sm ring-2 ring-sidebar/60 transition-transform group-data-[collapsible=icon]:absolute group-data-[collapsible=icon]:right-1 group-data-[collapsible=icon]:top-1 group-data-[collapsible=icon]:h-2.5 group-data-[collapsible=icon]:min-w-0 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:text-[0px]",
+        TONE[tone],
+      )}
+    >
+      {count > 99 ? "99+" : count}
+    </span>
+  );
+}
+
+
 export function AppSidebar() {
   const { roles } = useAuth();
+  const badges = useSidebarBadges();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const visible = items.filter((i) => i.roles.some((r) => roles.includes(r)));
 
@@ -68,12 +100,14 @@ export function AppSidebar() {
               {visible.map((item) => {
                 const active =
                   item.url === "/app" ? pathname === "/app" : pathname === item.url || pathname.startsWith(item.url + "/");
+                const count = item.badge ? badges[item.badge] : 0;
                 return (
-                  <SidebarMenuItem key={item.url}>
-                    <SidebarMenuButton asChild isActive={active}>
+                  <SidebarMenuItem key={item.url} className="relative">
+                    <SidebarMenuButton asChild isActive={active} tooltip={count > 0 ? `${item.title} (${count})` : item.title}>
                       <Link to={item.url} className="flex items-center gap-2">
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
+                        <item.icon className="h-4 w-4 shrink-0" />
+                        <span className="truncate">{item.title}</span>
+                        {count > 0 && <CountBadge count={count} tone={item.badgeTone ?? "danger"} />}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
