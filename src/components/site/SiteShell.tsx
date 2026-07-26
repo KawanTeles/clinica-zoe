@@ -45,7 +45,7 @@ function ClinicLogo({ logoUrl, nome }: { logoUrl: string | null; nome: string })
 
 export function SiteShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { session, hasAnyRole } = useAuth();
+  const { session, ready, isStaff: staffRole } = useAuth();
   const { settings } = useClinicSettings();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
