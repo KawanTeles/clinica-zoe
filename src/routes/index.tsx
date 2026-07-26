@@ -534,9 +534,6 @@ function CTAFinal() {
             </a>
           </div>
         </Reveal>
-
-          </div>
-        </Reveal>
       </div>
     </section>
   );
