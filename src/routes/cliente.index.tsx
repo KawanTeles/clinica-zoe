@@ -198,8 +198,9 @@ function ConsultasSection({ userId }: { userId: string }) {
                   <p className="text-xs font-medium uppercase tracking-wide text-primary">
                     {ag.profissional?.especialidade?.nome ?? "Consulta"}
                   </p>
-                  <p className="mt-1 truncate text-base font-semibold">
-                    {ag.profissional?.nome}
+                  <p className="mt-1 flex items-center gap-2 truncate text-base font-semibold">
+                    <PersonAvatar size="sm" nome={ag.profissional?.nome} fotoUrl={ag.profissional?.foto_url} />
+                    <span className="truncate">{ag.profissional?.nome}</span>
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {new Date(ag.data + "T00:00:00").toLocaleDateString("pt-BR", {

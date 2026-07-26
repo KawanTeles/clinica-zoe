@@ -186,8 +186,8 @@ function SolicitacoesPage() {
 
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="flex items-center gap-1 text-sm font-medium">
-                        <User className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="flex items-center gap-2 text-sm font-medium">
+                        <PersonAvatar size="xs" nome={a.paciente?.nome} fotoUrl={a.paciente?.foto_url} />
                         {a.paciente?.nome ?? "Sem paciente"}
                       </span>
                       <Badge variant="outline" className={STATUS_COLOR[a.status]}>
@@ -196,7 +196,7 @@ function SolicitacoesPage() {
                     </div>
                     <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
-                        <Stethoscope className="h-3 w-3" />
+                        <PersonAvatar size="xs" nome={a.profissional?.nome} fotoUrl={a.profissional?.foto_url} className="h-5 w-5 text-[8px]" />
                         {a.profissional?.nome} • {a.profissional?.especialidade?.nome ?? "—"}
                       </span>
                       {a.valor != null && (

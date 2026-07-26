@@ -272,8 +272,9 @@ export function AgendaView({
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="truncate font-medium">
-                        {a.paciente?.nome ?? "Sem paciente"}
+                      <p className="flex min-w-0 items-center gap-2 truncate font-medium">
+                        <PersonAvatar size="xs" nome={a.paciente?.nome} fotoUrl={a.paciente?.foto_url} />
+                        <span className="truncate">{a.paciente?.nome ?? "Sem paciente"}</span>
                       </p>
                       <Badge variant="outline" className={STATUS_COLOR[a.status]}>
                         {STATUS_LABEL[a.status]}

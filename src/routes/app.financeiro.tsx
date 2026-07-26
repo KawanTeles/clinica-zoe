@@ -410,8 +410,8 @@ function FinanceiroPage() {
 
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="flex items-center gap-1 text-sm font-medium">
-                        <User className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="flex items-center gap-2 text-sm font-medium">
+                        <PersonAvatar size="xs" nome={r.paciente?.nome} fotoUrl={r.paciente?.foto_url} />
                         {r.paciente?.nome ?? "Sem paciente"}
                       </span>
                       <Badge variant="outline" className={STATUS_COLOR[r.status_pagamento]}>
