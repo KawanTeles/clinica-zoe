@@ -60,7 +60,8 @@ function ClientePage() {
     if (!session) {
       navigate({ to: "/cliente/login", replace: true });
     } else if (isStaff) {
-      navigate({ to: "/app", replace: true });
+      // Sessão de equipe nunca abre a Área do Cliente: envia para autenticação de paciente
+      navigate({ to: "/cliente/login", replace: true });
     }
   }, [ready, session, isStaff, navigate]);
 
