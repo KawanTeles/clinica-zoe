@@ -538,8 +538,3 @@ function CTAFinal() {
     </section>
   );
 }
-
-      </div>
-    </section>
-  );
-}
