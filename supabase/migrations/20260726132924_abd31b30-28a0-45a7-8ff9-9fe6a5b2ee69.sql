@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.seed_disponibilidade_padrao() FROM PUBLIC, anon, authenticated;
