@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { Menu, X, Sparkles, MapPin, Phone, Mail, LayoutDashboard, LogOut, UserRound } from "lucide-react";
+import { Menu, X, Sparkles, MapPin, Phone, Mail, LayoutDashboard, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { useClinicSettings, whatsappHref } from "@/lib/clinic-settings";
@@ -128,13 +128,6 @@ export function SiteShell({ children }: { children: ReactNode }) {
                 </Button>
               </a>
             )}
-            {mode === "client" && (
-              <Link to="/cliente" className="hidden sm:inline-flex">
-                <Button variant="outline" size="sm" className={softButton}>
-                  <UserRound className="h-4 w-4 text-primary" /> Minha Área
-                </Button>
-              </Link>
-            )}
             {mode === "guest" && (
               <Link to="/cliente/login" className="hidden sm:inline-flex">
                 <Button variant="ghost" size="sm" className="rounded-full px-3.5">
@@ -191,13 +184,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
                     </Button>
                   </a>
                 )}
-                {mode === "client" && (
-                  <Link to="/cliente">
-                    <Button variant="outline" className={cn(softButton, "w-full justify-center")}>
-                      <UserRound className="h-4 w-4 text-primary" /> Minha Área
-                    </Button>
-                  </Link>
-                )}
+
                 {mode === "guest" && (
                   <Link to="/cliente/login">
                     <Button variant="outline" className={cn(softButton, "w-full justify-center")}>
