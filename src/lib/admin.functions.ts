@@ -17,6 +17,7 @@ const createUserSchema = z.object({
       valor_consulta_avista: z.number().nonnegative().default(0),
       valor_consulta_cartao: z.number().nonnegative().default(0),
       duracao_consulta_min: z.number().int().positive().default(60),
+      foto_url: z.string().max(500).optional().nullable(),
     })
     .optional()
     .nullable(),
@@ -66,6 +67,7 @@ export const adminCreateUser = createServerFn({ method: "POST" })
         nome: data.nome,
         email: data.email,
         telefone: data.telefone ?? null,
+        foto_url: data.profissional?.foto_url ?? null,
       });
 
     let profissionalId: string | null = null;
@@ -88,6 +90,7 @@ export const adminCreateUser = createServerFn({ method: "POST" })
           valor_consulta_avista: p.valor_consulta_avista,
           valor_consulta_cartao: p.valor_consulta_cartao,
           duracao_consulta_min: p.duracao_consulta_min,
+          foto_url: p.foto_url ?? null,
           status: "ATIVO",
         })
         .select("id")
