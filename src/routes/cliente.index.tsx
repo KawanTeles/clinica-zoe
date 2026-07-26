@@ -33,6 +33,8 @@ import {
 import { Loader2, CalendarDays, LogOut, Bell, UserCircle2 } from "lucide-react";
 import { STATUS_COLOR, STATUS_LABEL, addMinutes, fmtHora, todayISO } from "@/lib/agenda-utils";
 import { cn } from "@/lib/utils";
+import { AvatarUploader } from "@/components/media/AvatarUploader";
+import { PersonAvatar } from "@/lib/avatar";
 
 export const Route = createFileRoute("/cliente/")({
   head: () => ({
@@ -138,7 +140,7 @@ function ConsultasSection({ userId }: { userId: string }) {
       const { data, error } = await supabase
         .from("agendamentos")
         .select(
-          "id, data, hora_inicio, hora_fim, status, valor, forma_pagamento, observacoes, profissional:profissionais(id, nome, duracao_consulta_min, especialidade:especialidades(nome))",
+          "id, data, hora_inicio, hora_fim, status, valor, forma_pagamento, observacoes, profissional:profissionais(id, nome, foto_url, duracao_consulta_min, especialidade:especialidades(nome))",
         )
         .eq("cliente_user_id", userId)
         .order("data", { ascending: false })
@@ -196,8 +198,9 @@ function ConsultasSection({ userId }: { userId: string }) {
                   <p className="text-xs font-medium uppercase tracking-wide text-primary">
                     {ag.profissional?.especialidade?.nome ?? "Consulta"}
                   </p>
-                  <p className="mt-1 truncate text-base font-semibold">
-                    {ag.profissional?.nome}
+                  <p className="mt-1 flex items-center gap-2 truncate text-base font-semibold">
+                    <PersonAvatar size="sm" nome={ag.profissional?.nome} fotoUrl={ag.profissional?.foto_url} />
+                    <span className="truncate">{ag.profissional?.nome}</span>
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {new Date(ag.data + "T00:00:00").toLocaleDateString("pt-BR", {
@@ -440,12 +443,26 @@ function PerfilSection({ userId }: { userId: string }) {
     queryKey: ["cliente-perfil", userId],
     queryFn: async () => {
       const [{ data: prof }, { data: pac }] = await Promise.all([
-        supabase.from("profiles").select("nome, email, telefone").eq("id", userId).maybeSingle(),
-        supabase.from("pacientes").select("id, telefone, data_nascimento").eq("user_id", userId).maybeSingle(),
+        supabase.from("profiles").select("nome, email, telefone, foto_url").eq("id", userId).maybeSingle(),
+        supabase
+          .from("pacientes")
+          .select("id, telefone, data_nascimento, foto_url")
+          .eq("user_id", userId)
+          .maybeSingle(),
       ]);
       return { prof, pac };
     },
   });
+
+  const salvarFoto = async (next: string | null) => {
+    const { error } = await supabase.from("profiles").update({ foto_url: next }).eq("id", userId);
+    if (error) throw error;
+    if (data?.pac?.id) {
+      await supabase.from("pacientes").update({ foto_url: next }).eq("id", data.pac.id);
+    }
+    await qc.invalidateQueries({ queryKey: ["cliente-perfil"] });
+  };
+
 
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
@@ -492,7 +509,17 @@ function PerfilSection({ userId }: { userId: string }) {
 
   return (
     <div className="max-w-xl space-y-4 rounded-2xl border border-border bg-surface p-6 shadow-soft">
+      <div className="flex justify-center border-b border-border pb-6">
+        <AvatarUploader
+          bucket="clientes"
+          value={data?.prof?.foto_url ?? data?.pac?.foto_url ?? null}
+          onChange={salvarFoto}
+          nome={nome || data?.prof?.nome}
+          size="xl"
+        />
+      </div>
       <div className="space-y-2">
+
         <Label>Nome</Label>
         <Input value={nome} onChange={(e) => setNome(e.target.value)} />
       </div>

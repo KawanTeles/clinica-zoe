@@ -17,6 +17,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarDays, CheckCircle2, XCircle, Loader2, Clock, User, Stethoscope, CreditCard } from "lucide-react";
 import { STATUS_COLOR, STATUS_LABEL, fmtHora } from "@/lib/agenda-utils";
+import { PersonAvatar } from "@/lib/avatar";
 
 export const Route = createFileRoute("/app/solicitacoes")({
   head: () => ({
@@ -75,7 +76,7 @@ function SolicitacoesPage() {
       let q = supabase
         .from("agendamentos")
         .select(
-          "id, data, hora_inicio, hora_fim, status, valor, forma_pagamento, observacoes, profissional_id, paciente:pacientes(id,nome,telefone), profissional:profissionais(id,nome,especialidade:especialidades(nome))",
+          "id, data, hora_inicio, hora_fim, status, valor, forma_pagamento, observacoes, profissional_id, paciente:pacientes(id,nome,telefone,foto_url), profissional:profissionais(id,nome,foto_url,especialidade:especialidades(nome))",
         )
         .order("data", { ascending: true })
         .order("hora_inicio", { ascending: true });
@@ -186,8 +187,8 @@ function SolicitacoesPage() {
 
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="flex items-center gap-1 text-sm font-medium">
-                        <User className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="flex items-center gap-2 text-sm font-medium">
+                        <PersonAvatar size="xs" nome={a.paciente?.nome} fotoUrl={a.paciente?.foto_url} />
                         {a.paciente?.nome ?? "Sem paciente"}
                       </span>
                       <Badge variant="outline" className={STATUS_COLOR[a.status]}>
@@ -196,7 +197,7 @@ function SolicitacoesPage() {
                     </div>
                     <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
-                        <Stethoscope className="h-3 w-3" />
+                        <PersonAvatar size="xs" nome={a.profissional?.nome} fotoUrl={a.profissional?.foto_url} className="h-5 w-5 text-[8px]" />
                         {a.profissional?.nome} • {a.profissional?.especialidade?.nome ?? "—"}
                       </span>
                       {a.valor != null && (

@@ -18,6 +18,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Plus, Loader2, Users } from "lucide-react";
+import { AvatarUploader } from "@/components/media/AvatarUploader";
+import { PersonAvatar } from "@/lib/avatar";
 
 export const Route = createFileRoute("/app/pacientes")({
   head: () => ({
@@ -46,7 +48,7 @@ function PacientesPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pacientes")
-        .select("id, nome, email, telefone, data_nascimento, observacoes, created_at")
+        .select("id, nome, email, telefone, data_nascimento, observacoes, foto_url, created_at")
         .order("nome");
       if (error) throw error;
       return data;
@@ -81,12 +83,16 @@ function PacientesPage() {
           {data.map((p: any) => (
             <Card key={p.id} className="border-border shadow-soft transition hover:shadow-elegant">
               <CardHeader className="pb-2">
-                <CardTitle className="truncate text-base">{p.nome}</CardTitle>
+                <div className="flex items-center gap-3">
+                  <PersonAvatar size="md" nome={p.nome} fotoUrl={p.foto_url} />
+                  <CardTitle className="truncate text-base">{p.nome}</CardTitle>
+                </div>
               </CardHeader>
               <CardContent className="space-y-1 text-sm text-muted-foreground">
                 {p.email && <p className="truncate">{p.email}</p>}
                 {p.telefone && <p>{p.telefone}</p>}
                 {p.data_nascimento && <p>Nasc.: {new Date(p.data_nascimento).toLocaleDateString("pt-BR")}</p>}
+                <FotoPacienteDialog id={p.id} nome={p.nome} fotoUrl={p.foto_url} />
               </CardContent>
             </Card>
           ))}
@@ -100,6 +106,7 @@ function NovoPacienteDialog() {
   const [open, setOpen] = useState(false);
   const qc = useQueryClient();
   const [form, setForm] = useState({ nome: "", telefone: "", email: "", data_nascimento: "", observacoes: "" });
+  const [foto, setFoto] = useState<string | null>(null);
 
   const mut = useMutation({
     mutationFn: async () => {
@@ -110,6 +117,7 @@ function NovoPacienteDialog() {
         email: parsed.email || null,
         data_nascimento: parsed.data_nascimento || null,
         observacoes: parsed.observacoes || null,
+        foto_url: foto,
       });
       if (error) throw error;
     },
@@ -118,6 +126,7 @@ function NovoPacienteDialog() {
       qc.invalidateQueries({ queryKey: ["pacientes"] });
       qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
       setForm({ nome: "", telefone: "", email: "", data_nascimento: "", observacoes: "" });
+      setFoto(null);
       setOpen(false);
     },
     onError: (e: any) => {
@@ -138,6 +147,15 @@ function NovoPacienteDialog() {
           <DialogTitle>Cadastrar paciente</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-2 sm:grid-cols-2">
+          <div className="sm:col-span-2 flex justify-center">
+            <AvatarUploader
+              bucket="clientes"
+              value={foto}
+              nome={form.nome}
+              size="lg"
+              onChange={(next) => setFoto(next)}
+            />
+          </div>
           <div className="sm:col-span-2 space-y-1.5">
             <Label>Nome</Label>
             <Input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
@@ -167,6 +185,39 @@ function NovoPacienteDialog() {
             {mut.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Cadastrar
           </Button>
         </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+
+function FotoPacienteDialog({ id, nome, fotoUrl }: { id: string; nome: string; fotoUrl: string | null }) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className="mt-3 w-full">
+          Alterar foto
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Foto de {nome}</DialogTitle>
+        </DialogHeader>
+        <div className="flex justify-center py-2">
+          <AvatarUploader
+            bucket="clientes"
+            value={fotoUrl}
+            nome={nome}
+            size="xl"
+            onChange={async (next) => {
+              const { error } = await supabase.from("pacientes").update({ foto_url: next }).eq("id", id);
+              if (error) throw error;
+              await qc.invalidateQueries({ queryKey: ["pacientes"] });
+            }}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );

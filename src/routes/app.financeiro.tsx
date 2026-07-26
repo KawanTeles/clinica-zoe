@@ -40,6 +40,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { fmtHora } from "@/lib/agenda-utils";
+import { PersonAvatar } from "@/lib/avatar";
 
 export const Route = createFileRoute("/app/financeiro")({
   head: () => ({
@@ -140,7 +141,7 @@ function FinanceiroPage() {
       let q = supabase
         .from("financeiro")
         .select(
-          "id, valor, status_pagamento, forma_pagamento, pago_em, created_at, agendamento:agendamentos(id, data, hora_inicio, hora_fim, valor), paciente:pacientes(id, nome), profissional:profissionais(id, nome, especialidade_id, especialidade:especialidades(id, nome))",
+          "id, valor, status_pagamento, forma_pagamento, pago_em, created_at, agendamento:agendamentos(id, data, hora_inicio, hora_fim, valor), paciente:pacientes(id, nome, foto_url), profissional:profissionais(id, nome, foto_url, especialidade_id, especialidade:especialidades(id, nome))",
         )
         .order("created_at", { ascending: false });
       if (status !== "TODOS") q = q.eq("status_pagamento", status as any);
@@ -410,8 +411,8 @@ function FinanceiroPage() {
 
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="flex items-center gap-1 text-sm font-medium">
-                        <User className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="flex items-center gap-2 text-sm font-medium">
+                        <PersonAvatar size="xs" nome={r.paciente?.nome} fotoUrl={r.paciente?.foto_url} />
                         {r.paciente?.nome ?? "Sem paciente"}
                       </span>
                       <Badge variant="outline" className={STATUS_COLOR[r.status_pagamento]}>

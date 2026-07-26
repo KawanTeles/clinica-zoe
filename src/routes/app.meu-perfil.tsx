@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
+import { AvatarUploader } from "@/components/media/AvatarUploader";
+
 
 export const Route = createFileRoute("/app/meu-perfil")({
   head: () => ({
@@ -91,6 +93,26 @@ function MeuPerfil() {
           <CardTitle className="text-base">{data?.nome ?? "—"}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
+          <div className="sm:col-span-2 flex justify-center border-b border-border pb-6">
+            <AvatarUploader
+              bucket="profissionais"
+              value={data?.foto_url ?? null}
+              nome={data?.nome}
+              size="xl"
+              disabled={!data}
+              onChange={async (next) => {
+                if (!data) return;
+                const { error } = await supabase
+                  .from("profissionais")
+                  .update({ foto_url: next })
+                  .eq("id", data.id);
+                if (error) throw error;
+                await qc.invalidateQueries({ queryKey: ["meu-profissional", user?.id] });
+                await qc.invalidateQueries({ queryKey: ["profissionais"] });
+              }}
+            />
+          </div>
+
           <div className="space-y-1.5">
             <Label>Telefone</Label>
             <Input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} />

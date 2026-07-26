@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteShell, Reveal } from "@/components/site/SiteShell";
+import { ProfilePhoto } from "@/lib/avatar";
 import { Button } from "@/components/ui/button";
 import { CLINIC_INFO, directionsHref, mapsEmbedUrl, whatsappHref } from "@/lib/clinic-info";
 import {
@@ -248,18 +249,16 @@ function ProfissionaisSection() {
             <Reveal key={p.id} delay={i * 60}>
               <div className="group h-full overflow-hidden rounded-2xl border border-border bg-surface shadow-soft transition hover:-translate-y-1 hover:shadow-elegant">
                 <div className="aspect-[4/5] w-full overflow-hidden bg-secondary">
-                  {p.foto_url ? (
-                    <img
-                      src={p.foto_url}
-                      alt={p.nome}
-                      loading="lazy"
-                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="grid h-full w-full place-items-center text-primary-dark/40">
-                      <Sparkles className="h-10 w-10" />
-                    </div>
-                  )}
+                  <ProfilePhoto
+                    nome={p.nome}
+                    fotoUrl={p.foto_url}
+                    className="transition duration-500 group-hover:scale-105"
+                    fallback={
+                      <div className="grid h-full w-full place-items-center text-primary-dark/40">
+                        <Sparkles className="h-10 w-10" />
+                      </div>
+                    }
+                  />
                 </div>
                 <div className="p-5">
                   <p className="text-xs font-medium text-primary">

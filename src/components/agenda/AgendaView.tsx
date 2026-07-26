@@ -49,6 +49,7 @@ import {
   fmtHora,
   todayISO,
 } from "@/lib/agenda-utils";
+import { PersonAvatar } from "@/lib/avatar";
 
 type Props = {
   /** Escopo do profissional: quando definido, trava a agenda ao próprio profissional (view PROFISSIONAL) */
@@ -95,7 +96,7 @@ export function AgendaView({
       let q = supabase
         .from("agendamentos")
         .select(
-          "id, data, hora_inicio, hora_fim, status, valor, forma_pagamento, observacoes, paciente:pacientes(id,nome,telefone), profissional:profissionais(id,nome,especialidade:especialidades(nome))",
+          "id, data, hora_inicio, hora_fim, status, valor, forma_pagamento, observacoes, paciente:pacientes(id,nome,telefone,foto_url), profissional:profissionais(id,nome,foto_url,especialidade:especialidades(nome))",
         )
         .eq("data", data)
         .order("hora_inicio");
@@ -272,8 +273,9 @@ export function AgendaView({
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="truncate font-medium">
-                        {a.paciente?.nome ?? "Sem paciente"}
+                      <p className="flex min-w-0 items-center gap-2 truncate font-medium">
+                        <PersonAvatar size="xs" nome={a.paciente?.nome} fotoUrl={a.paciente?.foto_url} />
+                        <span className="truncate">{a.paciente?.nome ?? "Sem paciente"}</span>
                       </p>
                       <Badge variant="outline" className={STATUS_COLOR[a.status]}>
                         {STATUS_LABEL[a.status]}
