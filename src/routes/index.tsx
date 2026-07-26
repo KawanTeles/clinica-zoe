@@ -223,18 +223,7 @@ function EspecialidadesSection() {
 }
 
 function ProfissionaisSection() {
-  const { data } = useQuery({
-    queryKey: ["site-profissionais-destaque"],
-    queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from("profissionais_public")
-        .select("id, nome, foto_url, descricao, valor_consulta_avista, especialidade:especialidades(nome)")
-        .order("nome")
-        .limit(4);
-      if (error) throw error;
-      return (data ?? []) as any[];
-    },
-  });
+  const { data } = useProfissionaisPublicos(4);
 
   return (
     <section className="border-y border-border bg-surface-muted py-20">
@@ -255,42 +244,7 @@ function ProfissionaisSection() {
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {(data ?? []).map((p, i) => (
             <Reveal key={p.id} delay={i * 60}>
-              <div className="group h-full overflow-hidden rounded-2xl border border-border bg-surface shadow-soft transition hover:-translate-y-1 hover:shadow-elegant">
-                <div className="aspect-[4/5] w-full overflow-hidden bg-secondary">
-                  <ProfilePhoto
-                    nome={p.nome}
-                    fotoUrl={p.foto_url}
-                    className="transition duration-500 group-hover:scale-105"
-                    fallback={
-                      <div className="grid h-full w-full place-items-center text-primary-dark/40">
-                        <Sparkles className="h-10 w-10" />
-                      </div>
-                    }
-                  />
-                </div>
-                <div className="p-5">
-                  <p className="text-xs font-medium text-primary">
-                    {(p.especialidade as any)?.nome ?? "Especialista"}
-                  </p>
-                  <h3 className="mt-1 truncate text-base font-semibold">{p.nome}</h3>
-                  {p.valor_consulta_avista && (
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      A partir de{" "}
-                      <span className="font-semibold text-foreground">
-                        {Number(p.valor_consulta_avista).toLocaleString("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
-                        })}
-                      </span>
-                    </p>
-                  )}
-                  <Link to="/agendamento" className="mt-4 inline-flex">
-                    <Button size="sm" variant="outline" className="rounded-full">
-                      Agendar
-                    </Button>
-                  </Link>
-                </div>
-              </div>
+              <ProfissionalCard p={p} compact />
             </Reveal>
           ))}
           {!data?.length && (
@@ -303,6 +257,7 @@ function ProfissionaisSection() {
     </section>
   );
 }
+
 
 function Depoimentos() {
   const items = [
