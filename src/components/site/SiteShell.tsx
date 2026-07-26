@@ -208,9 +208,9 @@ export function SiteShell({ children }: { children: ReactNode }) {
                 </li>
               ))}
               <li>
-                <Link to={staffTo} className="hover:text-foreground">
+                <a href={staffTo} className="hover:text-foreground">
                   Acesso da equipe
-                </Link>
+                </a>
               </li>
             </ul>
           </div>
