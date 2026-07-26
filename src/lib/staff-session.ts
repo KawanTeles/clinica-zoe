@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { getSupabaseFor } from "@/integrations/supabase/dual-client";
 
-const STAFF_ROLES = ["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"];
+const STAFF_ROLES = ["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"] as const;
 
 /**
  * Indica se existe uma sessão da EQUIPE ativa no navegador (storage isolado).
