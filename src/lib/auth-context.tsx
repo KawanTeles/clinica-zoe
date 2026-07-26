@@ -1,13 +1,15 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
-import { useRouter } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
+import { useRouter, useRouterState } from "@tanstack/react-router";
+import { getSupabaseFor, scopeForPath, type AuthScope } from "@/lib/supabase";
 
 export type AppRole = "ADMIN" | "RECEPCIONISTA" | "PROFISSIONAL" | "CLIENTE";
 
 const STAFF_ROLES: AppRole[] = ["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"];
 
 interface AuthState {
+  /** área ativa: "staff" (/app, /auth) ou "client" (site público e /cliente) */
+  scope: AuthScope;
   /** true enquanto a sessão inicial ainda está sendo lida */
   loading: boolean;
   /** true somente quando sessão E papéis já foram resolvidos (nenhuma tela deve renderizar antes) */
@@ -28,6 +30,9 @@ interface AuthState {
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const scope = scopeForPath(pathname);
+
   const [session, setSession] = useState<Session | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [nome, setNome] = useState<string | null>(null);
@@ -35,33 +40,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [rolesLoaded, setRolesLoaded] = useState(false);
   const routerRef = useRef(useRouter());
 
-  const loadProfile = async (uid: string) => {
-    const [{ data: rolesData }, { data: profileData }] = await Promise.all([
-      supabase.from("user_roles").select("role").eq("user_id", uid),
-      supabase.from("profiles").select("nome").eq("id", uid).maybeSingle(),
-    ]);
-    setRoles((rolesData?.map((r) => r.role as AppRole)) ?? []);
-    setNome(profileData?.nome ?? null);
-    setRolesLoaded(true);
-  };
-
   useEffect(() => {
+    const supabase = getSupabaseFor(scope);
     let currentUserId: string | null = null;
+    let cancelled = false;
+
+    // troca de área: recomeça a leitura da sessão daquela área
+    setSession(null);
+    setRoles([]);
+    setNome(null);
+    setRolesLoaded(false);
+    setLoading(true);
+
+    const loadProfile = async (uid: string) => {
+      const [{ data: rolesData }, { data: profileData }] = await Promise.all([
+        supabase.from("user_roles").select("role").eq("user_id", uid),
+        supabase.from("profiles").select("nome").eq("id", uid).maybeSingle(),
+      ]);
+      if (cancelled) return;
+      setRoles((rolesData?.map((r) => r.role as AppRole)) ?? []);
+      setNome(profileData?.nome ?? null);
+      setRolesLoaded(true);
+    };
 
     // Listener FIRST, then read session
     const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
+      if (cancelled) return;
       setSession(s);
       if (s?.user) {
         const changed = currentUserId !== s.user.id;
         currentUserId = s.user.id;
         if (changed) {
-          // papéis do novo usuário ainda desconhecidos: bloqueia qualquer decisão de rota
           setRolesLoaded(false);
           setRoles([]);
           setNome(null);
-          // defer para evitar deadlock com o cliente supabase
           setTimeout(() => {
-            loadProfile(s.user.id).finally(() => setLoading(false));
+            if (!cancelled) loadProfile(s.user.id).finally(() => !cancelled && setLoading(false));
           }, 0);
         }
       } else {
@@ -75,23 +89,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) return;
       setSession(data.session);
       if (data.session?.user) {
         currentUserId = data.session.user.id;
-        loadProfile(data.session.user.id).finally(() => setLoading(false));
+        loadProfile(data.session.user.id).finally(() => !cancelled && setLoading(false));
       } else {
         setLoading(false);
       }
     });
 
-    return () => sub.subscription.unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
+  }, [scope]);
 
   const isStaff = STAFF_ROLES.some((r) => roles.includes(r));
   const ready = !loading && (!session || rolesLoaded);
 
   const value: AuthState = {
+    scope,
     loading,
     ready,
     session,
@@ -103,10 +121,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     hasRole: (r) => roles.includes(r),
     hasAnyRole: (rs) => rs.some((r) => roles.includes(r)),
     signOut: async () => {
-      await supabase.auth.signOut();
+      // encerra apenas a sessão da área atual
+      await getSupabaseFor(scope).auth.signOut();
     },
     refresh: async () => {
-      if (session?.user) await loadProfile(session.user.id);
+      if (session?.user) {
+        const supabase = getSupabaseFor(scope);
+        const uid = session.user.id;
+        const [{ data: rolesData }, { data: profileData }] = await Promise.all([
+          supabase.from("user_roles").select("role").eq("user_id", uid),
+          supabase.from("profiles").select("nome").eq("id", uid).maybeSingle(),
+        ]);
+        setRoles((rolesData?.map((r) => r.role as AppRole)) ?? []);
+        setNome(profileData?.nome ?? null);
+      }
     },
   };
 

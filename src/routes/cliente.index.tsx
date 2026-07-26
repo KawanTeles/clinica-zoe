@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
 import { AuthSplash } from "@/components/auth-splash";
 import { SiteShell, Reveal } from "@/components/site/SiteShell";
@@ -52,22 +52,18 @@ export const Route = createFileRoute("/cliente/")({
 });
 
 function ClientePage() {
-  const { session, ready, user, nome, signOut, isStaff } = useAuth();
+  const { session, ready, user, nome, signOut } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!ready) return;
-    if (!session) {
-      navigate({ to: "/cliente/login", replace: true });
-    } else if (isStaff) {
-      // Sessão de equipe nunca abre a Área do Cliente: envia para autenticação de paciente
-      navigate({ to: "/cliente/login", replace: true });
-    }
-  }, [ready, session, isStaff, navigate]);
+    if (!session) navigate({ to: "/cliente/login", replace: true });
+  }, [ready, session, navigate]);
 
-  if (!ready || !session || !user || isStaff) {
+  if (!ready || !session || !user) {
     return <AuthSplash message="Preparando seu ambiente..." />;
   }
+
 
   return (
     <SiteShell>

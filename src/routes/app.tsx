@@ -35,8 +35,7 @@ function AppLayout() {
 
   useEffect(() => {
     if (!ready) return;
-    if (!session) navigate({ to: "/auth", replace: true });
-    else if (!isStaff) navigate({ to: "/cliente", replace: true });
+    if (!session || !isStaff) navigate({ to: "/auth", replace: true });
   }, [ready, session, isStaff, navigate]);
 
   if (!ready || !session || !isStaff) {

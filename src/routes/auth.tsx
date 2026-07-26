@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,16 +27,23 @@ const emailSchema = z.string().trim().email("Email inválido").max(255);
 const passSchema = z.string().min(6, "Senha deve ter no mínimo 6 caracteres").max(100);
 
 function AuthPage() {
-  const { session, ready, homePath } = useAuth();
+  const { session, ready, isStaff, signOut } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (ready && session) navigate({ to: homePath, replace: true });
-  }, [ready, session, homePath, navigate]);
+    if (!ready || !session) return;
+    if (isStaff) {
+      navigate({ to: "/app", replace: true });
+    } else {
+      // conta sem acesso administrativo: encerra apenas a sessão do painel
+      void signOut().then(() => toast.error("Esta conta não tem acesso ao painel da equipe."));
+    }
+  }, [ready, session, isStaff, signOut, navigate]);
 
-  if (!ready || session) {
+  if (!ready || (session && isStaff)) {
     return <AuthSplash message={session ? "Entrando..." : "Carregando..."} />;
   }
+
 
   return (
     <div className="min-h-screen bg-linear-to-br from-background via-surface-muted to-background px-4 py-10">
