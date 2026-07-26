@@ -500,16 +500,16 @@ function InfoRow({
 
 function CTAFinal() {
   return (
-    <section className="relative overflow-hidden border-t border-border bg-cta bg-cta-gradient">
+    <section className="relative overflow-hidden border-t border-border bg-background">
       <div className="relative mx-auto max-w-5xl px-4 py-20 text-center sm:px-6">
 
         <Reveal>
-          <h2 className="text-3xl font-bold tracking-tight text-cta-foreground sm:text-4xl">
+          <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Pronto para cuidar de você com a Zoe?
           </h2>
         </Reveal>
         <Reveal delay={80}>
-          <p className="mx-auto mt-4 max-w-2xl text-cta-foreground/90">
+          <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
             Agende sua consulta agora — leva menos de um minuto.
           </p>
         </Reveal>
@@ -518,7 +518,7 @@ function CTAFinal() {
             <Link to="/agendamento">
               <Button
                 size="lg"
-                className="rounded-full bg-cta-foreground px-6 text-cta shadow-elegant transition-transform hover:-translate-y-0.5 hover:bg-cta-foreground/90"
+                className="rounded-full px-6 shadow-elegant transition-transform hover:-translate-y-0.5"
               >
                 Agendar consulta <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -527,11 +527,14 @@ function CTAFinal() {
               <Button
                 size="lg"
                 variant="outline"
-                className="rounded-full border-cta-foreground/70 bg-transparent px-6 text-cta-foreground transition-transform hover:-translate-y-0.5 hover:bg-cta-foreground/15 hover:text-cta-foreground"
+                className="rounded-full border-primary/40 px-6 text-foreground transition-transform hover:-translate-y-0.5 hover:bg-secondary"
               >
                 Falar no WhatsApp
               </Button>
             </a>
+          </div>
+        </Reveal>
+
           </div>
         </Reveal>
       </div>
