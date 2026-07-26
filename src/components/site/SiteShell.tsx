@@ -64,14 +64,16 @@ export function SiteShell({ children }: { children: ReactNode }) {
   }, []);
 
   // O site público pertence à sessão do paciente (isolada da sessão da equipe).
-  const { hasStaffSession, signOutStaff } = useStaffSession();
+  const { hasStaffSession, loading: staffSessionLoading, signOutStaff } = useStaffSession();
   const isClient = ready && !!session;
   // Nunca exibir "Painel da Equipe" e "Minha Área" ao mesmo tempo.
-  const mode: "staff" | "client" | "guest" = hasStaffSession
-    ? "staff"
-    : isClient
-      ? "client"
-      : "guest";
+  const mode: "loading" | "staff" | "client" | "guest" = !ready || staffSessionLoading
+    ? "loading"
+    : hasStaffSession
+      ? "staff"
+      : isClient
+        ? "client"
+        : "guest";
   const staffTo = hasStaffSession ? "/app" : "/auth";
 
 
@@ -140,7 +142,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
                 </Button>
               </Link>
             )}
-            {mode !== "guest" && (
+            {mode !== "guest" && mode !== "loading" && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -203,7 +205,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
                     </Button>
                   </Link>
                 )}
-                {mode !== "guest" && (
+                {mode !== "guest" && mode !== "loading" && (
                   <Button
                     variant="ghost"
                     className="w-full justify-center gap-1.5 rounded-full text-muted-foreground"
