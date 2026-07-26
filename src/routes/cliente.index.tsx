@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { AuthSplash } from "@/components/auth-splash";
 import { SiteShell, Reveal } from "@/components/site/SiteShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,26 +52,20 @@ export const Route = createFileRoute("/cliente/")({
 });
 
 function ClientePage() {
-  const { session, loading, user, nome, signOut, hasAnyRole } = useAuth();
+  const { session, ready, user, nome, signOut, isStaff } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (loading) return;
+    if (!ready) return;
     if (!session) {
-      navigate({ to: "/cliente/login" });
-    } else if (hasAnyRole(["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"])) {
-      navigate({ to: "/app" });
+      navigate({ to: "/cliente/login", replace: true });
+    } else if (isStaff) {
+      navigate({ to: "/app", replace: true });
     }
-  }, [loading, session, hasAnyRole, navigate]);
+  }, [ready, session, isStaff, navigate]);
 
-  if (loading || !session || !user) {
-    return (
-      <SiteShell>
-        <div className="grid min-h-[60vh] place-items-center">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-        </div>
-      </SiteShell>
-    );
+  if (!ready || !session || !user || isStaff) {
+    return <AuthSplash message="Preparando seu ambiente..." />;
   }
 
   return (

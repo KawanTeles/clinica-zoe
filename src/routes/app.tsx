@@ -13,7 +13,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User as UserIcon, Loader2, Globe } from "lucide-react";
+import { LogOut, User as UserIcon, Globe } from "lucide-react";
+import { AuthSplash } from "@/components/auth-splash";
 
 export const Route = createFileRoute("/app")({
   head: () => ({
@@ -29,22 +30,17 @@ export const Route = createFileRoute("/app")({
 });
 
 function AppLayout() {
-  const { loading, session, nome, roles, hasAnyRole, signOut } = useAuth();
+  const { ready, session, nome, roles, isStaff, signOut } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && !session) navigate({ to: "/auth" });
-    else if (!loading && session && roles.length && !hasAnyRole(["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"])) {
-      navigate({ to: "/cliente" });
-    }
-  }, [loading, session, roles, hasAnyRole, navigate]);
+    if (!ready) return;
+    if (!session) navigate({ to: "/auth", replace: true });
+    else if (!isStaff) navigate({ to: "/cliente", replace: true });
+  }, [ready, session, isStaff, navigate]);
 
-  if (loading || !session) {
-    return (
-      <div className="grid min-h-screen place-items-center bg-background">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-      </div>
-    );
+  if (!ready || !session || !isStaff) {
+    return <AuthSplash message="Preparando seu ambiente..." />;
   }
 
   const primaryRole = roles[0] ?? "CLIENTE";

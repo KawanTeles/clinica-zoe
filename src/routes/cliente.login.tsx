@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { HeartPulse, Loader2 } from "lucide-react";
+import { AuthSplash } from "@/components/auth-splash";
 
 export const Route = createFileRoute("/cliente/login")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -32,23 +33,23 @@ const passSchema = z.string().min(6, "Senha deve ter no mínimo 6 caracteres").m
 const nomeSchema = z.string().trim().min(2, "Informe o nome").max(120);
 
 function ClienteLoginPage() {
-  const { session, loading, hasAnyRole } = useAuth();
+  const { session, ready, isStaff, homePath } = useAuth();
   const navigate = useNavigate();
   const { redirect } = Route.useSearch();
   const [tab, setTab] = useState<"login" | "signup">("login");
 
   useEffect(() => {
-    if (!loading && session) {
-      const staff = hasAnyRole(["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"]);
-      if (staff) {
-        navigate({ to: "/app" });
-      } else if (redirect && redirect.startsWith("/") && !redirect.startsWith("//")) {
-        navigate({ to: redirect as any });
-      } else {
-        navigate({ to: "/cliente" });
-      }
+    if (!ready || !session) return;
+    if (!isStaff && redirect && redirect.startsWith("/") && !redirect.startsWith("//")) {
+      navigate({ to: redirect as any, replace: true });
+    } else {
+      navigate({ to: homePath, replace: true });
     }
-  }, [loading, session, hasAnyRole, navigate, redirect]);
+  }, [ready, session, isStaff, homePath, navigate, redirect]);
+
+  if (!ready || session) {
+    return <AuthSplash message={session ? "Entrando..." : "Carregando..."} />;
+  }
 
 
   return (
