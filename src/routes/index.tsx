@@ -93,24 +93,15 @@ function Hero() {
           </p>
         </Reveal>
         <Reveal delay={240}>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-8 flex justify-center">
             <Link to="/agendamento">
-              <Button size="lg" className="rounded-full px-6 shadow-elegant">
+              <Button size="lg" className="rounded-full px-8 shadow-elegant">
                 Agendar consulta
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <Link to="/cliente/login">
-              <Button size="lg" variant="outline" className="rounded-full px-6">
-                Entrar na área do cliente
-              </Button>
-            </Link>
-            <Link to="/auth">
-              <Button size="lg" variant="ghost" className="rounded-full px-6">
-                Entrar na equipe
-              </Button>
-            </Link>
           </div>
+
         </Reveal>
 
         <Reveal delay={320}>
