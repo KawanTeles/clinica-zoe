@@ -61,6 +61,8 @@ export function SiteShell({ children }: { children: ReactNode }) {
   // O site público pertence à sessão do paciente (isolada da sessão da equipe).
   const areaTo = ready && session ? "/cliente" : "/cliente/login";
   const areaLabel = ready && session ? "Minha Área" : "Entrar";
+  const { hasStaffSession } = useStaffSession();
+  const staffTo = hasStaffSession ? "/app" : "/auth";
 
 
   return (
