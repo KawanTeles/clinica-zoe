@@ -30,6 +30,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, Loader2, Stethoscope } from "lucide-react";
+import { AvatarUploader } from "@/components/media/AvatarUploader";
+import { PersonAvatar } from "@/lib/avatar";
 
 export const Route = createFileRoute("/app/profissionais")({
   head: () => ({
@@ -56,7 +58,7 @@ function ProfissionaisPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profissionais")
-        .select("id, nome, email, telefone, status, valor_consulta_avista, valor_consulta_cartao, duracao_consulta_min, especialidade:especialidades(nome)")
+        .select("id, user_id, foto_url, nome, email, telefone, status, valor_consulta_avista, valor_consulta_cartao, duracao_consulta_min, especialidade:especialidades(nome)")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -97,7 +99,8 @@ function ProfissionaisPage() {
             <Card key={p.id} className="border-border shadow-soft transition hover:shadow-elegant">
               <CardHeader>
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
+                  <PersonAvatar size="md" nome={p.nome} fotoUrl={p.foto_url} />
+                  <div className="min-w-0 flex-1">
                     <CardTitle className="truncate text-base">{p.nome}</CardTitle>
                     <p className="mt-1 truncate text-xs text-muted-foreground">
                       {p.especialidade?.nome ?? "Sem especialidade"}
@@ -114,6 +117,7 @@ function ProfissionaisPage() {
                   <span>Cartão: R$ {Number(p.valor_consulta_cartao ?? 0).toFixed(2)}</span>
                   <span>{p.duracao_consulta_min} min</span>
                 </div>
+                <FotoProfissionalDialog id={p.id} nome={p.nome} fotoUrl={p.foto_url} />
               </CardContent>
             </Card>
           ))}
@@ -162,6 +166,7 @@ function NovoProfissionalDialog() {
     valor_consulta_cartao: 0,
     duracao_consulta_min: 60,
   });
+  const [foto, setFoto] = useState<string | null>(null);
 
   const mut = useMutation({
     mutationFn: async () => {
@@ -183,6 +188,7 @@ function NovoProfissionalDialog() {
             valor_consulta_avista: parsed.valor_consulta_avista,
             valor_consulta_cartao: parsed.valor_consulta_cartao,
             duracao_consulta_min: parsed.duracao_consulta_min,
+            foto_url: foto,
           },
         },
       });
@@ -204,6 +210,7 @@ function NovoProfissionalDialog() {
         valor_consulta_cartao: 0,
         duracao_consulta_min: 60,
       });
+      setFoto(null);
     },
     onError: (e: any) => {
       if (e instanceof z.ZodError) toast.error(e.issues[0].message);
@@ -226,6 +233,15 @@ function NovoProfissionalDialog() {
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-2 sm:grid-cols-2">
+          <div className="sm:col-span-2 flex justify-center">
+            <AvatarUploader
+              bucket="profissionais"
+              value={foto}
+              nome={form.nome}
+              size="lg"
+              onChange={(next) => setFoto(next)}
+            />
+          </div>
           <Field label="Nome completo" span={2}>
             <Input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
           </Field>
@@ -304,5 +320,48 @@ function Field({ label, children, span = 1 }: { label: string; children: React.R
       <Label>{label}</Label>
       {children}
     </div>
+  );
+}
+
+
+function FotoProfissionalDialog({
+  id,
+  nome,
+  fotoUrl,
+}: {
+  id: string;
+  nome: string;
+  fotoUrl: string | null;
+}) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className="mt-3 w-full">
+          Alterar foto
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Foto de {nome}</DialogTitle>
+          <DialogDescription>JPG, PNG ou WEBP de até 5 MB. A imagem é cortada em formato quadrado.</DialogDescription>
+        </DialogHeader>
+        <div className="flex justify-center py-2">
+          <AvatarUploader
+            bucket="profissionais"
+            value={fotoUrl}
+            nome={nome}
+            size="xl"
+            onChange={async (next) => {
+              const { error } = await supabase.from("profissionais").update({ foto_url: next }).eq("id", id);
+              if (error) throw error;
+              await qc.invalidateQueries({ queryKey: ["profissionais"] });
+              await qc.invalidateQueries({ queryKey: ["profissionais-publicos"] });
+            }}
+          />
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
