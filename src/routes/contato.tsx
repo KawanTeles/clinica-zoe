@@ -51,7 +51,7 @@ function ContatoPage() {
                 icon={MessageCircle}
                 label="WhatsApp"
                 value={settings.whatsapp}
-                href={whatsappHref(settings, )}
+                href={whatsappHref(settings)}
               />
               <Row
                 icon={Mail}
