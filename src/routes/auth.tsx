@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ShieldCheck, Loader2 } from "lucide-react";
+import { AuthSplash } from "@/components/auth-splash";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -26,15 +27,16 @@ const emailSchema = z.string().trim().email("Email inválido").max(255);
 const passSchema = z.string().min(6, "Senha deve ter no mínimo 6 caracteres").max(100);
 
 function AuthPage() {
-  const { session, loading, hasAnyRole } = useAuth();
+  const { session, ready, homePath } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && session) {
-      const staff = hasAnyRole(["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"]);
-      navigate({ to: staff ? "/app" : "/cliente" });
-    }
-  }, [loading, session, hasAnyRole, navigate]);
+    if (ready && session) navigate({ to: homePath, replace: true });
+  }, [ready, session, homePath, navigate]);
+
+  if (!ready || session) {
+    return <AuthSplash message={session ? "Entrando..." : "Carregando..."} />;
+  }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-background via-surface-muted to-background px-4 py-10">

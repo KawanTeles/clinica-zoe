@@ -45,7 +45,7 @@ function ClinicLogo({ logoUrl, nome }: { logoUrl: string | null; nome: string })
 
 export function SiteShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { session, hasAnyRole } = useAuth();
+  const { session, ready, isStaff: staffRole } = useAuth();
   const { settings } = useClinicSettings();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -58,9 +58,15 @@ export function SiteShell({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const isStaff = !!session && hasAnyRole(["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"]);
+  const isStaff = !!session && staffRole;
   const areaTo = !session ? "/cliente/login" : isStaff ? "/app" : "/cliente";
-  const areaLabel = !session ? "Entrar" : isStaff ? "Painel Administrativo" : "Minha Área";
+  const areaLabel = !session
+    ? "Entrar"
+    : !ready
+      ? "Minha Área"
+      : isStaff
+        ? "Painel Administrativo"
+        : "Minha Área";
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
