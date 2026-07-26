@@ -184,13 +184,6 @@ export function SiteShell({ children }: { children: ReactNode }) {
                     </Button>
                   </a>
                 )}
-                {mode === "client" && (
-                  <Link to="/cliente">
-                    <Button variant="outline" className={cn(softButton, "w-full justify-center")}>
-                      <UserRound className="h-4 w-4 text-primary" /> Minha Área
-                    </Button>
-                  </Link>
-                )}
 
                 {mode === "guest" && (
                   <Link to="/cliente/login">
