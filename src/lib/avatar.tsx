@@ -94,3 +94,27 @@ export function PersonAvatar({
     </div>
   );
 }
+
+/** Foto preenchendo o container (cards do site público), com fallback livre. */
+export function ProfilePhoto({
+  nome,
+  fotoUrl,
+  fallback,
+  className,
+}: {
+  nome?: string | null;
+  fotoUrl?: string | null;
+  fallback: React.ReactNode;
+  className?: string;
+}) {
+  const url = useAvatarUrl(fotoUrl);
+  if (!url) return <>{fallback}</>;
+  return (
+    <img
+      src={url}
+      alt={nome ? `Foto de ${nome}` : "Foto do profissional"}
+      loading="lazy"
+      className={cn("h-full w-full object-cover", className)}
+    />
+  );
+}
