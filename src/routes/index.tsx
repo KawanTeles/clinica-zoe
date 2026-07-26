@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteShell, Reveal } from "@/components/site/SiteShell";
-import { ProfilePhoto } from "@/lib/avatar";
+import { ProfilePhoto, useAvatarUrl } from "@/lib/avatar";
 import { Button } from "@/components/ui/button";
 import { useClinicSettings, directionsHref, mapsEmbedUrl, whatsappHref } from "@/lib/clinic-settings";
 import {
