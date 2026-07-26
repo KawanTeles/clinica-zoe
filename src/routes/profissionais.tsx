@@ -14,10 +14,25 @@ export const Route = createFileRoute("/profissionais")({
       { property: "og:title", content: "Profissionais — Clínica Zoe" },
       { property: "og:description", content: "Nosso time de especialistas." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://clinicazoe.lovable.app/profissionais" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "/profissionais" }],
+    links: [{ rel: "canonical", href: "https://clinicazoe.lovable.app/profissionais" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Profissionais — Clínica Zoe",
+          url: "https://clinicazoe.lovable.app/profissionais",
+          description: "Time de especialistas da Clínica Zoe.",
+          about: { "@type": "MedicalBusiness", name: "Clínica Zoe" },
+        }),
+      },
+    ],
   }),
+
   component: ProfissionaisPublicos,
 });
 

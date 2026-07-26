@@ -1,0 +1,13 @@
+# Clínica Zoe
+
+> Clínica com atendimento humanizado e estética premium: especialidades, profissionais qualificados e agendamento online de consultas.
+
+A Clínica Zoe oferece consultas com profissionais qualificados em diversas especialidades. Pacientes podem consultar o time, ver valores e agendar online; a confirmação é feita pelo profissional responsável.
+
+## Pages
+
+- [Início](/): Visão geral da clínica, diferenciais, especialidades, profissionais, perguntas frequentes e localização.
+- [Sobre](/sobre): História, missão e valores da Clínica Zoe.
+- [Especialidades](/especialidades): Especialidades clínicas disponíveis para agendamento.
+- [Profissionais](/profissionais): Time de especialistas, formação, experiência e valores de consulta.
+- [Contato](/contato): Endereço, telefone, WhatsApp, e-mail e horário de funcionamento.

@@ -2,3 +2,5 @@ User-agent: *
 Allow: /
 Disallow: /app/
 Disallow: /cliente
+
+Sitemap: https://clinicazoe.lovable.app/sitemap.xml

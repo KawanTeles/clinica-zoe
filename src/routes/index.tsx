@@ -21,26 +21,75 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+const SITE_URL = "https://clinicazoe.lovable.app";
+
+const FAQ_ITEMS = [
+  {
+    q: "Como faço para agendar uma consulta?",
+    a: "Clique em Agendar consulta, escolha a especialidade, o profissional, o dia e o horário livre. Você receberá a confirmação após aprovação do profissional.",
+  },
+  {
+    q: "Posso remarcar ou cancelar?",
+    a: "Sim. Na Área do Cliente você acompanha, remarca ou cancela suas consultas com poucos cliques.",
+  },
+  {
+    q: "Quais são as formas de pagamento?",
+    a: "Aceitamos pagamento à vista (Pix, dinheiro) e cartão. Os valores são exibidos no momento do agendamento.",
+  },
+  {
+    q: "Meus dados estão seguros?",
+    a: "Sim. Utilizamos criptografia e políticas de acesso rigorosas para proteger suas informações.",
+  },
+];
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: `${"Clínica Zoe"} — Cuidado clínico premium` },
+      { title: "Clínica Zoe — Cuidado clínico premium" },
       {
         name: "description",
         content:
           "Clínica Zoe: agenda inteligente, profissionais qualificados e uma experiência clínica premium. Agende sua consulta em minutos.",
       },
-      { property: "og:title", content: "Clínica Zoe — Painel Administrativo" },
+      { property: "og:title", content: "Clínica Zoe — Cuidado clínico premium" },
       {
         property: "og:description",
         content: "Clínica Zoe: agenda inteligente, profissionais qualificados e uma experiência clínica premium. Agende sua consulta em minutos.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: `${SITE_URL}/` },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/` }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "MedicalBusiness",
+          name: "Clínica Zoe",
+          url: `${SITE_URL}/`,
+          description:
+            "Clínica Zoe: agenda inteligente, profissionais qualificados e uma experiência clínica premium.",
+          medicalSpecialty: "MedicalClinic",
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: FAQ_ITEMS.map((it) => ({
+            "@type": "Question",
+            name: it.q,
+            acceptedAnswer: { "@type": "Answer", text: it.a },
+          })),
+        }),
+      },
+    ],
   }),
   component: HomePage,
 });
+
 
 function HomePage() {
   return (
@@ -314,24 +363,8 @@ function Depoimentos() {
 }
 
 function FAQ() {
-  const items = [
-    {
-      q: "Como faço para agendar uma consulta?",
-      a: "Clique em Agendar consulta, escolha a especialidade, o profissional, o dia e o horário livre. Você receberá a confirmação após aprovação do profissional.",
-    },
-    {
-      q: "Posso remarcar ou cancelar?",
-      a: "Sim. Na Área do Cliente você acompanha, remarca ou cancela suas consultas com poucos cliques.",
-    },
-    {
-      q: "Quais são as formas de pagamento?",
-      a: "Aceitamos pagamento à vista (Pix, dinheiro) e cartão. Os valores são exibidos no momento do agendamento.",
-    },
-    {
-      q: "Meus dados estão seguros?",
-      a: "Sim. Utilizamos criptografia e políticas de acesso rigorosas para proteger suas informações.",
-    },
-  ];
+  const items = FAQ_ITEMS;
+
   const [open, setOpen] = useState<number | null>(0);
   return (
     <section className="border-y border-border bg-surface-muted py-20">

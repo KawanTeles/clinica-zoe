@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 
-// TODO: substituir por URL do projeto quando um domínio for definido.
-const BASE_URL = "";
+const BASE_URL = "https://clinicazoe.lovable.app";
 
 interface SitemapEntry {
   path: string;
@@ -10,14 +9,16 @@ interface SitemapEntry {
   priority?: string;
 }
 
+// Rotas públicas indexáveis. Painel (/app/*), /auth, /cliente/* e /agendamento
+// são áreas privadas ou noindex e ficam fora do sitemap por decisão.
 const entries: SitemapEntry[] = [
   { path: "/", changefreq: "weekly", priority: "1.0" },
   { path: "/sobre", changefreq: "monthly", priority: "0.7" },
   { path: "/especialidades", changefreq: "weekly", priority: "0.8" },
   { path: "/profissionais", changefreq: "weekly", priority: "0.8" },
-  { path: "/agendamento", changefreq: "weekly", priority: "0.9" },
   { path: "/contato", changefreq: "monthly", priority: "0.6" },
 ];
+
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
