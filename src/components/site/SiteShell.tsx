@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { Menu, X, Sparkles, MapPin, Phone, Mail, ShieldCheck } from "lucide-react";
+import { Menu, X, Sparkles, MapPin, Phone, Mail, ShieldCheck, LayoutDashboard, LogOut, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { useClinicSettings, whatsappHref } from "@/lib/clinic-settings";
