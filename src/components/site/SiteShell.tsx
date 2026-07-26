@@ -88,13 +88,14 @@ export function SiteShell({ children }: { children: ReactNode }) {
             : "bg-transparent",
         )}
       >
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6 md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+        <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
           <Link to="/" className="flex min-w-0 items-center gap-2">
             <ClinicLogo logoUrl={settings.logo_url} nome={settings.nome} />
             <span className="truncate text-base font-semibold tracking-tight">{settings.nome}</span>
           </Link>
 
-          <nav className="hidden items-center justify-center gap-1 md:flex">
+          <nav className="hidden items-center justify-center gap-1 whitespace-nowrap lg:flex">
+
 
             {NAV.map((item) => {
               const active =
