@@ -33,6 +33,8 @@ import {
 import { Loader2, CalendarDays, LogOut, Bell, UserCircle2 } from "lucide-react";
 import { STATUS_COLOR, STATUS_LABEL, addMinutes, fmtHora, todayISO } from "@/lib/agenda-utils";
 import { cn } from "@/lib/utils";
+import { AvatarUploader } from "@/components/media/AvatarUploader";
+import { PersonAvatar } from "@/lib/avatar";
 
 export const Route = createFileRoute("/cliente/")({
   head: () => ({
