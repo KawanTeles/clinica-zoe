@@ -500,9 +500,9 @@ function InfoRow({
 
 function CTAFinal() {
   return (
-    <section className="relative overflow-hidden border-t border-border">
-      <div aria-hidden className="absolute inset-0 -z-10 bg-cta bg-cta-gradient" />
-      <div className="mx-auto max-w-5xl px-4 py-20 text-center sm:px-6">
+    <section className="relative overflow-hidden border-t border-border bg-cta bg-cta-gradient">
+      <div className="relative mx-auto max-w-5xl px-4 py-20 text-center sm:px-6">
+
         <Reveal>
           <h2 className="text-3xl font-bold tracking-tight text-cta-foreground sm:text-4xl">
             Pronto para cuidar de você com a Zoe?
