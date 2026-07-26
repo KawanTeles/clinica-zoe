@@ -149,12 +149,12 @@ export function SiteShell({ children }: { children: ReactNode }) {
               ))}
               <ThemeToggle showLabel className="justify-start px-3" />
               {hasStaffSession && (
-                <Link
-                  to={staffTo}
+                <a
+                  href={staffTo}
                   className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-primary hover:bg-secondary"
                 >
                   <ShieldCheck className="h-4 w-4" /> Painel da equipe
-                </Link>
+                </a>
               )}
               <div className="mt-2 flex gap-2">
                 <Link to={areaTo} className="flex-1">
