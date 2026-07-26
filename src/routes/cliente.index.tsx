@@ -440,12 +440,26 @@ function PerfilSection({ userId }: { userId: string }) {
     queryKey: ["cliente-perfil", userId],
     queryFn: async () => {
       const [{ data: prof }, { data: pac }] = await Promise.all([
-        supabase.from("profiles").select("nome, email, telefone").eq("id", userId).maybeSingle(),
-        supabase.from("pacientes").select("id, telefone, data_nascimento").eq("user_id", userId).maybeSingle(),
+        supabase.from("profiles").select("nome, email, telefone, foto_url").eq("id", userId).maybeSingle(),
+        supabase
+          .from("pacientes")
+          .select("id, telefone, data_nascimento, foto_url")
+          .eq("user_id", userId)
+          .maybeSingle(),
       ]);
       return { prof, pac };
     },
   });
+
+  const salvarFoto = async (next: string | null) => {
+    const { error } = await supabase.from("profiles").update({ foto_url: next }).eq("id", userId);
+    if (error) throw error;
+    if (data?.pac?.id) {
+      await supabase.from("pacientes").update({ foto_url: next }).eq("id", data.pac.id);
+    }
+    await qc.invalidateQueries({ queryKey: ["cliente-perfil"] });
+  };
+
 
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
