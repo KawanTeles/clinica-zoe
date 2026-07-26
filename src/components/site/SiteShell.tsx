@@ -210,9 +210,18 @@ export function SiteShell({ children }: { children: ReactNode }) {
                     <LogOut className="h-4 w-4" /> Sair
                   </Button>
                 )}
-                <Link to="/agendamento">
-                  <Button className="w-full rounded-full">Agendar consulta</Button>
-                </Link>
+                {mode === "client" ? (
+                  <Link to="/cliente">
+                    <Button className="w-full justify-center gap-2 rounded-full">
+                      <UserRound className="h-4 w-4" /> Minha Área
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link to="/agendamento">
+                    <Button className="w-full rounded-full">Agendar consulta</Button>
+                  </Link>
+                )}
+
               </div>
 
             </div>
