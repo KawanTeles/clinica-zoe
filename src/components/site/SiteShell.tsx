@@ -128,13 +128,6 @@ export function SiteShell({ children }: { children: ReactNode }) {
                 </Button>
               </a>
             )}
-            {mode === "client" && (
-              <Link to="/cliente" className="hidden sm:inline-flex">
-                <Button variant="outline" size="sm" className={softButton}>
-                  <UserRound className="h-4 w-4 text-primary" /> Minha Área
-                </Button>
-              </Link>
-            )}
             {mode === "guest" && (
               <Link to="/cliente/login" className="hidden sm:inline-flex">
                 <Button variant="ghost" size="sm" className="rounded-full px-3.5">
