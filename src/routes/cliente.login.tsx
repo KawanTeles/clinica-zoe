@@ -52,7 +52,7 @@ function ClienteLoginPage() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary via-background to-surface-muted px-4 py-10">
+    <div className="min-h-screen bg-linear-to-br from-secondary via-background to-surface-muted px-4 py-10">
       <div className="mx-auto flex max-w-md flex-col items-center">
         <Link to="/" className="mb-8 flex items-center gap-2">
           <div className="grid h-11 w-11 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-elegant">

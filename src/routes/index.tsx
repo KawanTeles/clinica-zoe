@@ -60,7 +60,7 @@ function Hero() {
     <section className="relative overflow-hidden">
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-gradient-to-br from-secondary via-background to-surface-muted"
+        className="absolute inset-0 -z-10 bg-linear-to-br from-secondary via-background to-surface-muted"
       />
       <div
         aria-hidden
@@ -81,7 +81,7 @@ function Hero() {
         <Reveal delay={80}>
           <h1 className="mt-6 max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
             Sua saúde merece um{" "}
-            <span className="bg-gradient-to-r from-primary via-primary-light to-primary-dark bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-primary via-primary-light to-primary-dark bg-clip-text text-transparent">
               cuidado premium
             </span>
           </h1>
@@ -500,26 +500,26 @@ function InfoRow({
 
 function CTAFinal() {
   return (
-    <section className="relative overflow-hidden border-t border-border">
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-gradient-to-br from-primary via-primary-light to-primary-dark opacity-95"
-      />
-      <div className="mx-auto max-w-5xl px-4 py-20 text-center sm:px-6">
+    <section className="relative overflow-hidden border-t border-border bg-cta bg-cta-gradient">
+      <div className="relative mx-auto max-w-5xl px-4 py-20 text-center sm:px-6">
+
         <Reveal>
-          <h2 className="text-3xl font-bold tracking-tight text-primary-foreground sm:text-4xl">
+          <h2 className="text-3xl font-bold tracking-tight text-cta-foreground sm:text-4xl">
             Pronto para cuidar de você com a Zoe?
           </h2>
         </Reveal>
         <Reveal delay={80}>
-          <p className="mx-auto mt-4 max-w-2xl text-primary-foreground/90">
+          <p className="mx-auto mt-4 max-w-2xl text-cta-foreground/90">
             Agende sua consulta agora — leva menos de um minuto.
           </p>
         </Reveal>
         <Reveal delay={160}>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link to="/agendamento">
-              <Button size="lg" variant="secondary" className="rounded-full px-6 text-primary-dark">
+              <Button
+                size="lg"
+                className="rounded-full bg-cta-foreground px-6 text-cta shadow-elegant transition-transform hover:-translate-y-0.5 hover:bg-cta-foreground/90"
+              >
                 Agendar consulta <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
@@ -527,7 +527,7 @@ function CTAFinal() {
               <Button
                 size="lg"
                 variant="outline"
-                className="rounded-full border-primary-foreground/60 bg-transparent px-6 text-primary-foreground hover:bg-primary-foreground/10"
+                className="rounded-full border-cta-foreground/70 bg-transparent px-6 text-cta-foreground transition-transform hover:-translate-y-0.5 hover:bg-cta-foreground/15 hover:text-cta-foreground"
               >
                 Falar no WhatsApp
               </Button>

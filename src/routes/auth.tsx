@@ -37,7 +37,7 @@ function AuthPage() {
   }, [loading, session, hasAnyRole, navigate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-surface-muted to-background px-4 py-10">
+    <div className="min-h-screen bg-linear-to-br from-background via-surface-muted to-background px-4 py-10">
       <div className="mx-auto flex max-w-md flex-col items-center">
         <Link to="/" className="mb-8 flex items-center gap-2">
           <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary-dark text-primary-foreground shadow-soft">

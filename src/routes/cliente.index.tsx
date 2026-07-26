@@ -73,7 +73,7 @@ function ClientePage() {
 
   return (
     <SiteShell>
-      <section className="border-b border-border bg-gradient-to-br from-secondary via-background to-surface-muted py-12">
+      <section className="border-b border-border bg-linear-to-br from-secondary via-background to-surface-muted py-12">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 sm:px-6">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-primary">Área do Cliente</p>
