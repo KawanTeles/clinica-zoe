@@ -254,6 +254,7 @@ export type Database = {
           created_at: string
           data_nascimento: string | null
           email: string | null
+          foto_url: string | null
           id: string
           nome: string
           observacoes: string | null
@@ -265,6 +266,7 @@ export type Database = {
           created_at?: string
           data_nascimento?: string | null
           email?: string | null
+          foto_url?: string | null
           id?: string
           nome: string
           observacoes?: string | null
@@ -276,6 +278,7 @@ export type Database = {
           created_at?: string
           data_nascimento?: string | null
           email?: string | null
+          foto_url?: string | null
           id?: string
           nome?: string
           observacoes?: string | null
@@ -289,6 +292,7 @@ export type Database = {
         Row: {
           created_at: string
           email: string
+          foto_url: string | null
           id: string
           nome: string
           telefone: string | null
@@ -297,6 +301,7 @@ export type Database = {
         Insert: {
           created_at?: string
           email: string
+          foto_url?: string | null
           id: string
           nome?: string
           telefone?: string | null
@@ -305,6 +310,7 @@ export type Database = {
         Update: {
           created_at?: string
           email?: string
+          foto_url?: string | null
           id?: string
           nome?: string
           telefone?: string | null
