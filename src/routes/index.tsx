@@ -58,12 +58,20 @@ function HomePage() {
 
 function Hero() {
   const { settings } = useClinicSettings();
+  const heroBg = useAvatarUrl(settings.hero_imagem_url);
   return (
     <section className="relative overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-linear-to-br from-secondary via-background to-surface-muted"
       />
+      {heroBg && (
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-cover bg-center opacity-20"
+          style={{ backgroundImage: `url(${heroBg})` }}
+        />
+      )}
       <div
         aria-hidden
         className="absolute -top-40 right-[-10%] -z-10 h-[520px] w-[520px] rounded-full bg-primary/10 blur-3xl"
@@ -77,23 +85,22 @@ function Hero() {
         <Reveal>
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted-foreground shadow-soft">
             <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />
-            Atendimento humano · Estética premium
+            {settings.tagline}
           </span>
         </Reveal>
         <Reveal delay={80}>
           <h1 className="mt-6 max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-            Sua saúde merece um{" "}
             <span className="bg-linear-to-r from-primary via-primary-light to-primary-dark bg-clip-text text-transparent">
-              cuidado premium
+              {settings.hero_titulo}
             </span>
           </h1>
         </Reveal>
         <Reveal delay={160}>
           <p className="mt-6 max-w-2xl text-base text-muted-foreground sm:text-lg">
-            Agende consultas com profissionais especializados, acompanhe suas visitas e receba
-            confirmações em tempo real — tudo em uma experiência clínica sofisticada.
+            {settings.hero_subtitulo}
           </p>
         </Reveal>
+
         <Reveal delay={240}>
           <div className="mt-8 flex justify-center">
             <Link to="/agendamento">
