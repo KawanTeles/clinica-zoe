@@ -191,6 +191,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
                     </Button>
                   </Link>
                 )}
+
                 {mode === "guest" && (
                   <Link to="/cliente/login">
                     <Button variant="outline" className={cn(softButton, "w-full justify-center")}>
