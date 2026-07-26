@@ -33,32 +33,24 @@ const passSchema = z.string().min(6, "Senha deve ter no mínimo 6 caracteres").m
 const nomeSchema = z.string().trim().min(2, "Informe o nome").max(120);
 
 function ClienteLoginPage() {
-  const { session, ready, isStaff, signOut } = useAuth();
+  const { session, ready } = useAuth();
   const navigate = useNavigate();
   const { redirect } = Route.useSearch();
   const [tab, setTab] = useState<"login" | "signup">("login");
 
   useEffect(() => {
     if (!ready || !session) return;
-    // Sessão interna (equipe): encerra silenciosamente e mostra o login do paciente
-    if (isStaff) {
-      void signOut();
-      return;
-    }
     if (redirect && redirect.startsWith("/") && !redirect.startsWith("//")) {
       navigate({ to: redirect as any, replace: true });
     } else {
       navigate({ to: "/cliente", replace: true });
     }
-  }, [ready, session, isStaff, signOut, navigate, redirect]);
+  }, [ready, session, navigate, redirect]);
 
-  if (!ready || (session && !isStaff)) {
+  if (!ready || session) {
     return <AuthSplash message={session ? "Entrando..." : "Carregando..."} />;
   }
 
-  if (session && isStaff) {
-    return <AuthSplash message="Carregando..." />;
-  }
 
 
 
