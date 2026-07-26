@@ -44,9 +44,13 @@ function ClinicLogo({ logoUrl, nome }: { logoUrl: string | null; nome: string })
   );
 }
 
+/** Botão secundário elegante (borda suave, fundo transparente, hover leve). */
+const softButton =
+  "gap-1.5 rounded-full border border-border/70 bg-transparent px-3.5 text-foreground/90 shadow-none transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-foreground";
+
 export function SiteShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { session, ready } = useAuth();
+  const { session, ready, signOut } = useAuth();
   const { settings } = useClinicSettings();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -60,10 +64,16 @@ export function SiteShell({ children }: { children: ReactNode }) {
   }, []);
 
   // O site público pertence à sessão do paciente (isolada da sessão da equipe).
-  const areaTo = ready && session ? "/cliente" : "/cliente/login";
-  const areaLabel = ready && session ? "Minha Área" : "Entrar";
-  const { hasStaffSession } = useStaffSession();
+  const { hasStaffSession, signOutStaff } = useStaffSession();
+  const isClient = ready && !!session;
+  // Nunca exibir "Painel da Equipe" e "Minha Área" ao mesmo tempo.
+  const mode: "staff" | "client" | "guest" = hasStaffSession
+    ? "staff"
+    : isClient
+      ? "client"
+      : "guest";
   const staffTo = hasStaffSession ? "/app" : "/auth";
+
 
 
   return (
