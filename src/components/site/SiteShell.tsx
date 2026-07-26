@@ -88,13 +88,14 @@ export function SiteShell({ children }: { children: ReactNode }) {
             : "bg-transparent",
         )}
       >
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6 md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+        <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
           <Link to="/" className="flex min-w-0 items-center gap-2">
             <ClinicLogo logoUrl={settings.logo_url} nome={settings.nome} />
             <span className="truncate text-base font-semibold tracking-tight">{settings.nome}</span>
           </Link>
 
-          <nav className="hidden items-center justify-center gap-1 md:flex">
+          <nav className="hidden items-center justify-center gap-1 whitespace-nowrap lg:flex">
+
 
             {NAV.map((item) => {
               const active =
@@ -117,14 +118,14 @@ export function SiteShell({ children }: { children: ReactNode }) {
             })}
           </nav>
 
-          <div className="ml-auto flex items-center gap-2 md:ml-0 md:justify-self-end">
+          <div className="ml-auto flex shrink-0 items-center gap-2 lg:ml-0 lg:justify-self-end">
             <ThemeToggle />
 
             {mode === "staff" && (
               // navegação entre áreas usa carregamento completo (sessões isoladas)
               <a href={staffTo} className="hidden sm:inline-flex">
-                <Button variant="outline" size="sm" className={softButton}>
-                  <LayoutDashboard className="h-4 w-4 text-primary" /> Painel da Equipe
+                <Button size="sm" className="gap-2 rounded-full px-4 shadow-soft">
+                  <LayoutDashboard className="h-4 w-4" /> Painel da Equipe
                 </Button>
               </a>
             )}
@@ -146,13 +147,14 @@ export function SiteShell({ children }: { children: ReactNode }) {
               </Button>
             )}
 
-            {mode === "client" ? (
+            {mode === "client" && (
               <Link to="/cliente" className="hidden sm:inline-flex">
-                <Button size="sm" className="rounded-full px-4 shadow-soft">
+                <Button size="sm" className="gap-2 rounded-full px-4 shadow-soft">
                   <UserRound className="h-4 w-4" /> Minha Área
                 </Button>
               </Link>
-            ) : (
+            )}
+            {(mode === "guest" || mode === "loading") && (
               <Link to="/agendamento" className="hidden sm:inline-flex">
                 <Button size="sm" className="rounded-full px-4 shadow-soft">
                   Agendar consulta
@@ -161,7 +163,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
             )}
 
             <button
-              className="grid h-10 w-10 place-items-center rounded-lg text-foreground md:hidden"
+              className="grid h-10 w-10 place-items-center rounded-lg text-foreground lg:hidden"
               onClick={() => setOpen((v) => !v)}
               aria-label="Menu"
             >
@@ -169,10 +171,11 @@ export function SiteShell({ children }: { children: ReactNode }) {
             </button>
           </div>
 
+
         </div>
 
         {open && (
-          <div className="border-t border-border bg-background/95 backdrop-blur md:hidden">
+          <div className="border-t border-border bg-background/95 backdrop-blur lg:hidden">
             <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-3">
               {NAV.map((item) => (
                 <Link
@@ -210,17 +213,19 @@ export function SiteShell({ children }: { children: ReactNode }) {
                     <LogOut className="h-4 w-4" /> Sair
                   </Button>
                 )}
-                {mode === "client" ? (
+                {mode === "client" && (
                   <Link to="/cliente">
                     <Button className="w-full justify-center gap-2 rounded-full">
                       <UserRound className="h-4 w-4" /> Minha Área
                     </Button>
                   </Link>
-                ) : (
+                )}
+                {(mode === "guest" || mode === "loading") && (
                   <Link to="/agendamento">
                     <Button className="w-full rounded-full">Agendar consulta</Button>
                   </Link>
                 )}
+
 
               </div>
 
