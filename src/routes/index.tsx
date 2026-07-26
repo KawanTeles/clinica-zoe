@@ -363,24 +363,8 @@ function Depoimentos() {
 }
 
 function FAQ() {
-  const items = [
-    {
-      q: "Como faço para agendar uma consulta?",
-      a: "Clique em Agendar consulta, escolha a especialidade, o profissional, o dia e o horário livre. Você receberá a confirmação após aprovação do profissional.",
-    },
-    {
-      q: "Posso remarcar ou cancelar?",
-      a: "Sim. Na Área do Cliente você acompanha, remarca ou cancela suas consultas com poucos cliques.",
-    },
-    {
-      q: "Quais são as formas de pagamento?",
-      a: "Aceitamos pagamento à vista (Pix, dinheiro) e cartão. Os valores são exibidos no momento do agendamento.",
-    },
-    {
-      q: "Meus dados estão seguros?",
-      a: "Sim. Utilizamos criptografia e políticas de acesso rigorosas para proteger suas informações.",
-    },
-  ];
+  const items = FAQ_ITEMS;
+
   const [open, setOpen] = useState<number | null>(0);
   return (
     <section className="border-y border-border bg-surface-muted py-20">
