@@ -180,24 +180,43 @@ export function SiteShell({ children }: { children: ReactNode }) {
                 </Link>
               ))}
               <ThemeToggle showLabel className="justify-start px-3" />
-              {hasStaffSession && (
-                <a
-                  href={staffTo}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-primary hover:bg-secondary"
-                >
-                  <ShieldCheck className="h-4 w-4" /> Painel da equipe
-                </a>
-              )}
-              <div className="mt-2 flex gap-2">
-                <Link to={areaTo} className="flex-1">
-                  <Button variant="outline" className="w-full">
-                    {areaLabel}
+
+              <div className="mt-2 flex flex-col gap-2">
+                {mode === "staff" && (
+                  <a href={staffTo}>
+                    <Button variant="outline" className={cn(softButton, "w-full justify-center")}>
+                      <LayoutDashboard className="h-4 w-4 text-primary" /> Painel da Equipe
+                    </Button>
+                  </a>
+                )}
+                {mode === "client" && (
+                  <Link to="/cliente">
+                    <Button variant="outline" className={cn(softButton, "w-full justify-center")}>
+                      <UserRound className="h-4 w-4 text-primary" /> Minha Área
+                    </Button>
+                  </Link>
+                )}
+                {mode === "guest" && (
+                  <Link to="/cliente/login">
+                    <Button variant="outline" className={cn(softButton, "w-full justify-center")}>
+                      Entrar
+                    </Button>
+                  </Link>
+                )}
+                {mode !== "guest" && (
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-center gap-1.5 rounded-full text-muted-foreground"
+                    onClick={() => (mode === "staff" ? signOutStaff() : signOut())}
+                  >
+                    <LogOut className="h-4 w-4" /> Sair
                   </Button>
-                </Link>
-                <Link to="/agendamento" className="flex-1">
-                  <Button className="w-full">Agendar</Button>
+                )}
+                <Link to="/agendamento">
+                  <Button className="w-full rounded-full">Agendar consulta</Button>
                 </Link>
               </div>
+
             </div>
           </div>
         )}
