@@ -5,6 +5,7 @@ import { SiteShell, Reveal } from "@/components/site/SiteShell";
 import { ProfilePhoto, useAvatarUrl } from "@/lib/avatar";
 import { Button } from "@/components/ui/button";
 import { useClinicSettings, directionsHref, mapsEmbedUrl, whatsappHref } from "@/lib/clinic-settings";
+import { ProfissionalCard, useProfissionaisPublicos } from "@/lib/profissionais-public";
 import {
   Sparkles,
   ShieldCheck,
