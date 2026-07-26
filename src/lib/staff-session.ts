@@ -26,5 +26,9 @@ export function useStaffSession() {
     };
   }, []);
 
-  return { hasStaffSession };
+  const signOutStaff = async () => {
+    await getSupabaseFor("staff").auth.signOut();
+  };
+
+  return { hasStaffSession, signOutStaff };
 }

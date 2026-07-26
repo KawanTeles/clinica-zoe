@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { Menu, X, Sparkles, MapPin, Phone, Mail, ShieldCheck } from "lucide-react";
+import { Menu, X, Sparkles, MapPin, Phone, Mail, LayoutDashboard, LogOut, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { useClinicSettings, whatsappHref } from "@/lib/clinic-settings";
@@ -44,9 +44,13 @@ function ClinicLogo({ logoUrl, nome }: { logoUrl: string | null; nome: string })
   );
 }
 
+/** Botão secundário elegante (borda suave, fundo transparente, hover leve). */
+const softButton =
+  "gap-1.5 rounded-full border border-border/70 bg-transparent px-3.5 text-foreground/90 shadow-none transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-foreground";
+
 export function SiteShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { session, ready } = useAuth();
+  const { session, ready, signOut } = useAuth();
   const { settings } = useClinicSettings();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -60,10 +64,16 @@ export function SiteShell({ children }: { children: ReactNode }) {
   }, []);
 
   // O site público pertence à sessão do paciente (isolada da sessão da equipe).
-  const areaTo = ready && session ? "/cliente" : "/cliente/login";
-  const areaLabel = ready && session ? "Minha Área" : "Entrar";
-  const { hasStaffSession } = useStaffSession();
+  const { hasStaffSession, signOutStaff } = useStaffSession();
+  const isClient = ready && !!session;
+  // Nunca exibir "Painel da Equipe" e "Minha Área" ao mesmo tempo.
+  const mode: "staff" | "client" | "guest" = hasStaffSession
+    ? "staff"
+    : isClient
+      ? "client"
+      : "guest";
   const staffTo = hasStaffSession ? "/app" : "/auth";
+
 
 
   return (
@@ -107,19 +117,40 @@ export function SiteShell({ children }: { children: ReactNode }) {
 
           <div className="ml-auto flex items-center gap-2 md:ml-0 md:justify-self-end">
             <ThemeToggle />
-            {hasStaffSession && (
+
+            {mode === "staff" && (
               // navegação entre áreas usa carregamento completo (sessões isoladas)
               <a href={staffTo} className="hidden sm:inline-flex">
-                <Button variant="ghost" size="sm" className="gap-1.5">
-                  <ShieldCheck className="h-4 w-4 text-primary" /> Painel da equipe
+                <Button variant="outline" size="sm" className={softButton}>
+                  <LayoutDashboard className="h-4 w-4 text-primary" /> Painel da Equipe
                 </Button>
               </a>
             )}
-            <Link to={areaTo} className="hidden sm:inline-flex">
-              <Button variant="ghost" size="sm">
-                {areaLabel}
+            {mode === "client" && (
+              <Link to="/cliente" className="hidden sm:inline-flex">
+                <Button variant="outline" size="sm" className={softButton}>
+                  <UserRound className="h-4 w-4 text-primary" /> Minha Área
+                </Button>
+              </Link>
+            )}
+            {mode === "guest" && (
+              <Link to="/cliente/login" className="hidden sm:inline-flex">
+                <Button variant="ghost" size="sm" className="rounded-full px-3.5">
+                  Entrar
+                </Button>
+              </Link>
+            )}
+            {mode !== "guest" && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="hidden gap-1.5 rounded-full px-3.5 text-muted-foreground hover:text-foreground sm:inline-flex"
+                onClick={() => (mode === "staff" ? signOutStaff() : signOut())}
+              >
+                <LogOut className="h-4 w-4" /> Sair
               </Button>
-            </Link>
+            )}
+
             <Link to="/agendamento" className="hidden sm:inline-flex">
               <Button size="sm" className="rounded-full px-4 shadow-soft">
                 Agendar consulta
@@ -133,6 +164,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
+
         </div>
 
         {open && (
@@ -148,24 +180,43 @@ export function SiteShell({ children }: { children: ReactNode }) {
                 </Link>
               ))}
               <ThemeToggle showLabel className="justify-start px-3" />
-              {hasStaffSession && (
-                <a
-                  href={staffTo}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-primary hover:bg-secondary"
-                >
-                  <ShieldCheck className="h-4 w-4" /> Painel da equipe
-                </a>
-              )}
-              <div className="mt-2 flex gap-2">
-                <Link to={areaTo} className="flex-1">
-                  <Button variant="outline" className="w-full">
-                    {areaLabel}
+
+              <div className="mt-2 flex flex-col gap-2">
+                {mode === "staff" && (
+                  <a href={staffTo}>
+                    <Button variant="outline" className={cn(softButton, "w-full justify-center")}>
+                      <LayoutDashboard className="h-4 w-4 text-primary" /> Painel da Equipe
+                    </Button>
+                  </a>
+                )}
+                {mode === "client" && (
+                  <Link to="/cliente">
+                    <Button variant="outline" className={cn(softButton, "w-full justify-center")}>
+                      <UserRound className="h-4 w-4 text-primary" /> Minha Área
+                    </Button>
+                  </Link>
+                )}
+                {mode === "guest" && (
+                  <Link to="/cliente/login">
+                    <Button variant="outline" className={cn(softButton, "w-full justify-center")}>
+                      Entrar
+                    </Button>
+                  </Link>
+                )}
+                {mode !== "guest" && (
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-center gap-1.5 rounded-full text-muted-foreground"
+                    onClick={() => (mode === "staff" ? signOutStaff() : signOut())}
+                  >
+                    <LogOut className="h-4 w-4" /> Sair
                   </Button>
-                </Link>
-                <Link to="/agendamento" className="flex-1">
-                  <Button className="w-full">Agendar</Button>
+                )}
+                <Link to="/agendamento">
+                  <Button className="w-full rounded-full">Agendar consulta</Button>
                 </Link>
               </div>
+
             </div>
           </div>
         )}
