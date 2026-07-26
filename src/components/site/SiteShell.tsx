@@ -3,7 +3,8 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Menu, X, Sparkles, MapPin, Phone, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
-import { CLINIC_INFO, whatsappHref } from "@/lib/clinic-info";
+import { useClinicSettings, whatsappHref } from "@/lib/clinic-settings";
+import { useAvatarUrl } from "@/lib/avatar";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -15,9 +16,37 @@ const NAV = [
   { to: "/contato", label: "Contato" },
 ];
 
+const REDES: { key: string; label: string }[] = [
+  { key: "instagram", label: "Instagram" },
+  { key: "facebook", label: "Facebook" },
+  { key: "youtube", label: "YouTube" },
+  { key: "tiktok", label: "TikTok" },
+  { key: "linkedin", label: "LinkedIn" },
+];
+
+/** Logo da clínica com fallback no ícone padrão. */
+function ClinicLogo({ logoUrl, nome }: { logoUrl: string | null; nome: string }) {
+  const url = useAvatarUrl(logoUrl);
+  if (url) {
+    return (
+      <img
+        src={url}
+        alt={nome}
+        className="h-9 w-9 shrink-0 rounded-xl object-cover shadow-soft"
+      />
+    );
+  }
+  return (
+    <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-soft">
+      <Sparkles className="h-5 w-5" />
+    </div>
+  );
+}
+
 export function SiteShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { session } = useAuth();
+  const { session, hasAnyRole } = useAuth();
+  const { settings } = useClinicSettings();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -28,6 +57,10 @@ export function SiteShell({ children }: { children: ReactNode }) {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const isStaff = !!session && hasAnyRole(["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"]);
+  const areaTo = !session ? "/cliente/login" : isStaff ? "/app" : "/cliente";
+  const areaLabel = !session ? "Entrar" : isStaff ? "Painel Administrativo" : "Minha Área";
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
@@ -41,10 +74,8 @@ export function SiteShell({ children }: { children: ReactNode }) {
       >
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6 md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
           <Link to="/" className="flex min-w-0 items-center gap-2">
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-soft">
-              <Sparkles className="h-5 w-5" />
-            </div>
-            <span className="truncate text-base font-semibold tracking-tight">{CLINIC_INFO.nome}</span>
+            <ClinicLogo logoUrl={settings.logo_url} nome={settings.nome} />
+            <span className="truncate text-base font-semibold tracking-tight">{settings.nome}</span>
           </Link>
 
           <nav className="hidden items-center justify-center gap-1 md:flex">
@@ -72,9 +103,9 @@ export function SiteShell({ children }: { children: ReactNode }) {
 
           <div className="ml-auto flex items-center gap-2 md:ml-0 md:justify-self-end">
             <ThemeToggle />
-            <Link to={session ? "/cliente" : "/cliente/login"} className="hidden sm:inline-flex">
+            <Link to={areaTo} className="hidden sm:inline-flex">
               <Button variant="ghost" size="sm">
-                {session ? "Área do Cliente" : "Entrar"}
+                {areaLabel}
               </Button>
             </Link>
             <Link to="/agendamento" className="hidden sm:inline-flex">
@@ -106,9 +137,9 @@ export function SiteShell({ children }: { children: ReactNode }) {
               ))}
               <ThemeToggle showLabel className="justify-start px-3" />
               <div className="mt-2 flex gap-2">
-                <Link to={session ? "/cliente" : "/cliente/login"} className="flex-1">
+                <Link to={areaTo} className="flex-1">
                   <Button variant="outline" className="w-full">
-                    {session ? "Área do Cliente" : "Entrar"}
+                    {areaLabel}
                   </Button>
                 </Link>
                 <Link to="/agendamento" className="flex-1">
@@ -126,15 +157,27 @@ export function SiteShell({ children }: { children: ReactNode }) {
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-4">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2">
-              <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-primary-foreground shadow-soft">
-                <Sparkles className="h-5 w-5" />
-              </div>
-              <span className="text-base font-semibold">{CLINIC_INFO.nome}</span>
+              <ClinicLogo logoUrl={settings.logo_url} nome={settings.nome} />
+              <span className="text-base font-semibold">{settings.nome}</span>
             </div>
             <p className="mt-3 max-w-sm text-sm text-muted-foreground">
-              {CLINIC_INFO.tagline}. Agenda inteligente, profissionais qualificados e uma experiência
-              de atendimento premium para você e sua família.
+              {settings.texto_institucional || `${settings.tagline}.`}
             </p>
+            {REDES.some((r) => (settings.redes_sociais as any)?.[r.key]) && (
+              <div className="mt-4 flex flex-wrap gap-3 text-sm">
+                {REDES.filter((r) => (settings.redes_sociais as any)?.[r.key]).map((r) => (
+                  <a
+                    key={r.key}
+                    href={(settings.redes_sociais as any)[r.key]}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    {r.label}
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
           <div>
             <h4 className="text-sm font-semibold">Navegação</h4>
@@ -149,16 +192,24 @@ export function SiteShell({ children }: { children: ReactNode }) {
           <div>
             <h4 className="text-sm font-semibold">Contato</h4>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-              <li className="flex gap-2"><MapPin className="h-4 w-4 shrink-0 text-primary" /><span>{CLINIC_INFO.endereco}</span></li>
-              <li className="flex gap-2"><Phone className="h-4 w-4 shrink-0 text-primary" /><span>{CLINIC_INFO.telefone}</span></li>
-              <li className="flex gap-2"><Mail className="h-4 w-4 shrink-0 text-primary" /><span>{CLINIC_INFO.email}</span></li>
-              <li><a href={whatsappHref()} target="_blank" rel="noreferrer" className="text-primary hover:underline">WhatsApp</a></li>
+              {settings.endereco && (
+                <li className="flex gap-2"><MapPin className="h-4 w-4 shrink-0 text-primary" /><span>{settings.endereco}</span></li>
+              )}
+              {settings.telefone && (
+                <li className="flex gap-2"><Phone className="h-4 w-4 shrink-0 text-primary" /><span>{settings.telefone}</span></li>
+              )}
+              {settings.email && (
+                <li className="flex gap-2"><Mail className="h-4 w-4 shrink-0 text-primary" /><span>{settings.email}</span></li>
+              )}
+              {settings.whatsapp && (
+                <li><a href={whatsappHref(settings)} target="_blank" rel="noreferrer" className="text-primary hover:underline">WhatsApp</a></li>
+              )}
             </ul>
           </div>
         </div>
         <div className="border-t border-border">
           <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-muted-foreground sm:flex-row sm:px-6">
-            <span>© {new Date().getFullYear()} {CLINIC_INFO.nome}. Todos os direitos reservados.</span>
+            <span>© {new Date().getFullYear()} {settings.nome}. Todos os direitos reservados.</span>
             <span>Feito com cuidado.</span>
           </div>
         </div>
@@ -166,6 +217,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
     </div>
   );
 }
+
 
 export function Reveal({
   children,

@@ -2,9 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteShell, Reveal } from "@/components/site/SiteShell";
-import { ProfilePhoto } from "@/lib/avatar";
+import { ProfilePhoto, useAvatarUrl } from "@/lib/avatar";
 import { Button } from "@/components/ui/button";
-import { CLINIC_INFO, directionsHref, mapsEmbedUrl, whatsappHref } from "@/lib/clinic-info";
+import { useClinicSettings, directionsHref, mapsEmbedUrl, whatsappHref } from "@/lib/clinic-settings";
 import {
   Sparkles,
   ShieldCheck,
@@ -57,12 +57,21 @@ function HomePage() {
 }
 
 function Hero() {
+  const { settings } = useClinicSettings();
+  const heroBg = useAvatarUrl(settings.hero_imagem_url);
   return (
     <section className="relative overflow-hidden">
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-linear-to-br from-secondary via-background to-surface-muted"
       />
+      {heroBg && (
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-cover bg-center opacity-20"
+          style={{ backgroundImage: `url(${heroBg})` }}
+        />
+      )}
       <div
         aria-hidden
         className="absolute -top-40 right-[-10%] -z-10 h-[520px] w-[520px] rounded-full bg-primary/10 blur-3xl"
@@ -76,23 +85,22 @@ function Hero() {
         <Reveal>
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted-foreground shadow-soft">
             <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />
-            Atendimento humano · Estética premium
+            {settings.tagline}
           </span>
         </Reveal>
         <Reveal delay={80}>
           <h1 className="mt-6 max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-            Sua saúde merece um{" "}
             <span className="bg-linear-to-r from-primary via-primary-light to-primary-dark bg-clip-text text-transparent">
-              cuidado premium
+              {settings.hero_titulo}
             </span>
           </h1>
         </Reveal>
         <Reveal delay={160}>
           <p className="mt-6 max-w-2xl text-base text-muted-foreground sm:text-lg">
-            Agende consultas com profissionais especializados, acompanhe suas visitas e receba
-            confirmações em tempo real — tudo em uma experiência clínica sofisticada.
+            {settings.hero_subtitulo}
           </p>
         </Reveal>
+
         <Reveal delay={240}>
           <div className="mt-8 flex justify-center">
             <Link to="/agendamento">
@@ -419,6 +427,7 @@ function FAQ() {
 }
 
 function Localizacao() {
+  const { settings } = useClinicSettings();
   return (
     <section id="localizacao" className="py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -431,15 +440,15 @@ function Localizacao() {
         <div className="mt-10 grid gap-6 lg:grid-cols-2">
           <Reveal>
             <div className="space-y-4 rounded-2xl border border-border bg-surface p-6 shadow-soft">
-              <InfoRow icon={MapPin} label="Endereço" value={CLINIC_INFO.endereco} />
-              <InfoRow icon={Phone} label="Telefone" value={CLINIC_INFO.telefone} />
-              <InfoRow icon={Mail} label="Email" value={CLINIC_INFO.email} />
+              <InfoRow icon={MapPin} label="Endereço" value={settings.endereco} />
+              <InfoRow icon={Phone} label="Telefone" value={settings.telefone} />
+              <InfoRow icon={Mail} label="Email" value={settings.email} />
               <div className="rounded-xl bg-secondary/60 p-4">
                 <div className="flex items-center gap-2 text-sm font-semibold text-primary-dark">
                   <Clock className="h-4 w-4" /> Horário de funcionamento
                 </div>
                 <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-                  {CLINIC_INFO.horarios.map((h) => (
+                  {settings.horarios.map((h) => (
                     <li key={h.dias} className="flex justify-between">
                       <span>{h.dias}</span>
                       <span className="font-medium text-foreground">{h.horario}</span>
@@ -448,12 +457,12 @@ function Localizacao() {
                 </ul>
               </div>
               <div className="flex flex-wrap gap-2 pt-2">
-                <a href={directionsHref()} target="_blank" rel="noreferrer">
+                <a href={directionsHref(settings)} target="_blank" rel="noreferrer">
                   <Button className="rounded-full">
                     <Navigation className="mr-2 h-4 w-4" /> Como chegar
                   </Button>
                 </a>
-                <a href={whatsappHref()} target="_blank" rel="noreferrer">
+                <a href={whatsappHref(settings)} target="_blank" rel="noreferrer">
                   <Button variant="outline" className="rounded-full">WhatsApp</Button>
                 </a>
               </div>
@@ -463,7 +472,7 @@ function Localizacao() {
             <div className="overflow-hidden rounded-2xl border border-border shadow-soft">
               <iframe
                 title="Localização da Clínica Zoe"
-                src={mapsEmbedUrl()}
+                src={mapsEmbedUrl(settings)}
                 loading="lazy"
                 className="h-[420px] w-full"
               />
@@ -498,6 +507,7 @@ function InfoRow({
 }
 
 function CTAFinal() {
+  const { settings } = useClinicSettings();
   return (
     <section className="relative overflow-hidden border-t border-border bg-background">
       <div className="relative mx-auto max-w-5xl px-4 py-20 text-center sm:px-6">
@@ -522,7 +532,7 @@ function CTAFinal() {
                 Agendar consulta <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <a href={whatsappHref()} target="_blank" rel="noreferrer">
+            <a href={whatsappHref(settings)} target="_blank" rel="noreferrer">
               <Button
                 size="lg"
                 variant="outline"

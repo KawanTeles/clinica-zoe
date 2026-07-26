@@ -88,6 +88,72 @@ export type Database = {
           },
         ]
       }
+      configuracoes_clinica: {
+        Row: {
+          created_at: string
+          email: string | null
+          endereco: string | null
+          hero_imagem_url: string | null
+          hero_subtitulo: string | null
+          hero_titulo: string | null
+          horarios: Json
+          id: string
+          latitude: number | null
+          logo_url: string | null
+          longitude: number | null
+          nome: string
+          og_imagem_url: string | null
+          redes_sociais: Json
+          tagline: string | null
+          telefone: string | null
+          texto_institucional: string | null
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          endereco?: string | null
+          hero_imagem_url?: string | null
+          hero_subtitulo?: string | null
+          hero_titulo?: string | null
+          horarios?: Json
+          id?: string
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          nome?: string
+          og_imagem_url?: string | null
+          redes_sociais?: Json
+          tagline?: string | null
+          telefone?: string | null
+          texto_institucional?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          endereco?: string | null
+          hero_imagem_url?: string | null
+          hero_subtitulo?: string | null
+          hero_titulo?: string | null
+          horarios?: Json
+          id?: string
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          nome?: string
+          og_imagem_url?: string | null
+          redes_sociais?: Json
+          tagline?: string | null
+          telefone?: string | null
+          texto_institucional?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       especialidades: {
         Row: {
           created_at: string
@@ -320,11 +386,13 @@ export type Database = {
       }
       profissionais: {
         Row: {
+          anos_experiencia: number | null
           created_at: string
           descricao: string | null
           duracao_consulta_min: number | null
           email: string | null
           especialidade_id: string | null
+          formacao: string | null
           foto_url: string | null
           id: string
           nome: string
@@ -337,11 +405,13 @@ export type Database = {
           valor_consulta_cartao: number | null
         }
         Insert: {
+          anos_experiencia?: number | null
           created_at?: string
           descricao?: string | null
           duracao_consulta_min?: number | null
           email?: string | null
           especialidade_id?: string | null
+          formacao?: string | null
           foto_url?: string | null
           id?: string
           nome: string
@@ -354,11 +424,13 @@ export type Database = {
           valor_consulta_cartao?: number | null
         }
         Update: {
+          anos_experiencia?: number | null
           created_at?: string
           descricao?: string | null
           duracao_consulta_min?: number | null
           email?: string | null
           especialidade_id?: string | null
+          formacao?: string | null
           foto_url?: string | null
           id?: string
           nome?: string
@@ -525,37 +597,46 @@ export type Database = {
     Views: {
       profissionais_public: {
         Row: {
+          anos_experiencia: number | null
           created_at: string | null
           descricao: string | null
           duracao_consulta_min: number | null
           especialidade_id: string | null
+          formacao: string | null
           foto_url: string | null
           id: string | null
           nome: string | null
+          registro_profissional: string | null
           status: Database["public"]["Enums"]["profissional_status"] | null
           valor_consulta_avista: number | null
           valor_consulta_cartao: number | null
         }
         Insert: {
+          anos_experiencia?: number | null
           created_at?: string | null
           descricao?: string | null
           duracao_consulta_min?: number | null
           especialidade_id?: string | null
+          formacao?: string | null
           foto_url?: string | null
           id?: string | null
           nome?: string | null
+          registro_profissional?: string | null
           status?: Database["public"]["Enums"]["profissional_status"] | null
           valor_consulta_avista?: number | null
           valor_consulta_cartao?: number | null
         }
         Update: {
+          anos_experiencia?: number | null
           created_at?: string | null
           descricao?: string | null
           duracao_consulta_min?: number | null
           especialidade_id?: string | null
+          formacao?: string | null
           foto_url?: string | null
           id?: string | null
           nome?: string | null
+          registro_profissional?: string | null
           status?: Database["public"]["Enums"]["profissional_status"] | null
           valor_consulta_avista?: number | null
           valor_consulta_cartao?: number | null

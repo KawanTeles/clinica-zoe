@@ -43,13 +43,15 @@ function MeuPerfil() {
     },
   });
 
-  const [form, setForm] = useState({ telefone: "", descricao: "", registro_profissional: "" });
+  const [form, setForm] = useState({ telefone: "", descricao: "", registro_profissional: "", formacao: "", anos_experiencia: "" });
   useEffect(() => {
     if (data) {
       setForm({
         telefone: data.telefone ?? "",
         descricao: data.descricao ?? "",
         registro_profissional: data.registro_profissional ?? "",
+        formacao: data.formacao ?? "",
+        anos_experiencia: data.anos_experiencia != null ? String(data.anos_experiencia) : "",
       });
     }
   }, [data]);
@@ -63,6 +65,8 @@ function MeuPerfil() {
           telefone: form.telefone || null,
           descricao: form.descricao || null,
           registro_profissional: form.registro_profissional || null,
+          formacao: form.formacao || null,
+          anos_experiencia: form.anos_experiencia ? Number(form.anos_experiencia) : null,
         })
         .eq("id", data.id);
       if (error) throw error;
@@ -121,8 +125,20 @@ function MeuPerfil() {
             <Label>Registro profissional</Label>
             <Input value={form.registro_profissional} onChange={(e) => setForm({ ...form, registro_profissional: e.target.value })} />
           </div>
+          <div className="space-y-1.5">
+            <Label>Formação</Label>
+            <Input value={form.formacao} onChange={(e) => setForm({ ...form, formacao: e.target.value })} />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Anos de experiência</Label>
+            <Input
+              type="number"
+              value={form.anos_experiencia}
+              onChange={(e) => setForm({ ...form, anos_experiencia: e.target.value })}
+            />
+          </div>
           <div className="sm:col-span-2 space-y-1.5">
-            <Label>Descrição</Label>
+            <Label>Descrição (mini biografia)</Label>
             <Textarea rows={4} value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} />
           </div>
           <div className="sm:col-span-2">

@@ -30,7 +30,7 @@ function ProfissionaisPublicos() {
       const { data, error } = await (supabase as any)
         .from("profissionais_public")
         .select(
-          "id, nome, foto_url, descricao, valor_consulta_avista, valor_consulta_cartao, especialidade:especialidades(nome)",
+          "id, nome, foto_url, descricao, formacao, anos_experiencia, registro_profissional, valor_consulta_avista, valor_consulta_cartao, especialidade:especialidades(nome)",
         )
         .order("nome");
       if (error) throw error;
@@ -84,6 +84,15 @@ function ProfissionaisPublicos() {
                       {p.descricao && (
                         <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">{p.descricao}</p>
                       )}
+                      <ul className="mt-3 space-y-1 text-xs text-muted-foreground">
+                        {p.formacao && <li>Formação: <span className="text-foreground">{p.formacao}</span></li>}
+                        {p.anos_experiencia ? (
+                          <li>Experiência: <span className="text-foreground">{p.anos_experiencia} anos</span></li>
+                        ) : null}
+                        {p.registro_profissional && (
+                          <li>Registro: <span className="text-foreground">{p.registro_profissional}</span></li>
+                        )}
+                      </ul>
                       <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                         {p.valor_consulta_avista && (
                           <span>
