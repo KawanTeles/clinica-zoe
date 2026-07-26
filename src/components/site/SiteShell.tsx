@@ -118,14 +118,14 @@ export function SiteShell({ children }: { children: ReactNode }) {
             })}
           </nav>
 
-          <div className="ml-auto flex items-center gap-2 md:ml-0 md:justify-self-end">
+          <div className="ml-auto flex shrink-0 items-center gap-2 lg:ml-0 lg:justify-self-end">
             <ThemeToggle />
 
             {mode === "staff" && (
               // navegação entre áreas usa carregamento completo (sessões isoladas)
               <a href={staffTo} className="hidden sm:inline-flex">
-                <Button variant="outline" size="sm" className={softButton}>
-                  <LayoutDashboard className="h-4 w-4 text-primary" /> Painel da Equipe
+                <Button size="sm" className="gap-2 rounded-full px-4 shadow-soft">
+                  <LayoutDashboard className="h-4 w-4" /> Painel da Equipe
                 </Button>
               </a>
             )}
@@ -147,13 +147,14 @@ export function SiteShell({ children }: { children: ReactNode }) {
               </Button>
             )}
 
-            {mode === "client" ? (
+            {mode === "client" && (
               <Link to="/cliente" className="hidden sm:inline-flex">
-                <Button size="sm" className="rounded-full px-4 shadow-soft">
+                <Button size="sm" className="gap-2 rounded-full px-4 shadow-soft">
                   <UserRound className="h-4 w-4" /> Minha Área
                 </Button>
               </Link>
-            ) : (
+            )}
+            {(mode === "guest" || mode === "loading") && (
               <Link to="/agendamento" className="hidden sm:inline-flex">
                 <Button size="sm" className="rounded-full px-4 shadow-soft">
                   Agendar consulta
@@ -162,13 +163,14 @@ export function SiteShell({ children }: { children: ReactNode }) {
             )}
 
             <button
-              className="grid h-10 w-10 place-items-center rounded-lg text-foreground md:hidden"
+              className="grid h-10 w-10 place-items-center rounded-lg text-foreground lg:hidden"
               onClick={() => setOpen((v) => !v)}
               aria-label="Menu"
             >
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
+
 
         </div>
 
