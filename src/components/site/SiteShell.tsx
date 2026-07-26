@@ -108,11 +108,12 @@ export function SiteShell({ children }: { children: ReactNode }) {
           <div className="ml-auto flex items-center gap-2 md:ml-0 md:justify-self-end">
             <ThemeToggle />
             {hasStaffSession && (
-              <Link to={staffTo} className="hidden sm:inline-flex">
+              // navegação entre áreas usa carregamento completo (sessões isoladas)
+              <a href={staffTo} className="hidden sm:inline-flex">
                 <Button variant="ghost" size="sm" className="gap-1.5">
                   <ShieldCheck className="h-4 w-4 text-primary" /> Painel da equipe
                 </Button>
-              </Link>
+              </a>
             )}
             <Link to={areaTo} className="hidden sm:inline-flex">
               <Button variant="ghost" size="sm">
@@ -148,12 +149,12 @@ export function SiteShell({ children }: { children: ReactNode }) {
               ))}
               <ThemeToggle showLabel className="justify-start px-3" />
               {hasStaffSession && (
-                <Link
-                  to={staffTo}
+                <a
+                  href={staffTo}
                   className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-primary hover:bg-secondary"
                 >
                   <ShieldCheck className="h-4 w-4" /> Painel da equipe
-                </Link>
+                </a>
               )}
               <div className="mt-2 flex gap-2">
                 <Link to={areaTo} className="flex-1">
@@ -207,9 +208,9 @@ export function SiteShell({ children }: { children: ReactNode }) {
                 </li>
               ))}
               <li>
-                <Link to={staffTo} className="hover:text-foreground">
+                <a href={staffTo} className="hover:text-foreground">
                   Acesso da equipe
-                </Link>
+                </a>
               </li>
             </ul>
           </div>
