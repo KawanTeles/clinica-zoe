@@ -16,9 +16,24 @@ export const Route = createFileRoute("/especialidades")({
       { property: "og:title", content: "Especialidades — Clínica Zoe" },
       { property: "og:description", content: "Especialidades disponíveis para agendamento." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://clinicazoe.lovable.app/especialidades" },
     ],
-    links: [{ rel: "canonical", href: "/especialidades" }],
+    links: [{ rel: "canonical", href: "https://clinicazoe.lovable.app/especialidades" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Especialidades — Clínica Zoe",
+          url: "https://clinicazoe.lovable.app/especialidades",
+          description: "Especialidades disponíveis para agendamento na Clínica Zoe.",
+          about: { "@type": "MedicalBusiness", name: "Clínica Zoe" },
+        }),
+      },
+    ],
   }),
+
   component: EspecialidadesPage,
 });
 
