@@ -181,7 +181,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
                   {item.label}
                 </Link>
               ))}
-              <ThemeToggle showLabel className="justify-start px-3" />
+
 
               <div className="mt-2 flex flex-col gap-2">
                 {mode === "staff" && (
