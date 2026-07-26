@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
+import { AvatarUploader } from "@/components/media/AvatarUploader";
+
 
 export const Route = createFileRoute("/app/meu-perfil")({
   head: () => ({
