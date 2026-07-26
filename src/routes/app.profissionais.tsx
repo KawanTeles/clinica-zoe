@@ -135,6 +135,8 @@ const formSchema = z.object({
   especialidade_id: z.string().uuid().optional().nullable(),
   registro_profissional: z.string().optional(),
   descricao: z.string().optional(),
+  formacao: z.string().optional(),
+  anos_experiencia: z.number().int().min(0).max(80),
   valor_consulta_avista: z.number().nonnegative(),
   valor_consulta_cartao: z.number().nonnegative(),
   duracao_consulta_min: z.number().int().positive(),
@@ -162,6 +164,8 @@ function NovoProfissionalDialog() {
     especialidade_id: "",
     registro_profissional: "",
     descricao: "",
+    formacao: "",
+    anos_experiencia: 0,
     valor_consulta_avista: 0,
     valor_consulta_cartao: 0,
     duracao_consulta_min: 60,
@@ -185,6 +189,8 @@ function NovoProfissionalDialog() {
             especialidade_id: parsed.especialidade_id ?? null,
             registro_profissional: parsed.registro_profissional || null,
             descricao: parsed.descricao || null,
+            formacao: parsed.formacao || null,
+            anos_experiencia: parsed.anos_experiencia || null,
             valor_consulta_avista: parsed.valor_consulta_avista,
             valor_consulta_cartao: parsed.valor_consulta_cartao,
             duracao_consulta_min: parsed.duracao_consulta_min,
@@ -206,6 +212,8 @@ function NovoProfissionalDialog() {
         especialidade_id: "",
         registro_profissional: "",
         descricao: "",
+        formacao: "",
+        anos_experiencia: 0,
         valor_consulta_avista: 0,
         valor_consulta_cartao: 0,
         duracao_consulta_min: 60,
@@ -297,7 +305,17 @@ function NovoProfissionalDialog() {
               onChange={(e) => setForm({ ...form, duracao_consulta_min: Number(e.target.value) })}
             />
           </Field>
-          <Field label="Descrição" span={2}>
+          <Field label="Formação">
+            <Input value={form.formacao} onChange={(e) => setForm({ ...form, formacao: e.target.value })} />
+          </Field>
+          <Field label="Anos de experiência">
+            <Input
+              type="number"
+              value={form.anos_experiencia}
+              onChange={(e) => setForm({ ...form, anos_experiencia: Number(e.target.value) })}
+            />
+          </Field>
+          <Field label="Descrição (mini biografia)" span={2}>
             <Textarea rows={3} value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} />
           </Field>
         </div>

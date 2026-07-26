@@ -43,13 +43,15 @@ function MeuPerfil() {
     },
   });
 
-  const [form, setForm] = useState({ telefone: "", descricao: "", registro_profissional: "" });
+  const [form, setForm] = useState({ telefone: "", descricao: "", registro_profissional: "", formacao: "", anos_experiencia: "" });
   useEffect(() => {
     if (data) {
       setForm({
         telefone: data.telefone ?? "",
         descricao: data.descricao ?? "",
         registro_profissional: data.registro_profissional ?? "",
+        formacao: data.formacao ?? "",
+        anos_experiencia: data.anos_experiencia != null ? String(data.anos_experiencia) : "",
       });
     }
   }, [data]);
@@ -63,6 +65,8 @@ function MeuPerfil() {
           telefone: form.telefone || null,
           descricao: form.descricao || null,
           registro_profissional: form.registro_profissional || null,
+          formacao: form.formacao || null,
+          anos_experiencia: form.anos_experiencia ? Number(form.anos_experiencia) : null,
         })
         .eq("id", data.id);
       if (error) throw error;
