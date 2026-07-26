@@ -1,16 +1,24 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { useRouter } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 
 export type AppRole = "ADMIN" | "RECEPCIONISTA" | "PROFISSIONAL" | "CLIENTE";
 
+const STAFF_ROLES: AppRole[] = ["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"];
+
 interface AuthState {
+  /** true enquanto a sessão inicial ainda está sendo lida */
   loading: boolean;
+  /** true somente quando sessão E papéis já foram resolvidos (nenhuma tela deve renderizar antes) */
+  ready: boolean;
   session: Session | null;
   user: User | null;
   roles: AppRole[];
   nome: string | null;
+  isStaff: boolean;
+  /** rota de destino conforme os papéis do usuário */
+  homePath: "/app" | "/cliente";
   hasRole: (role: AppRole) => boolean;
   hasAnyRole: (roles: AppRole[]) => boolean;
   signOut: () => Promise<void>;
@@ -24,7 +32,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [nome, setNome] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  const [rolesLoaded, setRolesLoaded] = useState(false);
+  const routerRef = useRef(useRouter());
 
   const loadProfile = async (uid: string) => {
     const [{ data: rolesData }, { data: profileData }] = await Promise.all([
@@ -33,27 +42,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ]);
     setRoles((rolesData?.map((r) => r.role as AppRole)) ?? []);
     setNome(profileData?.nome ?? null);
+    setRolesLoaded(true);
   };
 
   useEffect(() => {
+    let currentUserId: string | null = null;
+
     // Listener FIRST, then read session
     const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
       setSession(s);
       if (s?.user) {
-        // defer to avoid deadlock
-        setTimeout(() => {
-          loadProfile(s.user.id);
-        }, 0);
+        const changed = currentUserId !== s.user.id;
+        currentUserId = s.user.id;
+        if (changed) {
+          // papéis do novo usuário ainda desconhecidos: bloqueia qualquer decisão de rota
+          setRolesLoaded(false);
+          setRoles([]);
+          setNome(null);
+          // defer para evitar deadlock com o cliente supabase
+          setTimeout(() => {
+            loadProfile(s.user.id).finally(() => setLoading(false));
+          }, 0);
+        }
       } else {
+        currentUserId = null;
         setRoles([]);
         setNome(null);
+        setRolesLoaded(false);
+        setLoading(false);
       }
-      router.invalidate();
+      routerRef.current.invalidate();
     });
 
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       if (data.session?.user) {
+        currentUserId = data.session.user.id;
         loadProfile(data.session.user.id).finally(() => setLoading(false));
       } else {
         setLoading(false);
@@ -64,12 +88,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const isStaff = STAFF_ROLES.some((r) => roles.includes(r));
+  const ready = !loading && (!session || rolesLoaded);
+
   const value: AuthState = {
     loading,
+    ready,
     session,
     user: session?.user ?? null,
     roles,
     nome,
+    isStaff,
+    homePath: isStaff ? "/app" : "/cliente",
     hasRole: (r) => roles.includes(r),
     hasAnyRole: (rs) => rs.some((r) => roles.includes(r)),
     signOut: async () => {
