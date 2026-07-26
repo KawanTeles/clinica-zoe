@@ -111,6 +111,10 @@
   --input: oklch(0.94 0.008 190);
   --ring: oklch(0.58 0.08 185);
 
+  --cta: oklch(0.45 0.07 188);
+  --cta-foreground: oklch(0.99 0.005 180);
+  --gradient-cta: linear-gradient(135deg, oklch(0.45 0.07 188), oklch(0.56 0.08 184));
+
   --chart-1: oklch(0.58 0.08 185);
   --chart-2: oklch(0.68 0.09 182);
   --chart-3: oklch(0.42 0.06 190);
@@ -160,6 +164,9 @@
   --destructive: oklch(0.65 0.20 25);
   --destructive-foreground: oklch(1 0 0);
   --ring: oklch(0.68 0.09 182);
+  --cta: oklch(0.38 0.055 190);
+  --cta-foreground: oklch(0.985 0.004 180);
+  --gradient-cta: linear-gradient(135deg, oklch(0.30 0.045 192), oklch(0.44 0.065 186));
   --sidebar-foreground: oklch(0.98 0.005 180);
   --sidebar-primary: oklch(0.68 0.09 182);
   --sidebar-primary-foreground: oklch(0.15 0.02 200);
