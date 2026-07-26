@@ -35,6 +35,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
     setThemeState(initial);
     applyTheme(initial);
+    const id = window.setTimeout(() => document.documentElement.classList.add("theme-ready"), 60);
+    return () => window.clearTimeout(id);
   }, []);
 
   const setTheme = useCallback((next: Theme) => {
