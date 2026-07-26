@@ -33,23 +33,69 @@ const passSchema = z.string().min(6, "Senha deve ter no mínimo 6 caracteres").m
 const nomeSchema = z.string().trim().min(2, "Informe o nome").max(120);
 
 function ClienteLoginPage() {
-  const { session, ready, isStaff, homePath } = useAuth();
+  const { session, ready, isStaff, signOut } = useAuth();
   const navigate = useNavigate();
   const { redirect } = Route.useSearch();
   const [tab, setTab] = useState<"login" | "signup">("login");
+  const [switching, setSwitching] = useState(false);
 
   useEffect(() => {
-    if (!ready || !session) return;
-    if (!isStaff && redirect && redirect.startsWith("/") && !redirect.startsWith("//")) {
+    if (!ready || !session || isStaff) return;
+    if (redirect && redirect.startsWith("/") && !redirect.startsWith("//")) {
       navigate({ to: redirect as any, replace: true });
     } else {
-      navigate({ to: homePath, replace: true });
+      navigate({ to: "/cliente", replace: true });
     }
-  }, [ready, session, isStaff, homePath, navigate, redirect]);
+  }, [ready, session, isStaff, navigate, redirect]);
 
-  if (!ready || session) {
+  if (!ready || (session && !isStaff)) {
     return <AuthSplash message={session ? "Entrando..." : "Carregando..."} />;
   }
+
+  if (session && isStaff) {
+    return (
+      <div className="min-h-screen bg-linear-to-br from-secondary via-background to-surface-muted px-4 py-10">
+        <div className="mx-auto flex max-w-md flex-col items-center">
+          <Link to="/" className="mb-8 flex items-center gap-2">
+            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-elegant">
+              <HeartPulse className="h-5 w-5" />
+            </div>
+            <span className="text-lg font-semibold tracking-tight">Clínica Zoe</span>
+          </Link>
+          <div className="w-full rounded-3xl border border-border bg-surface/90 p-6 shadow-elegant backdrop-blur sm:p-8">
+            <h1 className="text-xl font-semibold tracking-tight">Você está conectado como equipe</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              A Área do Paciente é separada do Painel Administrativo. Para ver consultas de paciente,
+              saia da sessão da equipe e entre com uma conta de paciente.
+            </p>
+            <div className="mt-6 space-y-3">
+              <Button
+                className="w-full rounded-full"
+                disabled={switching}
+                onClick={async () => {
+                  setSwitching(true);
+                  await signOut();
+                  setSwitching(false);
+                }}
+              >
+                {switching && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Sair e entrar como paciente
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full rounded-full"
+                onClick={() => navigate({ to: "/app" })}
+              >
+                Ir para o Painel da Equipe
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+
 
 
   return (
