@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { SiteShell, Reveal } from "@/components/site/SiteShell";
 import { ProfilePhoto, useAvatarUrl } from "@/lib/avatar";
 import { Button } from "@/components/ui/button";
