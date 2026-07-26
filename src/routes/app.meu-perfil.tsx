@@ -125,8 +125,20 @@ function MeuPerfil() {
             <Label>Registro profissional</Label>
             <Input value={form.registro_profissional} onChange={(e) => setForm({ ...form, registro_profissional: e.target.value })} />
           </div>
+          <div className="space-y-1.5">
+            <Label>Formação</Label>
+            <Input value={form.formacao} onChange={(e) => setForm({ ...form, formacao: e.target.value })} />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Anos de experiência</Label>
+            <Input
+              type="number"
+              value={form.anos_experiencia}
+              onChange={(e) => setForm({ ...form, anos_experiencia: e.target.value })}
+            />
+          </div>
           <div className="sm:col-span-2 space-y-1.5">
-            <Label>Descrição</Label>
+            <Label>Descrição (mini biografia)</Label>
             <Textarea rows={4} value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} />
           </div>
           <div className="sm:col-span-2">
