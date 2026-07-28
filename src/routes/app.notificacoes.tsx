@@ -223,10 +223,25 @@ function NotificacoesPage() {
           </p>
         </div>
         {isAdmin && (
-          <Button onClick={() => mProcessar.mutate()} disabled={mProcessar.isPending} className="gap-2">
-            {mProcessar.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-            Processar fila
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              onClick={() => mLembretes.mutate()}
+              disabled={mLembretes.isPending}
+              className="gap-2"
+            >
+              {mLembretes.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Bell className="h-4 w-4" />
+              )}
+              Gerar lembretes
+            </Button>
+            <Button onClick={() => mProcessar.mutate()} disabled={mProcessar.isPending} className="gap-2">
+              {mProcessar.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              Processar fila
+            </Button>
+          </div>
         )}
       </div>
 
@@ -237,6 +252,37 @@ function NotificacoesPage() {
         <StatCard label="Erros" value={stats.erro} icon={AlertTriangle} tone="red" />
         <StatCard label="Canceladas" value={stats.cancelada} icon={XCircle} tone="slate" />
       </div>
+
+      {isAdmin && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Próximos lembretes (48h)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {proximos.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nenhuma consulta nas próximas 48 horas.</p>
+            ) : (
+              <div className="space-y-2">
+                {proximos.map((a: any) => (
+                  <div
+                    key={a.id}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-card px-4 py-2 text-sm"
+                  >
+                    <span className="font-medium">
+                      {a.pacientes?.nome ?? "Paciente"} · {a.profissionais?.nome ?? "Profissional"}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {new Date(`${a.data}T00:00:00`).toLocaleDateString("pt-BR")} às{" "}
+                      {String(a.hora_inicio).slice(0, 5)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
 
       <Card>
         <CardHeader className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
