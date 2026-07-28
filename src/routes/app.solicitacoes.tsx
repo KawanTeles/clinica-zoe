@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { dispararNotificacoesAgendamento } from "@/lib/notifications.functions";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
@@ -90,6 +92,8 @@ function SolicitacoesPage() {
     enabled: !isProfissional || !!profId || filtroStatus === "TODOS",
   });
 
+  const dispararFn = useServerFn(dispararNotificacoesAgendamento);
+
   const statusMut = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: "APROVADO" | "RECUSADO" }) => {
       const { error } = await supabase.from("agendamentos").update({ status }).eq("id", id);
@@ -97,6 +101,7 @@ function SolicitacoesPage() {
     },
     onSuccess: (_, vars) => {
       toast.success(vars.status === "APROVADO" ? "Consulta aprovada" : "Consulta recusada");
+      dispararFn({ data: { agendamentoId: vars.id } }).catch(() => {});
       qc.invalidateQueries({ queryKey: ["solicitacoes"] });
       qc.invalidateQueries({ queryKey: ["agenda"] });
       qc.invalidateQueries({ queryKey: ["dashboard-stats"] });

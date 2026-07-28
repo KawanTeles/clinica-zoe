@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { dispararNotificacoesAgendamento } from "@/lib/notifications.functions";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
@@ -136,6 +138,8 @@ function AgendamentoPage() {
       : Number(profissional.valor_consulta_avista ?? profissional.valor_consulta_cartao ?? 0);
   }, [profissional, forma]);
 
+  const dispararFn = useServerFn(dispararNotificacoesAgendamento);
+
   const criar = useMutation({
     mutationFn: async () => {
       if (!session || !user) throw new Error("Faça login para agendar.");
@@ -198,6 +202,8 @@ function AgendamentoPage() {
       setCriado(id);
       setStep(5);
       toast.success("Solicitação enviada!");
+      // Dispara imediatamente os avisos externos (WhatsApp/e-mail) desta solicitação.
+      dispararFn({ data: { agendamentoId: id } }).catch(() => {});
     },
     onError: (e: any) => toast.error(e.message ?? "Não foi possível agendar."),
   });
