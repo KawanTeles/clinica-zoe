@@ -44,11 +44,13 @@ function MeuPerfil() {
     },
   });
 
-  const [form, setForm] = useState({ telefone: "", descricao: "", registro_profissional: "", formacao: "", anos_experiencia: "" });
+  const [form, setForm] = useState({ telefone: "", whatsapp: "", descricao: "", registro_profissional: "", formacao: "", anos_experiencia: "" });
   useEffect(() => {
     if (data) {
       setForm({
         telefone: data.telefone ?? "",
+        whatsapp: data.whatsapp ?? "",
+
         descricao: data.descricao ?? "",
         registro_profissional: data.registro_profissional ?? "",
         formacao: data.formacao ?? "",
