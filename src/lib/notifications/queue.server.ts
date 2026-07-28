@@ -8,7 +8,19 @@ export type ProcessResult = {
   error?: string;
   providerId?: string;
   adiada?: boolean;
+  definitivo?: boolean;
 };
+
+/**
+ * Política de reenvio automático: 1ª tentativa → +2 min → 2ª → +5 min → 3ª →
+ * +15 min → 4ª falha marca ERRO DEFINITIVO.
+ */
+export const RETRY_DELAYS_MIN = [2, 5, 15] as const;
+
+/** Minutos até a próxima tentativa, ou null quando o erro é definitivo. */
+export function proximoIntervaloMin(tentativas: number): number | null {
+  return RETRY_DELAYS_MIN[tentativas - 1] ?? null;
+}
 
 /** Hora atual (HH:MM) no fuso da clínica. */
 function horaLocal(): string {
@@ -29,6 +41,7 @@ export function dentroDaJanela(cfg: ProviderConfig): boolean {
   if (ini === fim) return true;
   return ini < fim ? agora >= ini && agora <= fim : agora >= ini || agora <= fim;
 }
+
 
 export async function processOne(id: string, opts?: { ignorarJanela?: boolean }): Promise<ProcessResult> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
