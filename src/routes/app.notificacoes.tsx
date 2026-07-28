@@ -88,8 +88,10 @@ const EVENTO_LABEL: Record<string, string> = {
   CONSULTA_CANCELADA: "Consulta cancelada",
   CONSULTA_REMARCADA: "Consulta remarcada",
   LEMBRETE_24H: "Lembrete 24h",
+  LEMBRETE_2H: "Lembrete 2h",
   PAGAMENTO_CONFIRMADO: "Pagamento confirmado",
 };
+
 
 function fmtDateTime(iso: string | null) {
   if (!iso) return "—";
