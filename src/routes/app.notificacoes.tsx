@@ -9,7 +9,9 @@ import {
   reenviarNotificacao,
   processarFilaNotificacoes,
   cancelarNotificacao,
+  gerarLembretesAgora,
 } from "@/lib/notifications.functions";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
