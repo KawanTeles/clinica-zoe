@@ -199,7 +199,8 @@ export const dispararNotificacoesAgendamento = createServerFn({ method: "POST" }
       .from("notificacoes")
       .select("id")
       .eq("agendamento_id", data.agendamentoId)
-      .eq("status_envio", "PENDENTE")
+      .in("status_envio", ["PENDENTE", "ERRO"])
+
       .in("canal", ["WHATSAPP", "EMAIL"])
       .limit(20);
     if (error) throw new Error(error.message);
