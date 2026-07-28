@@ -101,7 +101,7 @@ class EvolutionProvider implements MessageProvider {
         body: JSON.stringify({ number: digits(msg.to), text: `${msg.title}\n\n${msg.body}` }),
       });
       const raw = await resp.json().catch(() => null);
-      if (!resp.ok) return { ok: false, error: `HTTP ${resp.status}`, raw };
+      if (!resp.ok) return { ok: false, error: httpErro(resp.status), raw };
       return { ok: true, providerId: (raw as any)?.key?.id, raw };
     } catch (e) {
       return { ok: false, error: (e as Error).message };
@@ -153,7 +153,7 @@ class MetaCloudProvider implements MessageProvider {
         }),
       });
       const raw = await resp.json().catch(() => null);
-      if (!resp.ok) return { ok: false, error: `HTTP ${resp.status}`, raw };
+      if (!resp.ok) return { ok: false, error: httpErro(resp.status), raw };
       return { ok: true, providerId: (raw as any)?.messages?.[0]?.id, raw };
     } catch (e) {
       return { ok: false, error: (e as Error).message };
@@ -211,7 +211,7 @@ class TwilioProvider implements MessageProvider {
         },
       );
       const raw = await resp.json().catch(() => null);
-      if (!resp.ok) return { ok: false, error: `HTTP ${resp.status}`, raw };
+      if (!resp.ok) return { ok: false, error: httpErro(resp.status), raw };
       return { ok: true, providerId: (raw as any)?.sid, raw };
     } catch (e) {
       return { ok: false, error: (e as Error).message };
