@@ -236,7 +236,12 @@ export const DEFAULT_CONFIG: ProviderConfig = {
   conexao_status: "NAO_TESTADA",
   conexao_testada_em: null,
   conexao_erro: null,
+  janela_ativa: true,
+  janela_inicio: "08:00",
+  janela_fim: "20:00",
+  templates: {},
 };
+
 
 /** Lê a configuração no banco (service role). Nunca exponha o token ao cliente. */
 export async function loadConfig(): Promise<ProviderConfig> {
