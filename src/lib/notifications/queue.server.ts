@@ -71,10 +71,15 @@ export async function processOne(id: string, opts?: { ignorarJanela?: boolean })
         status_envio: "ERRO",
         ultimo_erro: "Destinatário sem contato",
         tentativas: (n.tentativas ?? 0) + 1,
+        definitivo: true,
+        proxima_tentativa_em: null,
       })
       .eq("id", id);
     return { ok: false, error: "Destinatário sem contato" };
   }
+
+  /** Reenvio manual: ignora a janela e reinicia o ciclo de tentativas. */
+  const manual = !!opts?.ignorarJanela;
 
   const cfg: ProviderConfig = await loadConfig();
 
@@ -92,7 +97,7 @@ export async function processOne(id: string, opts?: { ignorarJanela?: boolean })
 
   await (supabaseAdmin as any)
     .from("notificacoes")
-    .update({ status_envio: "ENVIANDO" })
+    .update({ status_envio: "ENVIANDO", ...(manual ? { definitivo: false } : {}) })
     .eq("id", id);
 
   // Texto: template personalizado do evento (se houver) ou o texto original.
@@ -117,7 +122,8 @@ export async function processOne(id: string, opts?: { ignorarJanela?: boolean })
   );
   const duracao = Date.now() - t0;
 
-  const tentativas = (n.tentativas ?? 0) + 1;
+  // Reenvio manual reinicia o ciclo automático de tentativas.
+  const tentativas = manual ? 1 : (n.tentativas ?? 0) + 1;
   const esperaMin = result.ok ? null : proximoIntervaloMin(tentativas);
   const definitivo = !result.ok && esperaMin === null;
 
