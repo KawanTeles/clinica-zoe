@@ -44,13 +44,25 @@ function ClinicLogo({ logoUrl, nome }: { logoUrl: string | null; nome: string })
   );
 }
 
-/** Botão secundário elegante (borda suave, fundo transparente, hover leve). */
-const softButton =
-  "gap-1.5 rounded-full border border-border/70 bg-transparent px-3.5 text-foreground/90 shadow-none transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-foreground";
+/** Botões de acesso: mesma altura, mesmo raio, mesmo alinhamento. */
+const accessButtonBase =
+  "inline-flex h-10 items-center justify-center gap-2 rounded-full px-4 text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+
+/** Paciente: fundo neutro (branco no claro, superfície escura no escuro) + borda suave. */
+const patientButton = cn(
+  accessButtonBase,
+  "border border-border bg-card text-foreground hover:border-primary/40 hover:bg-secondary",
+);
+
+/** Equipe: cor principal da clínica, destaque premium. */
+const clinicButton = cn(
+  accessButtonBase,
+  "bg-primary text-primary-foreground shadow-soft hover:bg-primary/90 hover:shadow-elegant",
+);
 
 export function SiteShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { session, ready, signOut } = useAuth();
+  const { session, ready } = useAuth();
   const { settings } = useClinicSettings();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -63,20 +75,16 @@ export function SiteShell({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // O site público pertence à sessão do paciente (isolada da sessão da equipe).
-  const { hasStaffSession, loading: staffSessionLoading, signOutStaff } = useStaffSession();
+  // Sessões independentes: paciente (site) e equipe (painel).
+  const { hasStaffSession, loading: staffSessionLoading } = useStaffSession();
+  const resolving = !ready || staffSessionLoading;
   const isClient = ready && !!session;
-  // Nunca exibir "Painel da Equipe" e "Minha Área" ao mesmo tempo.
-  const mode: "loading" | "staff" | "client" | "guest" = !ready || staffSessionLoading
-    ? "loading"
-    : hasStaffSession
-      ? "staff"
-      : isClient
-        ? "client"
-        : "guest";
+
+  // Área do Paciente -> Minha Área quando houver sessão de paciente.
+  const patientTo = isClient ? "/cliente" : "/cliente/login";
+  const patientLabel = isClient ? "Minha Área" : "Área do Paciente";
+  // Área da Clínica: sempre visível, nunca muda de nome.
   const staffTo = hasStaffSession ? "/app" : "/auth";
-
-
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
@@ -94,9 +102,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
             <span className="truncate text-base font-semibold tracking-tight">{settings.nome}</span>
           </Link>
 
-          <nav className="hidden items-center justify-center gap-1 whitespace-nowrap lg:flex">
-
-
+          <nav aria-label="Navegação principal" className="hidden items-center justify-center gap-1 whitespace-nowrap lg:flex">
             {NAV.map((item) => {
               const active =
                 item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
@@ -104,6 +110,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
                 <Link
                   key={item.to}
                   to={item.to}
+                  aria-current={active ? "page" : undefined}
                   className={cn(
                     "relative rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                     active ? "text-primary" : "text-muted-foreground hover:text-foreground",
@@ -121,58 +128,40 @@ export function SiteShell({ children }: { children: ReactNode }) {
           <div className="ml-auto flex shrink-0 items-center gap-2 lg:ml-0 lg:justify-self-end">
             <ThemeToggle />
 
-            {mode === "staff" && (
-              // navegação entre áreas usa carregamento completo (sessões isoladas)
-              <a href={staffTo} className="hidden sm:inline-flex">
-                <Button size="sm" className="gap-2 rounded-full px-4 shadow-soft">
-                  <LayoutDashboard className="h-4 w-4" /> Painel da Equipe
-                </Button>
-              </a>
-            )}
-            {mode === "guest" && (
-              <Link to="/cliente/login" className="hidden sm:inline-flex">
-                <Button variant="ghost" size="sm" className="rounded-full px-3.5">
-                  Entrar
-                </Button>
-              </Link>
-            )}
-            {mode !== "guest" && mode !== "loading" && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="hidden gap-1.5 rounded-full px-3.5 text-muted-foreground hover:text-foreground sm:inline-flex"
-                onClick={() => (mode === "staff" ? signOutStaff() : signOut())}
-              >
-                <LogOut className="h-4 w-4" /> Sair
-              </Button>
-            )}
+            <Link
+              to={patientTo}
+              aria-label={patientLabel}
+              className={cn(
+                patientButton,
+                "hidden sm:inline-flex",
+                resolving && "opacity-70",
+              )}
+            >
+              <UserRound className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+              <span>{patientLabel}</span>
+            </Link>
 
-            {mode === "client" && (
-              <Link to="/cliente" className="hidden sm:inline-flex">
-                <Button size="sm" className="gap-2 rounded-full px-4 shadow-soft">
-                  <UserRound className="h-4 w-4" /> Minha Área
-                </Button>
-              </Link>
-            )}
-            {(mode === "guest" || mode === "loading") && (
-              <Link to="/agendamento" className="hidden sm:inline-flex">
-                <Button size="sm" className="rounded-full px-4 shadow-soft">
-                  Agendar consulta
-                </Button>
-              </Link>
-            )}
+            {/* Sessões isoladas: navegação entre áreas usa carregamento completo. */}
+            <a
+              href={staffTo}
+              aria-label="Área da Clínica"
+              className={cn(clinicButton, "hidden sm:inline-flex")}
+            >
+              <Stethoscope className="h-4 w-4 shrink-0" aria-hidden="true" />
+              <span>Área da Clínica</span>
+            </a>
 
             <button
-              className="grid h-10 w-10 place-items-center rounded-lg text-foreground lg:hidden"
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-lg text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:hidden"
               onClick={() => setOpen((v) => !v)}
-              aria-label="Menu"
+              aria-label={open ? "Fechar menu" : "Abrir menu"}
+              aria-expanded={open}
             >
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
-
-
         </div>
+
 
         {open && (
           <div className="border-t border-border bg-background/95 backdrop-blur lg:hidden">
