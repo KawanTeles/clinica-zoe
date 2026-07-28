@@ -20,6 +20,8 @@ import {
 import { Plus, Loader2, Users } from "lucide-react";
 import { AvatarUploader } from "@/components/media/AvatarUploader";
 import { PersonAvatar } from "@/lib/avatar";
+import { WhatsAppLinha } from "@/components/contato/WhatsAppAviso";
+
 
 export const Route = createFileRoute("/app/pacientes")({
   head: () => ({
@@ -37,6 +39,7 @@ export const Route = createFileRoute("/app/pacientes")({
 const schema = z.object({
   nome: z.string().trim().min(2, "Informe o nome"),
   telefone: z.string().trim().optional(),
+  whatsapp: z.string().trim().optional(),
   email: z.string().trim().email("Email inválido").optional().or(z.literal("")),
   data_nascimento: z.string().optional(),
   observacoes: z.string().optional(),
@@ -48,12 +51,13 @@ function PacientesPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pacientes")
-        .select("id, nome, email, telefone, data_nascimento, observacoes, foto_url, created_at")
+        .select("id, nome, email, telefone, whatsapp, data_nascimento, observacoes, foto_url, created_at")
         .order("nome");
       if (error) throw error;
       return data;
     },
   });
+
 
   return (
     <div className="space-y-6">
@@ -90,10 +94,13 @@ function PacientesPage() {
               </CardHeader>
               <CardContent className="space-y-1 text-sm text-muted-foreground">
                 {p.email && <p className="truncate">{p.email}</p>}
-                {p.telefone && <p>{p.telefone}</p>}
+                {p.telefone && <p>Tel.: {p.telefone}</p>}
+                <p><WhatsAppLinha valor={p.whatsapp} /></p>
                 {p.data_nascimento && <p>Nasc.: {new Date(p.data_nascimento).toLocaleDateString("pt-BR")}</p>}
+                <EditarContatoPacienteDialog id={p.id} nome={p.nome} telefone={p.telefone} whatsapp={p.whatsapp} />
                 <FotoPacienteDialog id={p.id} nome={p.nome} fotoUrl={p.foto_url} />
               </CardContent>
+
             </Card>
           ))}
         </div>
@@ -105,7 +112,7 @@ function PacientesPage() {
 function NovoPacienteDialog() {
   const [open, setOpen] = useState(false);
   const qc = useQueryClient();
-  const [form, setForm] = useState({ nome: "", telefone: "", email: "", data_nascimento: "", observacoes: "" });
+  const [form, setForm] = useState({ nome: "", telefone: "", whatsapp: "", email: "", data_nascimento: "", observacoes: "" });
   const [foto, setFoto] = useState<string | null>(null);
 
   const mut = useMutation({
@@ -114,6 +121,7 @@ function NovoPacienteDialog() {
       const { error } = await supabase.from("pacientes").insert({
         nome: parsed.nome,
         telefone: parsed.telefone || null,
+        whatsapp: parsed.whatsapp || null,
         email: parsed.email || null,
         data_nascimento: parsed.data_nascimento || null,
         observacoes: parsed.observacoes || null,
@@ -125,7 +133,8 @@ function NovoPacienteDialog() {
       toast.success("Paciente cadastrado");
       qc.invalidateQueries({ queryKey: ["pacientes"] });
       qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
-      setForm({ nome: "", telefone: "", email: "", data_nascimento: "", observacoes: "" });
+      setForm({ nome: "", telefone: "", whatsapp: "", email: "", data_nascimento: "", observacoes: "" });
+
       setFoto(null);
       setOpen(false);
     },
@@ -165,6 +174,16 @@ function NovoPacienteDialog() {
             <Input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} />
           </div>
           <div className="space-y-1.5">
+            <Label>WhatsApp</Label>
+            <Input
+              value={form.whatsapp}
+              placeholder="(00) 00000-0000"
+              onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
+            />
+            <p className="text-[11px] text-muted-foreground">Usado nas notificações automáticas.</p>
+          </div>
+
+          <div className="space-y-1.5">
             <Label>Email</Label>
             <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
           </div>
@@ -183,6 +202,84 @@ function NovoPacienteDialog() {
           </Button>
           <Button onClick={() => mut.mutate()} disabled={mut.isPending}>
             {mut.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Cadastrar
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function EditarContatoPacienteDialog({
+  id,
+  nome,
+  telefone,
+  whatsapp,
+}: {
+  id: string;
+  nome: string;
+  telefone: string | null;
+  whatsapp: string | null;
+}) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [tel, setTel] = useState(telefone ?? "");
+  const [wpp, setWpp] = useState(whatsapp ?? "");
+
+  const mut = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("pacientes")
+        .update({ telefone: tel.trim() || null, whatsapp: wpp.trim() || null })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Contatos atualizados");
+      qc.invalidateQueries({ queryKey: ["pacientes"] });
+      setOpen(false);
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Falha ao salvar"),
+  });
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v);
+        if (v) {
+          setTel(telefone ?? "");
+          setWpp(whatsapp ?? "");
+        }
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className="mt-3 w-full">
+          Editar contatos
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Contatos de {nome}</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 py-2">
+          <div className="space-y-1.5">
+            <Label>Telefone</Label>
+            <Input value={tel} onChange={(e) => setTel(e.target.value)} />
+          </div>
+          <div className="space-y-1.5">
+            <Label>WhatsApp</Label>
+            <Input value={wpp} placeholder="(00) 00000-0000" onChange={(e) => setWpp(e.target.value)} />
+            <p className="text-[11px] text-muted-foreground">
+              Sem WhatsApp o paciente não receberá notificações automáticas.
+            </p>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => setOpen(false)}>
+            Cancelar
+          </Button>
+          <Button onClick={() => mut.mutate()} disabled={mut.isPending}>
+            {mut.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Salvar
           </Button>
         </DialogFooter>
       </DialogContent>

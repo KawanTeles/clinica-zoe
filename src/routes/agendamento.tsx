@@ -160,7 +160,6 @@ function AgendamentoPage() {
             user_id: user.id,
             nome: nome ?? user.email ?? "Cliente",
             email: user.email ?? null,
-            telefone: telefone || null,
             whatsapp: telefone || null,
           })
           .select("id")
@@ -170,8 +169,9 @@ function AgendamentoPage() {
       } else if (telefone) {
         await supabase
           .from("pacientes")
-          .update({ telefone, whatsapp: telefone })
+          .update({ whatsapp: telefone })
           .eq("id", paciente_id);
+
       }
 
 
