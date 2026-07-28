@@ -105,6 +105,11 @@ export function NotificacoesConfigCard() {
           provider: form.provider,
           provider_url: form.provider_url,
           remetente: form.remetente,
+          janela_ativa: form.janela_ativa,
+          janela_inicio: form.janela_inicio,
+          janela_fim: form.janela_fim,
+          templates: form.templates ?? {},
+
           ...(token ? { provider_token: token } : {}),
         },
       });
