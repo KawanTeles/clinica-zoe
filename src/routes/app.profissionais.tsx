@@ -137,6 +137,8 @@ const formSchema = z.object({
   email: z.string().trim().email("Email inválido"),
   senha: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
   telefone: z.string().trim().optional(),
+  whatsapp: z.string().trim().optional(),
+
   especialidade_id: z.string().uuid().optional().nullable(),
   registro_profissional: z.string().optional(),
   descricao: z.string().optional(),
