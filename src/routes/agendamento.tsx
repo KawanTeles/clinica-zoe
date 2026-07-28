@@ -393,7 +393,7 @@ function AgendamentoPage() {
               <div className="space-y-4">
                 <h2 className="text-lg font-semibold">Forma de pagamento e detalhes</h2>
                 <div className="space-y-2">
-                  <Label>Telefone para contato</Label>
+                  <Label>WhatsApp para contato</Label>
                   <Input
                     value={telefone}
                     onChange={(e) => setTelefone(e.target.value)}
