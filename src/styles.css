@@ -212,3 +212,13 @@
     letter-spacing: -0.02em;
   }
 }
+
+/* Hide the injected "Made with Lovable" badge without breaking layout.
+   Targets only the badge container, never generic links. */
+[data-lovable-badge],
+.lovable-badge,
+[id^="lovable-badge"],
+iframe[src*="lovable"][src*="badge"],
+div[class*="lovable-badge"] {
+  display: none !important;
+}
