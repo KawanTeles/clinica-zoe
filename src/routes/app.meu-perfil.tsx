@@ -66,6 +66,8 @@ function MeuPerfil() {
         .from("profissionais")
         .update({
           telefone: form.telefone || null,
+          whatsapp: form.whatsapp || null,
+
           descricao: form.descricao || null,
           registro_profissional: form.registro_profissional || null,
           formacao: form.formacao || null,
