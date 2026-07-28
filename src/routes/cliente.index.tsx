@@ -114,9 +114,11 @@ function ClientePage() {
             <TabsContent value="notificacoes" className="mt-6">
               <NotificacoesSection userId={user.id} />
             </TabsContent>
-            <TabsContent value="perfil" className="mt-6">
+            <TabsContent value="perfil" className="mt-6 space-y-6">
               <PerfilSection userId={user.id} />
+              <SecurityCard />
             </TabsContent>
+
           </Tabs>
         </div>
       </section>
