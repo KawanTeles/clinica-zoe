@@ -275,6 +275,14 @@ function NovoProfissionalDialog() {
           <Field label="Telefone">
             <Input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} />
           </Field>
+          <Field label="WhatsApp">
+            <Input
+              value={form.whatsapp}
+              placeholder="(00) 00000-0000"
+              onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
+            />
+          </Field>
+
           <Field label="Registro profissional">
             <Input value={form.registro_profissional} onChange={(e) => setForm({ ...form, registro_profissional: e.target.value })} />
           </Field>
