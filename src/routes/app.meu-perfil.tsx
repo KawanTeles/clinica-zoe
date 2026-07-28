@@ -127,6 +127,18 @@ function MeuPerfil() {
             <Input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} />
           </div>
           <div className="space-y-1.5">
+            <Label>WhatsApp</Label>
+            <Input
+              value={form.whatsapp}
+              placeholder="(00) 00000-0000"
+              onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Sem WhatsApp você não receberá notificações automáticas.
+            </p>
+          </div>
+
+          <div className="space-y-1.5">
             <Label>Registro profissional</Label>
             <Input value={form.registro_profissional} onChange={(e) => setForm({ ...form, registro_profissional: e.target.value })} />
           </div>
