@@ -20,7 +20,9 @@ import {
   salvarConfigNotificacoes,
   testarConexaoNotificacoes,
 } from "@/lib/notifications.functions";
+import { Textarea } from "@/components/ui/textarea";
 import { Loader2, MessageSquare, Save, PlugZap } from "lucide-react";
+
 
 type Cfg = {
   destinatario_solicitacao: "PROFISSIONAL" | "RECEPCIONISTA" | "AMBOS";
@@ -33,7 +35,23 @@ type Cfg = {
   conexao_status: string;
   conexao_testada_em: string | null;
   conexao_erro: string | null;
+  janela_ativa: boolean;
+  janela_inicio: string;
+  janela_fim: string;
+  templates: Record<string, string>;
 };
+
+const EVENTOS: Array<{ key: string; label: string }> = [
+  { key: "SOLICITACAO_NOVA", label: "Nova solicitação" },
+  { key: "CONSULTA_APROVADA", label: "Consulta confirmada" },
+  { key: "CONSULTA_RECUSADA", label: "Solicitação recusada" },
+  { key: "CONSULTA_CANCELADA", label: "Consulta cancelada" },
+  { key: "CONSULTA_REMARCADA", label: "Consulta remarcada" },
+  { key: "LEMBRETE_24H", label: "Lembrete 24 horas" },
+  { key: "LEMBRETE_2H", label: "Lembrete 2 horas" },
+  { key: "PAGAMENTO_CONFIRMADO", label: "Pagamento confirmado" },
+];
+
 
 export const NOTIF_CONFIG_KEY = ["notificacoes-config"] as const;
 
@@ -89,6 +107,11 @@ export function NotificacoesConfigCard() {
           provider: form.provider,
           provider_url: form.provider_url,
           remetente: form.remetente,
+          janela_ativa: form.janela_ativa,
+          janela_inicio: form.janela_inicio,
+          janela_fim: form.janela_fim,
+          templates: form.templates ?? {},
+
           ...(token ? { provider_token: token } : {}),
         },
       });
@@ -237,7 +260,63 @@ export function NotificacoesConfigCard() {
           )}
         </section>
 
+        <section className="space-y-3">
+          <h3 className="text-sm font-semibold">Horário de envio</h3>
+          <ToggleRow
+            label="Enviar somente dentro do horário permitido"
+            checked={form.janela_ativa}
+            onChange={(v) => set("janela_ativa", v)}
+          />
+          <div className="grid max-w-md gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label>Início</Label>
+              <Input
+                type="time"
+                value={form.janela_inicio}
+                onChange={(e) => set("janela_inicio", e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Fim</Label>
+              <Input
+                type="time"
+                value={form.janela_fim}
+                onChange={(e) => set("janela_fim", e.target.value)}
+              />
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Mensagens geradas fora da janela ficam na fila e são enviadas no próximo horário
+            permitido (fuso de São Paulo). Reenvios manuais ignoram a janela.
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h3 className="text-sm font-semibold">Textos das mensagens</h3>
+          <p className="text-xs text-muted-foreground">
+            Deixe em branco para usar o texto padrão. Variáveis disponíveis: {"{nome}"},{" "}
+            {"{profissional}"}, {"{especialidade}"}, {"{data}"}, {"{hora}"}, {"{endereco}"},{" "}
+            {"{valor}"}, {"{clinica}"}.
+          </p>
+          <div className="grid gap-4">
+            {EVENTOS.map((ev) => (
+              <div key={ev.key} className="space-y-1.5">
+                <Label>{ev.label}</Label>
+                <Textarea
+                  rows={3}
+                  placeholder="Texto padrão do sistema"
+                  value={form.templates?.[ev.key] ?? ""}
+                  onChange={(e) =>
+                    set("templates", { ...(form.templates ?? {}), [ev.key]: e.target.value })
+                  }
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+
         <div className="flex flex-wrap justify-end gap-2">
+
           <Button variant="outline" onClick={() => mTestar.mutate()} disabled={mTestar.isPending}>
             {mTestar.isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

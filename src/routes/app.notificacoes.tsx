@@ -10,6 +10,8 @@ import {
   processarFilaNotificacoes,
   cancelarNotificacao,
   gerarLembretesAgora,
+  reenviarErros,
+
 } from "@/lib/notifications.functions";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -150,7 +152,17 @@ function NotificacoesPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+  const reenviarErrosFn = useServerFn(reenviarErros);
+  const mReenviarErros = useMutation({
+    mutationFn: () => reenviarErrosFn({ data: undefined as any }),
+    onSuccess: (r: any) => {
+      toast.success(`${r?.enviadas ?? 0}/${r?.total ?? 0} notificação(ões) reenviada(s)`);
+      qc.invalidateQueries({ queryKey: ["notificacoes"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
   const lembretesFn = useServerFn(gerarLembretesAgora);
+
   const mLembretes = useMutation({
     mutationFn: () => lembretesFn({ data: undefined as any }),
     onSuccess: (r: any) => {
@@ -203,15 +215,34 @@ function NotificacoesPage() {
   }, [notifs, tab, canal, busca]);
 
   const stats = useMemo(() => {
-    const s = { total: notifs.length, pendente: 0, enviada: 0, erro: 0, cancelada: 0 };
+    const hojeStr = new Date().toDateString();
+    const s = {
+      total: notifs.length,
+      pendente: 0,
+      enviada: 0,
+      erro: 0,
+      cancelada: 0,
+      hoje: 0,
+      mediaMs: 0,
+    };
+    let somaMs = 0;
+    let comMs = 0;
     for (const n of notifs) {
       if (n.status_envio === "PENDENTE" || n.status_envio === "ENVIANDO") s.pendente++;
       else if (n.status_envio === "ENVIADA") s.enviada++;
       else if (n.status_envio === "ERRO") s.erro++;
       else if (n.status_envio === "CANCELADA") s.cancelada++;
+      if (n.enviado_em && new Date(n.enviado_em).toDateString() === hojeStr) s.hoje++;
+      const ms = (n as any).duracao_ms;
+      if (typeof ms === "number") {
+        somaMs += ms;
+        comMs++;
+      }
     }
+    s.mediaMs = comMs ? Math.round(somaMs / comMs) : 0;
     return s;
   }, [notifs]);
+
 
   return (
     <div className="space-y-6">
@@ -237,20 +268,37 @@ function NotificacoesPage() {
               )}
               Gerar lembretes
             </Button>
+            <Button
+              variant="outline"
+              onClick={() => mReenviarErros.mutate()}
+              disabled={mReenviarErros.isPending || stats.erro === 0}
+              className="gap-2"
+            >
+              {mReenviarErros.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4" />
+              )}
+              Reenviar erros ({stats.erro})
+            </Button>
             <Button onClick={() => mProcessar.mutate()} disabled={mProcessar.isPending} className="gap-2">
               {mProcessar.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               Processar fila
             </Button>
+
           </div>
         )}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-4 xl:grid-cols-7">
         <StatCard label="Total" value={stats.total} icon={Inbox} />
         <StatCard label="Pendentes" value={stats.pendente} icon={Loader2} tone="amber" />
         <StatCard label="Enviadas" value={stats.enviada} icon={CheckCircle2} tone="green" />
+        <StatCard label="Enviadas hoje" value={stats.hoje} icon={Send} tone="green" />
         <StatCard label="Erros" value={stats.erro} icon={AlertTriangle} tone="red" />
         <StatCard label="Canceladas" value={stats.cancelada} icon={XCircle} tone="slate" />
+        <StatCard label="Tempo médio (ms)" value={stats.mediaMs} icon={RefreshCw} tone="slate" />
+
       </div>
 
       {isAdmin && (

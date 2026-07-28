@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CalendarDays, CheckCircle2, XCircle, Loader2, Clock, User, Stethoscope, CreditCard } from "lucide-react";
+import { CalendarDays, CheckCircle2, XCircle, Loader2, Clock, User, Stethoscope, CreditCard, Send } from "lucide-react";
 import { STATUS_COLOR, STATUS_LABEL, fmtHora } from "@/lib/agenda-utils";
 import { WhatsAppAviso, semWhatsapp } from "@/components/contato/WhatsAppAviso";
 import { PersonAvatar } from "@/lib/avatar";
@@ -223,25 +223,43 @@ function SolicitacoesPage() {
                     )}
                   </div>
 
-                  {a.status === "PENDENTE" && canAct && (
-                    <div className="flex w-full gap-2 md:w-auto">
+                  <div className="flex w-full flex-wrap gap-2 md:w-auto">
+                    {canAct && (
                       <Button
-                        variant="outline"
-                        className="flex-1 gap-2 border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive md:flex-none"
-                        onClick={() => statusMut.mutate({ id: a.id, status: "RECUSADO" })}
-                        disabled={statusMut.isPending}
+                        variant="ghost"
+                        className="gap-2"
+                        onClick={() =>
+                          toast.promise(dispararFn({ data: { agendamentoId: a.id } }), {
+                            loading: "Reenviando notificações...",
+                            success: (r: any) => `${r.enviados}/${r.total} notificação(ões) enviada(s)`,
+                            error: "Falha ao reenviar",
+                          })
+                        }
                       >
-                        <XCircle className="h-4 w-4" /> Recusar
+                        <Send className="h-4 w-4" /> Reenviar
                       </Button>
-                      <Button
-                        className="flex-1 gap-2 md:flex-none"
-                        onClick={() => statusMut.mutate({ id: a.id, status: "APROVADO" })}
-                        disabled={statusMut.isPending}
-                      >
-                        <CheckCircle2 className="h-4 w-4" /> Aceitar
-                      </Button>
-                    </div>
-                  )}
+                    )}
+                    {a.status === "PENDENTE" && canAct && (
+                      <>
+                        <Button
+                          variant="outline"
+                          className="flex-1 gap-2 border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive md:flex-none"
+                          onClick={() => statusMut.mutate({ id: a.id, status: "RECUSADO" })}
+                          disabled={statusMut.isPending}
+                        >
+                          <XCircle className="h-4 w-4" /> Recusar
+                        </Button>
+                        <Button
+                          className="flex-1 gap-2 md:flex-none"
+                          onClick={() => statusMut.mutate({ id: a.id, status: "APROVADO" })}
+                          disabled={statusMut.isPending}
+                        >
+                          <CheckCircle2 className="h-4 w-4" /> Aceitar
+                        </Button>
+                      </>
+                    )}
+                  </div>
+
                 </div>
               ))}
             </div>

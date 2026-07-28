@@ -35,7 +35,12 @@ export interface ProviderConfig {
   conexao_status: string;
   conexao_testada_em: string | null;
   conexao_erro: string | null;
+  janela_ativa: boolean;
+  janela_inicio: string;
+  janela_fim: string;
+  templates: Record<string, string>;
 }
+
 
 export interface MessageProvider {
   id: string;
@@ -231,7 +236,12 @@ export const DEFAULT_CONFIG: ProviderConfig = {
   conexao_status: "NAO_TESTADA",
   conexao_testada_em: null,
   conexao_erro: null,
+  janela_ativa: true,
+  janela_inicio: "08:00",
+  janela_fim: "20:00",
+  templates: {},
 };
+
 
 /** Lê a configuração no banco (service role). Nunca exponha o token ao cliente. */
 export async function loadConfig(): Promise<ProviderConfig> {
