@@ -35,7 +35,12 @@ export interface ProviderConfig {
   conexao_status: string;
   conexao_testada_em: string | null;
   conexao_erro: string | null;
+  janela_ativa: boolean;
+  janela_inicio: string;
+  janela_fim: string;
+  templates: Record<string, string>;
 }
+
 
 export interface MessageProvider {
   id: string;
