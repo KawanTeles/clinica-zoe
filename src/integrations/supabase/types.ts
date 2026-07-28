@@ -315,6 +315,54 @@ export type Database = {
           },
         ]
       }
+      notificacoes_config: {
+        Row: {
+          conexao_erro: string | null
+          conexao_status: string
+          conexao_testada_em: string | null
+          created_at: string
+          destinatario_solicitacao: string
+          id: string
+          lembrete_24h_ativo: boolean
+          lembrete_2h_ativo: boolean
+          provider: string
+          provider_token: string | null
+          provider_url: string | null
+          remetente: string | null
+          updated_at: string
+        }
+        Insert: {
+          conexao_erro?: string | null
+          conexao_status?: string
+          conexao_testada_em?: string | null
+          created_at?: string
+          destinatario_solicitacao?: string
+          id?: string
+          lembrete_24h_ativo?: boolean
+          lembrete_2h_ativo?: boolean
+          provider?: string
+          provider_token?: string | null
+          provider_url?: string | null
+          remetente?: string | null
+          updated_at?: string
+        }
+        Update: {
+          conexao_erro?: string | null
+          conexao_status?: string
+          conexao_testada_em?: string | null
+          created_at?: string
+          destinatario_solicitacao?: string
+          id?: string
+          lembrete_24h_ativo?: boolean
+          lembrete_2h_ativo?: boolean
+          provider?: string
+          provider_token?: string | null
+          provider_url?: string | null
+          remetente?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pacientes: {
         Row: {
           created_at: string
@@ -327,6 +375,7 @@ export type Database = {
           telefone: string | null
           updated_at: string
           user_id: string | null
+          whatsapp: string | null
         }
         Insert: {
           created_at?: string
@@ -339,6 +388,7 @@ export type Database = {
           telefone?: string | null
           updated_at?: string
           user_id?: string | null
+          whatsapp?: string | null
         }
         Update: {
           created_at?: string
@@ -351,6 +401,7 @@ export type Database = {
           telefone?: string | null
           updated_at?: string
           user_id?: string | null
+          whatsapp?: string | null
         }
         Relationships: []
       }
@@ -421,6 +472,7 @@ export type Database = {
           user_id: string | null
           valor_consulta_avista: number | null
           valor_consulta_cartao: number | null
+          whatsapp: string | null
         }
         Insert: {
           anos_experiencia?: number | null
@@ -440,6 +492,7 @@ export type Database = {
           user_id?: string | null
           valor_consulta_avista?: number | null
           valor_consulta_cartao?: number | null
+          whatsapp?: string | null
         }
         Update: {
           anos_experiencia?: number | null
@@ -459,6 +512,7 @@ export type Database = {
           user_id?: string | null
           valor_consulta_avista?: number | null
           valor_consulta_cartao?: number | null
+          whatsapp?: string | null
         }
         Relationships: [
           {
@@ -765,6 +819,7 @@ export type Database = {
         | "CONSULTA_REMARCADA"
         | "LEMBRETE_24H"
         | "PAGAMENTO_CONFIRMADO"
+        | "LEMBRETE_2H"
       notif_status_envio:
         | "PENDENTE"
         | "ENVIANDO"
@@ -926,6 +981,7 @@ export const Constants = {
         "CONSULTA_REMARCADA",
         "LEMBRETE_24H",
         "PAGAMENTO_CONFIRMADO",
+        "LEMBRETE_2H",
       ],
       notif_status_envio: [
         "PENDENTE",
