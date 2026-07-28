@@ -46,7 +46,7 @@ function ClinicLogo({ logoUrl, nome }: { logoUrl: string | null; nome: string })
 
 /** Botões de acesso: mesma altura, mesmo raio, mesmo alinhamento. */
 const accessButtonBase =
-  "inline-flex h-10 items-center justify-center gap-2 rounded-full px-4 text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+  "inline-flex h-10 items-center justify-center gap-2 rounded-full px-3.5 xl:px-4 text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
 /** Paciente: fundo neutro (branco no claro, superfície escura no escuro) + borda suave. */
 const patientButton = cn(
@@ -96,7 +96,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
             : "bg-transparent",
         )}
       >
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+        <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6 lg:grid lg:grid-cols-[auto_minmax(0,1fr)_auto]">
           <Link to="/" className="flex min-w-0 items-center gap-2">
             <ClinicLogo logoUrl={settings.logo_url} nome={settings.nome} />
             <span className="truncate text-base font-semibold tracking-tight">{settings.nome}</span>
