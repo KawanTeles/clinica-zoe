@@ -156,7 +156,7 @@ function NotificacoesPage() {
   const mReenviarErros = useMutation({
     mutationFn: () => reenviarErrosFn({ data: undefined as any }),
     onSuccess: (r: any) => {
-      toast.success(`${r?.reenviados ?? r?.processed ?? 0} notificação(ões) reprocessada(s)`);
+      toast.success(`${r?.enviadas ?? 0}/${r?.total ?? 0} notificação(ões) reenviada(s)`);
       qc.invalidateQueries({ queryKey: ["notificacoes"] });
     },
     onError: (e: Error) => toast.error(e.message),
