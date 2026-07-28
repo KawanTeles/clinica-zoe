@@ -264,12 +264,15 @@ function NotificacoesPage() {
         )}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-4 xl:grid-cols-7">
         <StatCard label="Total" value={stats.total} icon={Inbox} />
         <StatCard label="Pendentes" value={stats.pendente} icon={Loader2} tone="amber" />
         <StatCard label="Enviadas" value={stats.enviada} icon={CheckCircle2} tone="green" />
+        <StatCard label="Enviadas hoje" value={stats.hoje} icon={Send} tone="green" />
         <StatCard label="Erros" value={stats.erro} icon={AlertTriangle} tone="red" />
         <StatCard label="Canceladas" value={stats.cancelada} icon={XCircle} tone="slate" />
+        <StatCard label="Tempo médio (ms)" value={stats.mediaMs} icon={RefreshCw} tone="slate" />
+
       </div>
 
       {isAdmin && (
