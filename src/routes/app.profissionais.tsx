@@ -193,6 +193,8 @@ function NovoProfissionalDialog() {
           email: parsed.email,
           senha: parsed.senha,
           telefone: parsed.telefone || null,
+          whatsapp: parsed.whatsapp || null,
+
           role: "PROFISSIONAL",
           profissional: {
             especialidade_id: parsed.especialidade_id ?? null,
