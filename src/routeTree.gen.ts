@@ -35,6 +35,7 @@ import { Route as AppFinanceiroRouteImport } from './routes/app.financeiro'
 import { Route as AppContaRouteImport } from './routes/app.conta'
 import { Route as AppConfiguracoesRouteImport } from './routes/app.configuracoes'
 import { Route as AppAgendaRouteImport } from './routes/app.agenda'
+import { Route as ApiPublicHooksNotificacoesRouteImport } from './routes/api/public/hooks/notificacoes'
 
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
@@ -166,6 +167,12 @@ const AppAgendaRoute = AppAgendaRouteImport.update({
   path: '/agenda',
   getParentRoute: () => AppRoute,
 } as any)
+const ApiPublicHooksNotificacoesRoute =
+  ApiPublicHooksNotificacoesRouteImport.update({
+    id: '/api/public/hooks/notificacoes',
+    path: '/api/public/hooks/notificacoes',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -194,6 +201,7 @@ export interface FileRoutesByFullPath {
   '/cliente/login': typeof ClienteLoginRoute
   '/app/': typeof AppIndexRoute
   '/cliente/': typeof ClienteIndexRoute
+  '/api/public/hooks/notificacoes': typeof ApiPublicHooksNotificacoesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -220,6 +228,7 @@ export interface FileRoutesByTo {
   '/cliente/login': typeof ClienteLoginRoute
   '/app': typeof AppIndexRoute
   '/cliente': typeof ClienteIndexRoute
+  '/api/public/hooks/notificacoes': typeof ApiPublicHooksNotificacoesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -249,6 +258,7 @@ export interface FileRoutesById {
   '/cliente/login': typeof ClienteLoginRoute
   '/app/': typeof AppIndexRoute
   '/cliente/': typeof ClienteIndexRoute
+  '/api/public/hooks/notificacoes': typeof ApiPublicHooksNotificacoesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -279,6 +289,7 @@ export interface FileRouteTypes {
     | '/cliente/login'
     | '/app/'
     | '/cliente/'
+    | '/api/public/hooks/notificacoes'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -305,6 +316,7 @@ export interface FileRouteTypes {
     | '/cliente/login'
     | '/app'
     | '/cliente'
+    | '/api/public/hooks/notificacoes'
   id:
     | '__root__'
     | '/'
@@ -333,6 +345,7 @@ export interface FileRouteTypes {
     | '/cliente/login'
     | '/app/'
     | '/cliente/'
+    | '/api/public/hooks/notificacoes'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -347,6 +360,7 @@ export interface RootRouteChildren {
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SobreRoute: typeof SobreRoute
+  ApiPublicHooksNotificacoesRoute: typeof ApiPublicHooksNotificacoesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -533,6 +547,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAgendaRouteImport
       parentRoute: typeof AppRoute
     }
+    '/api/public/hooks/notificacoes': {
+      id: '/api/public/hooks/notificacoes'
+      path: '/api/public/hooks/notificacoes'
+      fullPath: '/api/public/hooks/notificacoes'
+      preLoaderRoute: typeof ApiPublicHooksNotificacoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -595,6 +616,7 @@ const rootRouteChildren: RootRouteChildren = {
   RedefinirSenhaRoute: RedefinirSenhaRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SobreRoute: SobreRoute,
+  ApiPublicHooksNotificacoesRoute: ApiPublicHooksNotificacoesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

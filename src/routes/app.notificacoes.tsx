@@ -9,7 +9,9 @@ import {
   reenviarNotificacao,
   processarFilaNotificacoes,
   cancelarNotificacao,
+  gerarLembretesAgora,
 } from "@/lib/notifications.functions";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -86,8 +88,10 @@ const EVENTO_LABEL: Record<string, string> = {
   CONSULTA_CANCELADA: "Consulta cancelada",
   CONSULTA_REMARCADA: "Consulta remarcada",
   LEMBRETE_24H: "Lembrete 24h",
+  LEMBRETE_2H: "Lembrete 2h",
   PAGAMENTO_CONFIRMADO: "Pagamento confirmado",
 };
+
 
 function fmtDateTime(iso: string | null) {
   if (!iso) return "—";
@@ -146,6 +150,39 @@ function NotificacoesPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+  const lembretesFn = useServerFn(gerarLembretesAgora);
+  const mLembretes = useMutation({
+    mutationFn: () => lembretesFn({ data: undefined as any }),
+    onSuccess: (r: any) => {
+      toast.success(`${r?.criados ?? 0} lembrete(s) gerado(s)`);
+      qc.invalidateQueries({ queryKey: ["notificacoes"] });
+      qc.invalidateQueries({ queryKey: ["proximos-lembretes"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const { data: proximos = [] } = useQuery({
+    queryKey: ["proximos-lembretes"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const hoje = new Date();
+      const fim = new Date(hoje.getTime() + 48 * 3600 * 1000);
+      const iso = (d: Date) => d.toISOString().slice(0, 10);
+      const { data, error } = await supabase
+        .from("agendamentos")
+        .select("id, data, hora_inicio, pacientes(nome), profissionais(nome)")
+        .gte("data", iso(hoje))
+        .lte("data", iso(fim))
+        .in("status", ["APROVADO", "REMARCADO"])
+        .order("data")
+        .order("hora_inicio")
+        .limit(20);
+      if (error) throw error;
+      return (data ?? []) as any[];
+    },
+  });
+
+
 
   const filtered = useMemo(() => {
     return notifs.filter((n) => {
@@ -186,10 +223,25 @@ function NotificacoesPage() {
           </p>
         </div>
         {isAdmin && (
-          <Button onClick={() => mProcessar.mutate()} disabled={mProcessar.isPending} className="gap-2">
-            {mProcessar.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-            Processar fila
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              onClick={() => mLembretes.mutate()}
+              disabled={mLembretes.isPending}
+              className="gap-2"
+            >
+              {mLembretes.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Bell className="h-4 w-4" />
+              )}
+              Gerar lembretes
+            </Button>
+            <Button onClick={() => mProcessar.mutate()} disabled={mProcessar.isPending} className="gap-2">
+              {mProcessar.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              Processar fila
+            </Button>
+          </div>
         )}
       </div>
 
@@ -200,6 +252,37 @@ function NotificacoesPage() {
         <StatCard label="Erros" value={stats.erro} icon={AlertTriangle} tone="red" />
         <StatCard label="Canceladas" value={stats.cancelada} icon={XCircle} tone="slate" />
       </div>
+
+      {isAdmin && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Próximos lembretes (48h)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {proximos.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nenhuma consulta nas próximas 48 horas.</p>
+            ) : (
+              <div className="space-y-2">
+                {proximos.map((a: any) => (
+                  <div
+                    key={a.id}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-card px-4 py-2 text-sm"
+                  >
+                    <span className="font-medium">
+                      {a.pacientes?.nome ?? "Paciente"} · {a.profissionais?.nome ?? "Profissional"}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {new Date(`${a.data}T00:00:00`).toLocaleDateString("pt-BR")} às{" "}
+                      {String(a.hora_inicio).slice(0, 5)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
 
       <Card>
         <CardHeader className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">

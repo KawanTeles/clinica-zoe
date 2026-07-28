@@ -13,96 +13,25 @@ async function assertAdmin(supabase: any, userId: string) {
   if (!data) throw new Error("Somente administradores podem executar esta ação");
 }
 
-/** Processa uma notificação da fila, chamando o provider correto e atualizando o status. */
-async function processOne(id: string) {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { pickProvider } = await import("@/lib/notifications/provider.server");
-
-  const { data: n, error } = await supabaseAdmin
-    .from("notificacoes")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
-  if (error || !n) return { ok: false, error: "Notificação não encontrada" };
-
-  if (n.canal === "INTERNO") {
-    await supabaseAdmin
-      .from("notificacoes")
-      .update({ status_envio: "ENVIADA", enviado_em: new Date().toISOString() })
-      .eq("id", id);
-    return { ok: true };
-  }
-
-  const to = n.canal === "WHATSAPP" ? n.destinatario_telefone : n.destinatario_email;
-  if (!to) {
-    await supabaseAdmin
-      .from("notificacoes")
-      .update({ status_envio: "ERRO", ultimo_erro: "Destinatário sem contato", tentativas: (n.tentativas ?? 0) + 1 })
-      .eq("id", id);
-    return { ok: false, error: "Destinatário sem contato" };
-  }
-
-  await supabaseAdmin.from("notificacoes").update({ status_envio: "ENVIANDO" }).eq("id", id);
-
-  const provider = pickProvider(n.canal as "WHATSAPP" | "EMAIL");
-  const result = await provider.send({
-    channel: n.canal as "WHATSAPP" | "EMAIL",
-    to,
-    title: n.titulo,
-    body: n.mensagem,
-    metadata: { notificacao_id: n.id, agendamento_id: n.agendamento_id },
-  });
-
-  await supabaseAdmin
-    .from("notificacoes")
-    .update(
-      result.ok
-        ? {
-            status_envio: "ENVIADA",
-            enviado_em: new Date().toISOString(),
-            tentativas: (n.tentativas ?? 0) + 1,
-            ultimo_erro: null,
-          }
-        : {
-            status_envio: "ERRO",
-            tentativas: (n.tentativas ?? 0) + 1,
-            ultimo_erro: result.error ?? "Falha desconhecida",
-          },
-    )
-    .eq("id", id);
-
-  return result;
-}
-
 export const reenviarNotificacao = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
+    const { processOne } = await import("@/lib/notifications/queue.server");
     const r = await processOne(data.id);
     return { ok: r.ok, error: r.error, providerId: r.providerId };
   });
 
 export const processarFilaNotificacoes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { limit?: number }) => z.object({ limit: z.number().int().min(1).max(50).default(20) }).parse(data))
+  .inputValidator((data: { limit?: number }) =>
+    z.object({ limit: z.number().int().min(1).max(50).default(20) }).parse(data),
+  )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: pend, error } = await supabaseAdmin
-      .from("notificacoes")
-      .select("id")
-      .eq("status_envio", "PENDENTE")
-      .in("canal", ["WHATSAPP", "EMAIL"])
-      .order("created_at", { ascending: true })
-      .limit(data.limit);
-    if (error) throw new Error(error.message);
-    const results: Array<{ id: string; ok: boolean; error?: string; providerId?: string }> = [];
-    for (const row of pend ?? []) {
-      const r = await processOne(row.id);
-      results.push({ id: row.id, ok: r.ok, error: r.error, providerId: r.providerId });
-    }
-    return { processed: results.length, results };
+    const { processQueue } = await import("@/lib/notifications/queue.server");
+    return await processQueue(data.limit);
   });
 
 export const cancelarNotificacao = createServerFn({ method: "POST" })
@@ -117,4 +46,115 @@ export const cancelarNotificacao = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+/** Gera manualmente os lembretes pendentes (24h/2h). */
+export const gerarLembretesAgora = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { gerarLembretes } = await import("@/lib/notifications/queue.server");
+    return { criados: await gerarLembretes() };
+  });
+
+/** Configuração de notificações — o token nunca é devolvido, apenas se está definido. */
+export const obterConfigNotificacoes = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { loadConfig } = await import("@/lib/notifications/provider.server");
+    const cfg = await loadConfig();
+    return {
+      destinatario_solicitacao: cfg.destinatario_solicitacao,
+      lembrete_24h_ativo: cfg.lembrete_24h_ativo,
+      lembrete_2h_ativo: cfg.lembrete_2h_ativo,
+      provider: cfg.provider,
+      provider_url: cfg.provider_url ?? "",
+      remetente: cfg.remetente ?? "",
+      token_definido: !!cfg.provider_token,
+      conexao_status: cfg.conexao_status,
+      conexao_testada_em: cfg.conexao_testada_em,
+      conexao_erro: cfg.conexao_erro,
+    };
+  });
+
+const configSchema = z.object({
+  destinatario_solicitacao: z.enum(["PROFISSIONAL", "RECEPCIONISTA", "AMBOS"]),
+  lembrete_24h_ativo: z.boolean(),
+  lembrete_2h_ativo: z.boolean(),
+  provider: z.enum(["console", "evolution", "meta", "twilio"]),
+  provider_url: z.string().max(500).optional().default(""),
+  remetente: z.string().max(120).optional().default(""),
+  /** Enviado apenas quando o admin digita um novo token. */
+  provider_token: z.string().max(2000).optional(),
+});
+
+export const salvarConfigNotificacoes = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => configSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const payload: Record<string, unknown> = {
+      destinatario_solicitacao: data.destinatario_solicitacao,
+      lembrete_24h_ativo: data.lembrete_24h_ativo,
+      lembrete_2h_ativo: data.lembrete_2h_ativo,
+      provider: data.provider,
+      provider_url: data.provider_url || null,
+      remetente: data.remetente || null,
+    };
+    if (data.provider_token) payload.provider_token = data.provider_token;
+
+    const { data: existing } = await (supabaseAdmin as any)
+      .from("notificacoes_config")
+      .select("id")
+      .order("created_at")
+      .limit(1)
+      .maybeSingle();
+
+    if (existing?.id) {
+      const { error } = await (supabaseAdmin as any)
+        .from("notificacoes_config")
+        .update(payload)
+        .eq("id", existing.id);
+      if (error) throw new Error(error.message);
+    } else {
+      const { error } = await (supabaseAdmin as any)
+        .from("notificacoes_config")
+        .insert(payload);
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true };
+  });
+
+export const testarConexaoNotificacoes = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { loadConfig, pickProvider } = await import("@/lib/notifications/provider.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const cfg = await loadConfig();
+    const provider = pickProvider("WHATSAPP", cfg);
+    const r = await provider.test(cfg);
+
+    const { data: existing } = await (supabaseAdmin as any)
+      .from("notificacoes_config")
+      .select("id")
+      .order("created_at")
+      .limit(1)
+      .maybeSingle();
+    if (existing?.id) {
+      await (supabaseAdmin as any)
+        .from("notificacoes_config")
+        .update({
+          conexao_status: r.ok ? "CONECTADO" : "ERRO",
+          conexao_testada_em: new Date().toISOString(),
+          conexao_erro: r.ok ? null : (r.error ?? "Falha desconhecida"),
+        })
+        .eq("id", existing.id);
+    }
+
+    return { ok: r.ok, error: r.error, provider: provider.id };
   });

@@ -161,14 +161,19 @@ function AgendamentoPage() {
             nome: nome ?? user.email ?? "Cliente",
             email: user.email ?? null,
             telefone: telefone || null,
+            whatsapp: telefone || null,
           })
           .select("id")
           .single();
         if (pErr) throw pErr;
         paciente_id = novoPac.id;
       } else if (telefone) {
-        await supabase.from("pacientes").update({ telefone }).eq("id", paciente_id);
+        await supabase
+          .from("pacientes")
+          .update({ telefone, whatsapp: telefone })
+          .eq("id", paciente_id);
       }
+
 
       const { data: ag, error } = await supabase
         .from("agendamentos")
@@ -388,7 +393,7 @@ function AgendamentoPage() {
               <div className="space-y-4">
                 <h2 className="text-lg font-semibold">Forma de pagamento e detalhes</h2>
                 <div className="space-y-2">
-                  <Label>Telefone para contato</Label>
+                  <Label>WhatsApp para contato</Label>
                   <Input
                     value={telefone}
                     onChange={(e) => setTelefone(e.target.value)}
