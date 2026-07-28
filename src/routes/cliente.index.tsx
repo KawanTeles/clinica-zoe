@@ -374,63 +374,9 @@ function RemarcarDialog({
 }
 
 function NotificacoesSection({ userId }: { userId: string }) {
-  const { data, isLoading } = useQuery({
-    queryKey: ["cliente-notificacoes", userId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("notificacoes")
-        .select("id, titulo, mensagem, evento, status_envio, canal, created_at")
-        .eq("usuario_id", userId)
-        .order("created_at", { ascending: false })
-        .limit(50);
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
-
-  if (isLoading) {
-    return (
-      <div className="grid place-items-center py-20">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!data?.length) {
-    return (
-      <div className="rounded-2xl border border-dashed border-border bg-surface-muted p-10 text-center">
-        <p className="text-sm text-muted-foreground">Sem notificações no momento.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="grid gap-3">
-      {data.map((n: any, i) => (
-        <Reveal key={n.id} delay={i * 40}>
-          <div className="rounded-2xl border border-border bg-surface p-4 shadow-soft">
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold">{n.titulo ?? n.evento ?? "Notificação"}</p>
-                {n.mensagem && (
-                  <p className="mt-1 text-sm text-muted-foreground">{n.mensagem}</p>
-                )}
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {new Date(n.created_at).toLocaleString("pt-BR")}
-                </p>
-              </div>
-              {n.canal && (
-                <Badge variant="outline" className="text-xs">
-                  {n.canal}
-                </Badge>
-              )}
-            </div>
-          </div>
-        </Reveal>
-      ))}
-    </div>
-  );
+  return <NotificacoesTimeline usuarioId={userId} pacienteUserId={userId} />;
 }
+
 
 function PerfilSection({ userId }: { userId: string }) {
   const qc = useQueryClient();
