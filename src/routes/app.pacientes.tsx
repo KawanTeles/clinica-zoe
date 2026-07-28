@@ -20,6 +20,8 @@ import {
 import { Plus, Loader2, Users } from "lucide-react";
 import { AvatarUploader } from "@/components/media/AvatarUploader";
 import { PersonAvatar } from "@/lib/avatar";
+import { WhatsAppLinha } from "@/components/contato/WhatsAppAviso";
+
 
 export const Route = createFileRoute("/app/pacientes")({
   head: () => ({
