@@ -113,13 +113,16 @@ function ProfissionaisPage() {
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
                 <p className="truncate text-muted-foreground">{p.email}</p>
-                {p.telefone && <p className="text-muted-foreground">{p.telefone}</p>}
+                {p.telefone && <p className="text-muted-foreground">Tel.: {p.telefone}</p>}
+                <p><WhatsAppLinha valor={p.whatsapp} /></p>
                 <div className="flex flex-wrap gap-x-4 gap-y-1 pt-2 text-xs text-muted-foreground">
                   <span>À vista: R$ {Number(p.valor_consulta_avista ?? 0).toFixed(2)}</span>
                   <span>Cartão: R$ {Number(p.valor_consulta_cartao ?? 0).toFixed(2)}</span>
                   <span>{p.duracao_consulta_min} min</span>
                 </div>
+                <EditarContatoProfissionalDialog id={p.id} nome={p.nome} telefone={p.telefone} whatsapp={p.whatsapp} />
                 <FotoProfissionalDialog id={p.id} nome={p.nome} fotoUrl={p.foto_url} />
+
               </CardContent>
             </Card>
           ))}
