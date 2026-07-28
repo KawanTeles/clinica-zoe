@@ -209,6 +209,84 @@ function NovoPacienteDialog() {
   );
 }
 
+function EditarContatoPacienteDialog({
+  id,
+  nome,
+  telefone,
+  whatsapp,
+}: {
+  id: string;
+  nome: string;
+  telefone: string | null;
+  whatsapp: string | null;
+}) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [tel, setTel] = useState(telefone ?? "");
+  const [wpp, setWpp] = useState(whatsapp ?? "");
+
+  const mut = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("pacientes")
+        .update({ telefone: tel.trim() || null, whatsapp: wpp.trim() || null })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Contatos atualizados");
+      qc.invalidateQueries({ queryKey: ["pacientes"] });
+      setOpen(false);
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Falha ao salvar"),
+  });
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v);
+        if (v) {
+          setTel(telefone ?? "");
+          setWpp(whatsapp ?? "");
+        }
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className="mt-3 w-full">
+          Editar contatos
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Contatos de {nome}</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 py-2">
+          <div className="space-y-1.5">
+            <Label>Telefone</Label>
+            <Input value={tel} onChange={(e) => setTel(e.target.value)} />
+          </div>
+          <div className="space-y-1.5">
+            <Label>WhatsApp</Label>
+            <Input value={wpp} placeholder="(00) 00000-0000" onChange={(e) => setWpp(e.target.value)} />
+            <p className="text-[11px] text-muted-foreground">
+              Sem WhatsApp o paciente não receberá notificações automáticas.
+            </p>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => setOpen(false)}>
+            Cancelar
+          </Button>
+          <Button onClick={() => mut.mutate()} disabled={mut.isPending}>
+            {mut.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Salvar
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 
 function FotoPacienteDialog({ id, nome, fotoUrl }: { id: string; nome: string; fotoUrl: string | null }) {
   const qc = useQueryClient();
