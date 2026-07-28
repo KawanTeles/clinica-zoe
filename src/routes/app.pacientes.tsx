@@ -112,7 +112,7 @@ function PacientesPage() {
 function NovoPacienteDialog() {
   const [open, setOpen] = useState(false);
   const qc = useQueryClient();
-  const [form, setForm] = useState({ nome: "", telefone: "", email: "", data_nascimento: "", observacoes: "" });
+  const [form, setForm] = useState({ nome: "", telefone: "", whatsapp: "", email: "", data_nascimento: "", observacoes: "" });
   const [foto, setFoto] = useState<string | null>(null);
 
   const mut = useMutation({
@@ -121,6 +121,7 @@ function NovoPacienteDialog() {
       const { error } = await supabase.from("pacientes").insert({
         nome: parsed.nome,
         telefone: parsed.telefone || null,
+        whatsapp: parsed.whatsapp || null,
         email: parsed.email || null,
         data_nascimento: parsed.data_nascimento || null,
         observacoes: parsed.observacoes || null,
@@ -132,7 +133,8 @@ function NovoPacienteDialog() {
       toast.success("Paciente cadastrado");
       qc.invalidateQueries({ queryKey: ["pacientes"] });
       qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
-      setForm({ nome: "", telefone: "", email: "", data_nascimento: "", observacoes: "" });
+      setForm({ nome: "", telefone: "", whatsapp: "", email: "", data_nascimento: "", observacoes: "" });
+
       setFoto(null);
       setOpen(false);
     },
