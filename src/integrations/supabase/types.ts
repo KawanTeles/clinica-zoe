@@ -775,6 +775,7 @@ export type Database = {
         }
         Returns: string
       }
+      gerar_lembretes: { Args: never; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -788,6 +789,30 @@ export type Database = {
           hora_fim: string
           hora_inicio: string
         }[]
+      }
+      notif_config: {
+        Args: never
+        Returns: {
+          conexao_erro: string | null
+          conexao_status: string
+          conexao_testada_em: string | null
+          created_at: string
+          destinatario_solicitacao: string
+          id: string
+          lembrete_24h_ativo: boolean
+          lembrete_2h_ativo: boolean
+          provider: string
+          provider_token: string | null
+          provider_url: string | null
+          remetente: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "notificacoes_config"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       resolve_valor_consulta: {
         Args: { _forma_pagamento: string; _profissional_id: string }
