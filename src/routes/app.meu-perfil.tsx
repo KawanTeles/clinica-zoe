@@ -166,7 +166,17 @@ function MeuPerfil() {
         </CardContent>
       </Card>
 
+      <Card className="border-border shadow-soft">
+        <CardHeader>
+          <CardTitle className="text-base">Histórico de notificações</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {user && <NotificacoesTimeline usuarioId={user.id} profissionalUserId={user.id} limit={40} />}
+        </CardContent>
+      </Card>
+
       <SecurityCard className="border-border shadow-soft" />
     </div>
   );
 }
+
