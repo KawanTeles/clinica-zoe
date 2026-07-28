@@ -265,7 +265,7 @@ export type Database = {
           titulo: string
           ultimo_erro: string | null
           updated_at: string
-          usuario_id: string
+          usuario_id: string | null
         }
         Insert: {
           agendamento_id?: string | null
@@ -284,7 +284,7 @@ export type Database = {
           titulo: string
           ultimo_erro?: string | null
           updated_at?: string
-          usuario_id: string
+          usuario_id?: string | null
         }
         Update: {
           agendamento_id?: string | null
@@ -303,7 +303,7 @@ export type Database = {
           titulo?: string
           ultimo_erro?: string | null
           updated_at?: string
-          usuario_id?: string
+          usuario_id?: string | null
         }
         Relationships: [
           {
