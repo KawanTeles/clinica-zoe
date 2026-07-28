@@ -60,7 +60,7 @@ function ProfissionaisPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profissionais")
-        .select("id, user_id, foto_url, nome, email, telefone, status, valor_consulta_avista, valor_consulta_cartao, duracao_consulta_min, especialidade:especialidades(nome)")
+        .select("id, user_id, foto_url, nome, email, telefone, whatsapp, status, valor_consulta_avista, valor_consulta_cartao, duracao_consulta_min, especialidade:especialidades(nome)")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
