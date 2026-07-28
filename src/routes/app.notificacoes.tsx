@@ -150,6 +150,39 @@ function NotificacoesPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+  const lembretesFn = useServerFn(gerarLembretesAgora);
+  const mLembretes = useMutation({
+    mutationFn: () => lembretesFn({ data: undefined as any }),
+    onSuccess: (r: any) => {
+      toast.success(`${r?.criados ?? 0} lembrete(s) gerado(s)`);
+      qc.invalidateQueries({ queryKey: ["notificacoes"] });
+      qc.invalidateQueries({ queryKey: ["proximos-lembretes"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const { data: proximos = [] } = useQuery({
+    queryKey: ["proximos-lembretes"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const hoje = new Date();
+      const fim = new Date(hoje.getTime() + 48 * 3600 * 1000);
+      const iso = (d: Date) => d.toISOString().slice(0, 10);
+      const { data, error } = await supabase
+        .from("agendamentos")
+        .select("id, data, hora_inicio, pacientes(nome), profissionais(nome)")
+        .gte("data", iso(hoje))
+        .lte("data", iso(fim))
+        .in("status", ["APROVADO", "REMARCADO"])
+        .order("data")
+        .order("hora_inicio")
+        .limit(20);
+      if (error) throw error;
+      return (data ?? []) as any[];
+    },
+  });
+
+
 
   const filtered = useMemo(() => {
     return notifs.filter((n) => {
