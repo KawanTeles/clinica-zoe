@@ -177,46 +177,21 @@ export function SiteShell({ children }: { children: ReactNode }) {
               ))}
 
 
-              <div className="mt-2 flex flex-col gap-2">
-                {mode === "staff" && (
-                  <a href={staffTo}>
-                    <Button variant="outline" className={cn(softButton, "w-full justify-center")}>
-                      <LayoutDashboard className="h-4 w-4 text-primary" /> Painel da Equipe
-                    </Button>
-                  </a>
-                )}
-
-                {mode === "guest" && (
-                  <Link to="/cliente/login">
-                    <Button variant="outline" className={cn(softButton, "w-full justify-center")}>
-                      Entrar
-                    </Button>
-                  </Link>
-                )}
-                {mode !== "guest" && mode !== "loading" && (
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-center gap-1.5 rounded-full text-muted-foreground"
-                    onClick={() => (mode === "staff" ? signOutStaff() : signOut())}
-                  >
-                    <LogOut className="h-4 w-4" /> Sair
-                  </Button>
-                )}
-                {mode === "client" && (
-                  <Link to="/cliente">
-                    <Button className="w-full justify-center gap-2 rounded-full">
-                      <UserRound className="h-4 w-4" /> Minha Área
-                    </Button>
-                  </Link>
-                )}
-                {(mode === "guest" || mode === "loading") && (
-                  <Link to="/agendamento">
-                    <Button className="w-full rounded-full">Agendar consulta</Button>
-                  </Link>
-                )}
-
-
+              <div className="mt-3 flex flex-col gap-2">
+                <Link
+                  to={patientTo}
+                  aria-label={patientLabel}
+                  className={cn(patientButton, "w-full")}
+                >
+                  <UserRound className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                  <span>{patientLabel}</span>
+                </Link>
+                <a href={staffTo} aria-label="Área da Clínica" className={cn(clinicButton, "w-full")}>
+                  <Stethoscope className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>Área da Clínica</span>
+                </a>
               </div>
+
 
             </div>
           </div>
