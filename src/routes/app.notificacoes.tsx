@@ -203,15 +203,34 @@ function NotificacoesPage() {
   }, [notifs, tab, canal, busca]);
 
   const stats = useMemo(() => {
-    const s = { total: notifs.length, pendente: 0, enviada: 0, erro: 0, cancelada: 0 };
+    const hojeStr = new Date().toDateString();
+    const s = {
+      total: notifs.length,
+      pendente: 0,
+      enviada: 0,
+      erro: 0,
+      cancelada: 0,
+      hoje: 0,
+      mediaMs: 0,
+    };
+    let somaMs = 0;
+    let comMs = 0;
     for (const n of notifs) {
       if (n.status_envio === "PENDENTE" || n.status_envio === "ENVIANDO") s.pendente++;
       else if (n.status_envio === "ENVIADA") s.enviada++;
       else if (n.status_envio === "ERRO") s.erro++;
       else if (n.status_envio === "CANCELADA") s.cancelada++;
+      if (n.enviado_em && new Date(n.enviado_em).toDateString() === hojeStr) s.hoje++;
+      const ms = (n as any).duracao_ms;
+      if (typeof ms === "number") {
+        somaMs += ms;
+        comMs++;
+      }
     }
+    s.mediaMs = comMs ? Math.round(somaMs / comMs) : 0;
     return s;
   }, [notifs]);
+
 
   return (
     <div className="space-y-6">
