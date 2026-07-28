@@ -89,6 +89,8 @@ export const adminCreateUser = createServerFn({ method: "POST" })
           nome: data.nome,
           email: data.email,
           telefone: data.telefone ?? null,
+          whatsapp: data.whatsapp ?? null,
+
           especialidade_id: p.especialidade_id ?? null,
           registro_profissional: p.registro_profissional ?? null,
           descricao: p.descricao ?? null,
