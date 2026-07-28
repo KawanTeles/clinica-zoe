@@ -161,14 +161,19 @@ function AgendamentoPage() {
             nome: nome ?? user.email ?? "Cliente",
             email: user.email ?? null,
             telefone: telefone || null,
+            whatsapp: telefone || null,
           })
           .select("id")
           .single();
         if (pErr) throw pErr;
         paciente_id = novoPac.id;
       } else if (telefone) {
-        await supabase.from("pacientes").update({ telefone }).eq("id", paciente_id);
+        await supabase
+          .from("pacientes")
+          .update({ telefone, whatsapp: telefone })
+          .eq("id", paciente_id);
       }
+
 
       const { data: ag, error } = await supabase
         .from("agendamentos")
