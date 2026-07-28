@@ -25,6 +25,7 @@ import { Route as AppAgendaRouteImport } from './routes/app.agenda'
 import { Route as AppConfiguracoesRouteImport } from './routes/app.configuracoes'
 import { Route as AppContaRouteImport } from './routes/app.conta'
 import { Route as AppFinanceiroRouteImport } from './routes/app.financeiro'
+import { Route as AppMarketingRouteImport } from './routes/app.marketing'
 import { Route as AppMeuPerfilRouteImport } from './routes/app.meu-perfil'
 import { Route as AppMeusPacientesRouteImport } from './routes/app.meus-pacientes'
 import { Route as AppMinhaAgendaRouteImport } from './routes/app.minha-agenda'
@@ -33,8 +34,10 @@ import { Route as AppPacientesRouteImport } from './routes/app.pacientes'
 import { Route as AppProfissionaisRouteImport } from './routes/app.profissionais'
 import { Route as AppSolicitacoesRouteImport } from './routes/app.solicitacoes'
 import { Route as AppUsuariosRouteImport } from './routes/app.usuarios'
+import { Route as AppWhatsappRouteImport } from './routes/app.whatsapp'
 import { Route as ClienteIndexRouteImport } from './routes/cliente.index'
 import { Route as ClienteLoginRouteImport } from './routes/cliente.login'
+import { Route as ApiPublicHooksMetaRouteImport } from './routes/api/public/hooks/meta'
 import { Route as ApiPublicHooksNotificacoesRouteImport } from './routes/api/public/hooks/notificacoes'
 
 const IndexRoute = IndexRouteImport.update({
@@ -117,6 +120,11 @@ const AppFinanceiroRoute = AppFinanceiroRouteImport.update({
   path: '/financeiro',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMarketingRoute = AppMarketingRouteImport.update({
+  id: '/marketing',
+  path: '/marketing',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMeuPerfilRoute = AppMeuPerfilRouteImport.update({
   id: '/meu-perfil',
   path: '/meu-perfil',
@@ -157,6 +165,11 @@ const AppUsuariosRoute = AppUsuariosRouteImport.update({
   path: '/usuarios',
   getParentRoute: () => AppRoute,
 } as any)
+const AppWhatsappRoute = AppWhatsappRouteImport.update({
+  id: '/whatsapp',
+  path: '/whatsapp',
+  getParentRoute: () => AppRoute,
+} as any)
 const ClienteIndexRoute = ClienteIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -166,6 +179,11 @@ const ClienteLoginRoute = ClienteLoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => ClienteRoute,
+} as any)
+const ApiPublicHooksMetaRoute = ApiPublicHooksMetaRouteImport.update({
+  id: '/api/public/hooks/meta',
+  path: '/api/public/hooks/meta',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicHooksNotificacoesRoute =
   ApiPublicHooksNotificacoesRouteImport.update({
@@ -190,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/app/configuracoes': typeof AppConfiguracoesRoute
   '/app/conta': typeof AppContaRoute
   '/app/financeiro': typeof AppFinanceiroRoute
+  '/app/marketing': typeof AppMarketingRoute
   '/app/meu-perfil': typeof AppMeuPerfilRoute
   '/app/meus-pacientes': typeof AppMeusPacientesRoute
   '/app/minha-agenda': typeof AppMinhaAgendaRoute
@@ -198,9 +217,11 @@ export interface FileRoutesByFullPath {
   '/app/profissionais': typeof AppProfissionaisRoute
   '/app/solicitacoes': typeof AppSolicitacoesRoute
   '/app/usuarios': typeof AppUsuariosRoute
+  '/app/whatsapp': typeof AppWhatsappRoute
   '/cliente/login': typeof ClienteLoginRoute
   '/app/': typeof AppIndexRoute
   '/cliente/': typeof ClienteIndexRoute
+  '/api/public/hooks/meta': typeof ApiPublicHooksMetaRoute
   '/api/public/hooks/notificacoes': typeof ApiPublicHooksNotificacoesRoute
 }
 export interface FileRoutesByTo {
@@ -217,6 +238,7 @@ export interface FileRoutesByTo {
   '/app/configuracoes': typeof AppConfiguracoesRoute
   '/app/conta': typeof AppContaRoute
   '/app/financeiro': typeof AppFinanceiroRoute
+  '/app/marketing': typeof AppMarketingRoute
   '/app/meu-perfil': typeof AppMeuPerfilRoute
   '/app/meus-pacientes': typeof AppMeusPacientesRoute
   '/app/minha-agenda': typeof AppMinhaAgendaRoute
@@ -225,9 +247,11 @@ export interface FileRoutesByTo {
   '/app/profissionais': typeof AppProfissionaisRoute
   '/app/solicitacoes': typeof AppSolicitacoesRoute
   '/app/usuarios': typeof AppUsuariosRoute
+  '/app/whatsapp': typeof AppWhatsappRoute
   '/cliente/login': typeof ClienteLoginRoute
   '/app': typeof AppIndexRoute
   '/cliente': typeof ClienteIndexRoute
+  '/api/public/hooks/meta': typeof ApiPublicHooksMetaRoute
   '/api/public/hooks/notificacoes': typeof ApiPublicHooksNotificacoesRoute
 }
 export interface FileRoutesById {
@@ -247,6 +271,7 @@ export interface FileRoutesById {
   '/app/configuracoes': typeof AppConfiguracoesRoute
   '/app/conta': typeof AppContaRoute
   '/app/financeiro': typeof AppFinanceiroRoute
+  '/app/marketing': typeof AppMarketingRoute
   '/app/meu-perfil': typeof AppMeuPerfilRoute
   '/app/meus-pacientes': typeof AppMeusPacientesRoute
   '/app/minha-agenda': typeof AppMinhaAgendaRoute
@@ -255,9 +280,11 @@ export interface FileRoutesById {
   '/app/profissionais': typeof AppProfissionaisRoute
   '/app/solicitacoes': typeof AppSolicitacoesRoute
   '/app/usuarios': typeof AppUsuariosRoute
+  '/app/whatsapp': typeof AppWhatsappRoute
   '/cliente/login': typeof ClienteLoginRoute
   '/app/': typeof AppIndexRoute
   '/cliente/': typeof ClienteIndexRoute
+  '/api/public/hooks/meta': typeof ApiPublicHooksMetaRoute
   '/api/public/hooks/notificacoes': typeof ApiPublicHooksNotificacoesRoute
 }
 export interface FileRouteTypes {
@@ -278,6 +305,7 @@ export interface FileRouteTypes {
     | '/app/configuracoes'
     | '/app/conta'
     | '/app/financeiro'
+    | '/app/marketing'
     | '/app/meu-perfil'
     | '/app/meus-pacientes'
     | '/app/minha-agenda'
@@ -286,9 +314,11 @@ export interface FileRouteTypes {
     | '/app/profissionais'
     | '/app/solicitacoes'
     | '/app/usuarios'
+    | '/app/whatsapp'
     | '/cliente/login'
     | '/app/'
     | '/cliente/'
+    | '/api/public/hooks/meta'
     | '/api/public/hooks/notificacoes'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -305,6 +335,7 @@ export interface FileRouteTypes {
     | '/app/configuracoes'
     | '/app/conta'
     | '/app/financeiro'
+    | '/app/marketing'
     | '/app/meu-perfil'
     | '/app/meus-pacientes'
     | '/app/minha-agenda'
@@ -313,9 +344,11 @@ export interface FileRouteTypes {
     | '/app/profissionais'
     | '/app/solicitacoes'
     | '/app/usuarios'
+    | '/app/whatsapp'
     | '/cliente/login'
     | '/app'
     | '/cliente'
+    | '/api/public/hooks/meta'
     | '/api/public/hooks/notificacoes'
   id:
     | '__root__'
@@ -334,6 +367,7 @@ export interface FileRouteTypes {
     | '/app/configuracoes'
     | '/app/conta'
     | '/app/financeiro'
+    | '/app/marketing'
     | '/app/meu-perfil'
     | '/app/meus-pacientes'
     | '/app/minha-agenda'
@@ -342,9 +376,11 @@ export interface FileRouteTypes {
     | '/app/profissionais'
     | '/app/solicitacoes'
     | '/app/usuarios'
+    | '/app/whatsapp'
     | '/cliente/login'
     | '/app/'
     | '/cliente/'
+    | '/api/public/hooks/meta'
     | '/api/public/hooks/notificacoes'
   fileRoutesById: FileRoutesById
 }
@@ -360,6 +396,7 @@ export interface RootRouteChildren {
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SobreRoute: typeof SobreRoute
+  ApiPublicHooksMetaRoute: typeof ApiPublicHooksMetaRoute
   ApiPublicHooksNotificacoesRoute: typeof ApiPublicHooksNotificacoesRoute
 }
 
@@ -477,6 +514,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFinanceiroRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/marketing': {
+      id: '/app/marketing'
+      path: '/marketing'
+      fullPath: '/app/marketing'
+      preLoaderRoute: typeof AppMarketingRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/meu-perfil': {
       id: '/app/meu-perfil'
       path: '/meu-perfil'
@@ -533,6 +577,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppUsuariosRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/whatsapp': {
+      id: '/app/whatsapp'
+      path: '/whatsapp'
+      fullPath: '/app/whatsapp'
+      preLoaderRoute: typeof AppWhatsappRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/cliente/': {
       id: '/cliente/'
       path: '/'
@@ -546,6 +597,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/cliente/login'
       preLoaderRoute: typeof ClienteLoginRouteImport
       parentRoute: typeof ClienteRoute
+    }
+    '/api/public/hooks/meta': {
+      id: '/api/public/hooks/meta'
+      path: '/api/public/hooks/meta'
+      fullPath: '/api/public/hooks/meta'
+      preLoaderRoute: typeof ApiPublicHooksMetaRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/hooks/notificacoes': {
       id: '/api/public/hooks/notificacoes'
@@ -562,6 +620,7 @@ interface AppRouteChildren {
   AppConfiguracoesRoute: typeof AppConfiguracoesRoute
   AppContaRoute: typeof AppContaRoute
   AppFinanceiroRoute: typeof AppFinanceiroRoute
+  AppMarketingRoute: typeof AppMarketingRoute
   AppMeuPerfilRoute: typeof AppMeuPerfilRoute
   AppMeusPacientesRoute: typeof AppMeusPacientesRoute
   AppMinhaAgendaRoute: typeof AppMinhaAgendaRoute
@@ -570,6 +629,7 @@ interface AppRouteChildren {
   AppProfissionaisRoute: typeof AppProfissionaisRoute
   AppSolicitacoesRoute: typeof AppSolicitacoesRoute
   AppUsuariosRoute: typeof AppUsuariosRoute
+  AppWhatsappRoute: typeof AppWhatsappRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
@@ -578,6 +638,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppConfiguracoesRoute: AppConfiguracoesRoute,
   AppContaRoute: AppContaRoute,
   AppFinanceiroRoute: AppFinanceiroRoute,
+  AppMarketingRoute: AppMarketingRoute,
   AppMeuPerfilRoute: AppMeuPerfilRoute,
   AppMeusPacientesRoute: AppMeusPacientesRoute,
   AppMinhaAgendaRoute: AppMinhaAgendaRoute,
@@ -586,6 +647,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppProfissionaisRoute: AppProfissionaisRoute,
   AppSolicitacoesRoute: AppSolicitacoesRoute,
   AppUsuariosRoute: AppUsuariosRoute,
+  AppWhatsappRoute: AppWhatsappRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
@@ -616,6 +678,7 @@ const rootRouteChildren: RootRouteChildren = {
   RedefinirSenhaRoute: RedefinirSenhaRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SobreRoute: SobreRoute,
+  ApiPublicHooksMetaRoute: ApiPublicHooksMetaRoute,
   ApiPublicHooksNotificacoesRoute: ApiPublicHooksNotificacoesRoute,
 }
 export const routeTree = rootRouteImport

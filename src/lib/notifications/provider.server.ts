@@ -81,51 +81,7 @@ class ConsoleProvider implements MessageProvider {
 }
 
 /** Evolution API (auto-hospedada). */
-class EvolutionProvider implements MessageProvider {
-  id = "evolution";
-  supports(channel: OutboundChannel) {
-    return channel === "WHATSAPP";
-  }
-  private base(cfg: ProviderConfig) {
-    return (cfg.provider_url ?? "").replace(/\/+$/, "");
-  }
-  async send(msg: OutboundMessage, cfg: ProviderConfig): Promise<DeliveryResult> {
-    const url = this.base(cfg);
-    const key = cfg.provider_token;
-    const instance = cfg.provider_instancia || cfg.remetente;
-    if (!url || !key || !instance) return { ok: false, error: "Evolution API não configurada" };
-    try {
-      const resp = await fetch(`${url}/message/sendText/${instance}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", apikey: key },
-        body: JSON.stringify({ number: digits(msg.to), text: `${msg.title}\n\n${msg.body}` }),
-      });
-      const raw = await resp.json().catch(() => null);
-      if (!resp.ok) return { ok: false, error: httpErro(resp.status), raw };
-      return { ok: true, providerId: (raw as any)?.key?.id, raw };
-    } catch (e) {
-      return { ok: false, error: (e as Error).message };
-    }
-  }
-  async test(cfg: ProviderConfig): Promise<DeliveryResult> {
-    const url = this.base(cfg);
-    const inst = cfg.provider_instancia || cfg.remetente;
-    if (!url || !cfg.provider_token || !inst)
-      return { ok: false, error: "Informe URL, token e instância." };
-    try {
-      const resp = await fetch(`${url}/instance/connectionState/${inst}`, {
-        headers: { apikey: cfg.provider_token },
-      });
-      const raw = await resp.json().catch(() => null);
-      if (!resp.ok) return { ok: false, error: httpErro(resp.status), raw };
-      return { ok: true, raw };
-    } catch (e) {
-      return { ok: false, error: (e as Error).message };
-    }
-  }
-}
-
-/** Meta WhatsApp Cloud API. */
+/** Meta WhatsApp Cloud API (Graph API v20.0+). */
 class MetaCloudProvider implements MessageProvider {
   id = "meta";
   supports(channel: OutboundChannel) {
@@ -137,8 +93,9 @@ class MetaCloudProvider implements MessageProvider {
   async send(msg: OutboundMessage, cfg: ProviderConfig): Promise<DeliveryResult> {
     const phoneId = cfg.provider_phone_number_id || cfg.remetente;
     if (!cfg.provider_token || !phoneId)
-      return { ok: false, error: "Meta Cloud API não configurada" };
+      return { ok: false, error: "Meta Cloud API não configurada (informe Token e Phone Number ID)" };
     try {
+      const textContent = msg.title && !msg.body.startsWith(msg.title) ? `${msg.title}\n\n${msg.body}` : msg.body;
       const resp = await fetch(`${this.base(cfg)}/${phoneId}/messages`, {
         method: "POST",
         headers: {
@@ -147,9 +104,13 @@ class MetaCloudProvider implements MessageProvider {
         },
         body: JSON.stringify({
           messaging_product: "whatsapp",
+          recipient_type: "individual",
           to: digits(msg.to),
           type: "text",
-          text: { body: `${msg.title}\n\n${msg.body}` },
+          text: {
+            preview_url: true,
+            body: textContent,
+          },
         }),
       });
       const raw = await resp.json().catch(() => null);
@@ -162,7 +123,7 @@ class MetaCloudProvider implements MessageProvider {
   async test(cfg: ProviderConfig): Promise<DeliveryResult> {
     const phoneId = cfg.provider_phone_number_id || cfg.remetente;
     if (!cfg.provider_token || !phoneId)
-      return { ok: false, error: "Informe token e Phone Number ID." };
+      return { ok: false, error: "Informe token e Phone Number ID da Meta Cloud API." };
     try {
       const resp = await fetch(`${this.base(cfg)}/${phoneId}`, {
         headers: { Authorization: `Bearer ${cfg.provider_token}` },
@@ -178,7 +139,6 @@ class MetaCloudProvider implements MessageProvider {
 
 /**
  * Twilio (WhatsApp/SMS).
- * URL = Account SID base; token = "SID:TOKEN" ou token de API.
  */
 class TwilioProvider implements MessageProvider {
   id = "twilio";
@@ -193,7 +153,7 @@ class TwilioProvider implements MessageProvider {
   async send(msg: OutboundMessage, cfg: ProviderConfig): Promise<DeliveryResult> {
     const { sid, token } = this.auth(cfg);
     if (!sid || !token || !cfg.remetente)
-      return { ok: false, error: "Twilio não configurado (use SID:TOKEN no campo token)." };
+      return { ok: false, error: "Twilio não configurado." };
     try {
       const resp = await fetch(
         `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`,
@@ -219,7 +179,7 @@ class TwilioProvider implements MessageProvider {
   }
   async test(cfg: ProviderConfig): Promise<DeliveryResult> {
     const { sid, token } = this.auth(cfg);
-    if (!sid || !token) return { ok: false, error: "Informe SID:TOKEN no campo token." };
+    if (!sid || !token) return { ok: false, error: "Informe SID:TOKEN." };
     try {
       const resp = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}.json`, {
         headers: { Authorization: `Basic ${btoa(`${sid}:${token}`)}` },
@@ -233,7 +193,6 @@ class TwilioProvider implements MessageProvider {
 }
 
 const providers: MessageProvider[] = [
-  new EvolutionProvider(),
   new MetaCloudProvider(),
   new TwilioProvider(),
   new ConsoleProvider(),
@@ -242,8 +201,8 @@ const providers: MessageProvider[] = [
 export const PROVIDER_IDS = providers.map((p) => p.id);
 
 export const DEFAULT_CONFIG: ProviderConfig = {
-  provider: "console",
-  provider_url: null,
+  provider: "meta",
+  provider_url: "https://graph.facebook.com/v20.0",
   provider_token: null,
   remetente: null,
   provider_instancia: null,
@@ -261,10 +220,29 @@ export const DEFAULT_CONFIG: ProviderConfig = {
   templates: {},
 };
 
-
 /** Lê a configuração no banco (service role). Nunca exponha o token ao cliente. */
 export async function loadConfig(): Promise<ProviderConfig> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+  // 1. Tenta carregar da tabela whatsapp_meta_config
+  const { data: metaCfg } = await (supabaseAdmin as any)
+    .from("whatsapp_meta_config")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (metaCfg?.access_token && metaCfg?.phone_number_id) {
+    return {
+      ...DEFAULT_CONFIG,
+      provider: "meta",
+      provider_token: metaCfg.access_token,
+      provider_phone_number_id: metaCfg.phone_number_id,
+      remetente: metaCfg.phone_number_id,
+      webhook_secret: metaCfg.verify_token,
+    };
+  }
+
   const { data } = await (supabaseAdmin as any)
     .from("notificacoes_config")
     .select("*")

@@ -12,6 +12,8 @@ import {
   UserCircle2,
   ShieldCheck,
   Sparkles,
+  MessageSquare,
+  Megaphone,
 } from "lucide-react";
 import {
   Sidebar,
@@ -40,13 +42,15 @@ type Item = {
 
 const items: Item[] = [
   { title: "Dashboard", url: "/app", icon: LayoutDashboard, roles: ["ADMIN"] },
-  { title: "Profissionais", url: "/app/profissionais", icon: Stethoscope, roles: ["ADMIN"] },
-  { title: "Pacientes", url: "/app/pacientes", icon: Users, roles: ["ADMIN", "RECEPCIONISTA"] },
-  { title: "Agenda", url: "/app/agenda", icon: CalendarDays, roles: ["ADMIN", "RECEPCIONISTA"], badge: "agenda", badgeTone: "primary" },
-  { title: "Financeiro", url: "/app/financeiro", icon: DollarSign, roles: ["ADMIN", "PROFISSIONAL"], badge: "financeiro", badgeTone: "warning" },
-  { title: "Usuários", url: "/app/usuarios", icon: UserCog, roles: ["ADMIN"] },
   { title: "Configurações", url: "/app/configuracoes", icon: Settings, roles: ["ADMIN"] },
+  { title: "Agenda", url: "/app/agenda", icon: CalendarDays, roles: ["ADMIN", "RECEPCIONISTA"], badge: "agenda", badgeTone: "primary" },
+  { title: "Pacientes", url: "/app/pacientes", icon: Users, roles: ["ADMIN", "RECEPCIONISTA"] },
+  { title: "Financeiro", url: "/app/financeiro", icon: DollarSign, roles: ["ADMIN", "PROFISSIONAL"], badge: "financeiro", badgeTone: "warning" },
+  { title: "Profissionais", url: "/app/profissionais", icon: Stethoscope, roles: ["ADMIN"] },
+  { title: "Marketing", url: "/app/marketing", icon: Megaphone, roles: ["ADMIN", "RECEPCIONISTA"] },
   { title: "Notificações", url: "/app/notificacoes", icon: Bell, roles: ["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"], badge: "notificacoes", badgeTone: "danger" },
+  { title: "WhatsApp", url: "/app/whatsapp", icon: MessageSquare, roles: ["ADMIN", "RECEPCIONISTA"] },
+  { title: "Usuários", url: "/app/usuarios", icon: UserCog, roles: ["ADMIN"] },
   { title: "Minha Agenda", url: "/app/minha-agenda", icon: CalendarDays, roles: ["PROFISSIONAL"], badge: "agenda", badgeTone: "primary" },
   { title: "Meus Pacientes", url: "/app/meus-pacientes", icon: Users, roles: ["PROFISSIONAL"] },
   { title: "Solicitações", url: "/app/solicitacoes", icon: ClipboardList, roles: ["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"], badge: "solicitacoes", badgeTone: "danger" },

@@ -31,6 +31,8 @@ type Cfg = {
   provider: "console" | "evolution" | "meta" | "twilio";
   provider_url: string;
   remetente: string;
+  provider_instancia: string;
+  webhook_secret: string;
   token_definido: boolean;
   conexao_status: string;
   conexao_testada_em: string | null;
@@ -57,15 +59,10 @@ export const NOTIF_CONFIG_KEY = ["notificacoes-config"] as const;
 
 const PROVIDER_HINT: Record<Cfg["provider"], { url: string; remetente: string; token: string }> = {
   console: { url: "—", remetente: "—", token: "Não é necessário (modo de teste)" },
-  evolution: {
-    url: "https://sua-evolution.com",
-    remetente: "nome-da-instancia",
-    token: "apikey da Evolution",
-  },
   meta: {
     url: "https://graph.facebook.com/v20.0",
-    remetente: "ID do número (phone_number_id)",
-    token: "Access token permanente",
+    remetente: "Phone Number ID da Meta",
+    token: "Access token permanente (System User Token)",
   },
   twilio: {
     url: "—",
@@ -218,15 +215,14 @@ export function NotificacoesConfigCard() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="meta">Meta WhatsApp Cloud API (Oficial)</SelectItem>
                   <SelectItem value="console">Simulado (log interno)</SelectItem>
-                  <SelectItem value="evolution">Evolution API</SelectItem>
-                  <SelectItem value="meta">Meta WhatsApp Cloud API</SelectItem>
                   <SelectItem value="twilio">Twilio</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>URL da API</Label>
+              <Label>URL Graph API</Label>
               <Input
                 value={form.provider_url}
                 placeholder={hint.url}
@@ -234,7 +230,7 @@ export function NotificacoesConfigCard() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Número remetente / instância</Label>
+              <Label>Phone Number ID</Label>
               <Input
                 value={form.remetente}
                 placeholder={hint.remetente}
@@ -242,7 +238,7 @@ export function NotificacoesConfigCard() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Token</Label>
+              <Label>Access Token (Permanent System User Token)</Label>
               <Input
                 type="password"
                 autoComplete="new-password"
@@ -251,7 +247,18 @@ export function NotificacoesConfigCard() {
                 onChange={(e) => setToken(e.target.value)}
               />
               <p className="text-xs text-muted-foreground">
-                O token fica somente no servidor e nunca é exibido novamente.
+                O token de acesso permanente fica armazenado com segurança no servidor.
+              </p>
+            </div>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label>Webhook Verify Token</Label>
+              <Input
+                value={form.webhook_secret}
+                placeholder="clinica_zoe_verify_token_2026"
+                onChange={(e) => set("webhook_secret", e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                URL do Webhook: <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">{typeof window !== "undefined" ? window.location.origin : ""}/api/public/hooks/meta</code>
               </p>
             </div>
           </div>

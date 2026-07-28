@@ -54,15 +54,19 @@ export const Route = createFileRoute("/app/notificacoes")({
 
 type Notif = {
   id: string;
-  usuario_id: string;
+  usuario_id: string | null;
   titulo: string;
   mensagem: string;
+  mensagem_recebida?: string | null;
   tipo: string;
   canal: "WHATSAPP" | "EMAIL" | "INTERNO";
-  status_envio: "PENDENTE" | "ENVIANDO" | "ENVIADA" | "ERRO" | "CANCELADA";
+  status_envio: "PENDENTE" | "ENVIANDO" | "ENVIADA" | "ENTREGUE" | "LIDO" | "RESPONDIDO" | "ERRO" | "CANCELADA";
   tentativas: number;
   ultimo_erro: string | null;
   enviado_em: string | null;
+  entregue_em?: string | null;
+  lido_em?: string | null;
+  respondido_em?: string | null;
   evento: string | null;
   agendamento_id: string | null;
   destinatario_telefone: string | null;
@@ -74,18 +78,34 @@ type Notif = {
 const STATUS_COLOR: Record<Notif["status_envio"], string> = {
   PENDENTE: "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30",
   ENVIANDO: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-500/15 dark:text-blue-300 dark:border-blue-500/30",
-  ENVIADA: "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30",
+  ENVIADA: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-500/15 dark:text-blue-300 dark:border-blue-500/30",
+  ENTREGUE: "bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-500/15 dark:text-sky-300 dark:border-sky-500/30",
+  LIDO: "bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-500/15 dark:text-indigo-300 dark:border-indigo-500/30",
+  RESPONDIDO: "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30",
   ERRO: "bg-red-100 text-red-800 border-red-200 dark:bg-red-500/15 dark:text-red-300 dark:border-red-500/30",
   CANCELADA: "bg-muted text-muted-foreground border-border",
 };
+
+const STATUS_LABEL: Record<Notif["status_envio"], string> = {
+  PENDENTE: "Pendente",
+  ENVIANDO: "Enviando",
+  ENVIADA: "Enviado",
+  ENTREGUE: "Entregue",
+  LIDO: "Lido",
+  RESPONDIDO: "Respondido",
+  ERRO: "Falhou",
+  CANCELADA: "Cancelada",
+};
+
 const CANAL_ICON: Record<Notif["canal"], React.ComponentType<{ className?: string }>> = {
   WHATSAPP: MessageSquare,
   EMAIL: Mail,
   INTERNO: Bell,
 };
+
 const EVENTO_LABEL: Record<string, string> = {
   SOLICITACAO_NOVA: "Nova solicitação",
-  CONSULTA_APROVADA: "Consulta aprovada",
+  CONSULTA_APROVADA: "Consulta confirmada",
   CONSULTA_RECUSADA: "Consulta recusada",
   CONSULTA_CANCELADA: "Consulta cancelada",
   CONSULTA_REMARCADA: "Consulta remarcada",
@@ -389,7 +409,7 @@ function NotificacoesPage() {
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="text-sm font-semibold">{n.titulo}</span>
                           <Badge variant="outline" className={STATUS_COLOR[n.status_envio]}>
-                            {n.status_envio}
+                            {STATUS_LABEL[n.status_envio] ?? n.status_envio}
                           </Badge>
                           <Badge variant="secondary" className="text-xs">
                             {n.canal}
@@ -400,10 +420,18 @@ function NotificacoesPage() {
                             </span>
                           )}
                         </div>
-                        <p className="mt-1 text-sm text-muted-foreground">{n.mensagem}</p>
+                        <p className="mt-1 text-sm text-muted-foreground whitespace-pre-line">{n.mensagem}</p>
+                        {n.mensagem_recebida && (
+                          <div className="mt-2 rounded-lg bg-secondary/70 p-2 text-xs font-medium text-secondary-foreground">
+                            <strong>Resposta recebida:</strong> {n.mensagem_recebida}
+                          </div>
+                        )}
                         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                           <span>Criada: {fmtDateTime(n.created_at)}</span>
                           <span>Enviada: {fmtDateTime(n.enviado_em)}</span>
+                          {n.entregue_em && <span>Entregue: {fmtDateTime(n.entregue_em)}</span>}
+                          {n.lido_em && <span>Lida: {fmtDateTime(n.lido_em)}</span>}
+                          {n.respondido_em && <span>Respondida: {fmtDateTime(n.respondido_em)}</span>}
                           <span>Tentativas: {n.tentativas}</span>
                           {(n.destinatario_telefone || n.destinatario_email) && (
                             <span>Contato: {n.destinatario_telefone ?? n.destinatario_email}</span>
