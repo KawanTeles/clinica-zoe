@@ -174,6 +174,16 @@ function NovoPacienteDialog() {
             <Input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} />
           </div>
           <div className="space-y-1.5">
+            <Label>WhatsApp</Label>
+            <Input
+              value={form.whatsapp}
+              placeholder="(00) 00000-0000"
+              onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
+            />
+            <p className="text-[11px] text-muted-foreground">Usado nas notificações automáticas.</p>
+          </div>
+
+          <div className="space-y-1.5">
             <Label>Email</Label>
             <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
           </div>
