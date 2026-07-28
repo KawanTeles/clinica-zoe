@@ -16,7 +16,7 @@ async function assertAdmin(supabase: any, userId: string) {
 /** Processa uma notificação da fila, chamando o provider correto e atualizando o status. */
 async function processOne(id: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { pickProvider } = await import("@/lib/notifications/provider.server");
+  const { pickProvider, loadConfig } = await import("@/lib/notifications/provider.server");
 
   const { data: n, error } = await supabaseAdmin
     .from("notificacoes")
@@ -44,14 +44,19 @@ async function processOne(id: string) {
 
   await supabaseAdmin.from("notificacoes").update({ status_envio: "ENVIANDO" }).eq("id", id);
 
-  const provider = pickProvider(n.canal as "WHATSAPP" | "EMAIL");
-  const result = await provider.send({
-    channel: n.canal as "WHATSAPP" | "EMAIL",
-    to,
-    title: n.titulo,
-    body: n.mensagem,
-    metadata: { notificacao_id: n.id, agendamento_id: n.agendamento_id },
-  });
+  const cfg = await loadConfig();
+  const provider = pickProvider(n.canal as "WHATSAPP" | "EMAIL", cfg);
+  const result = await provider.send(
+    {
+      channel: n.canal as "WHATSAPP" | "EMAIL",
+      to,
+      title: n.titulo,
+      body: n.mensagem,
+      metadata: { notificacao_id: n.id, agendamento_id: n.agendamento_id },
+    },
+    cfg,
+  );
+
 
   await supabaseAdmin
     .from("notificacoes")
