@@ -33,7 +33,23 @@ type Cfg = {
   conexao_status: string;
   conexao_testada_em: string | null;
   conexao_erro: string | null;
+  janela_ativa: boolean;
+  janela_inicio: string;
+  janela_fim: string;
+  templates: Record<string, string>;
 };
+
+const EVENTOS: Array<{ key: string; label: string }> = [
+  { key: "SOLICITACAO_NOVA", label: "Nova solicitação" },
+  { key: "CONSULTA_APROVADA", label: "Consulta confirmada" },
+  { key: "CONSULTA_RECUSADA", label: "Solicitação recusada" },
+  { key: "CONSULTA_CANCELADA", label: "Consulta cancelada" },
+  { key: "CONSULTA_REMARCADA", label: "Consulta remarcada" },
+  { key: "LEMBRETE_24H", label: "Lembrete 24 horas" },
+  { key: "LEMBRETE_2H", label: "Lembrete 2 horas" },
+  { key: "PAGAMENTO_CONFIRMADO", label: "Pagamento confirmado" },
+];
+
 
 export const NOTIF_CONFIG_KEY = ["notificacoes-config"] as const;
 
