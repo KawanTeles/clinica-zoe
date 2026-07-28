@@ -32,6 +32,7 @@ import { Route as AppMinhaAgendaRouteImport } from './routes/app.minha-agenda'
 import { Route as AppMeusPacientesRouteImport } from './routes/app.meus-pacientes'
 import { Route as AppMeuPerfilRouteImport } from './routes/app.meu-perfil'
 import { Route as AppFinanceiroRouteImport } from './routes/app.financeiro'
+import { Route as AppContaRouteImport } from './routes/app.conta'
 import { Route as AppConfiguracoesRouteImport } from './routes/app.configuracoes'
 import { Route as AppAgendaRouteImport } from './routes/app.agenda'
 
@@ -150,6 +151,11 @@ const AppFinanceiroRoute = AppFinanceiroRouteImport.update({
   path: '/financeiro',
   getParentRoute: () => AppRoute,
 } as any)
+const AppContaRoute = AppContaRouteImport.update({
+  id: '/conta',
+  path: '/conta',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppConfiguracoesRoute = AppConfiguracoesRouteImport.update({
   id: '/configuracoes',
   path: '/configuracoes',
@@ -175,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/sobre': typeof SobreRoute
   '/app/agenda': typeof AppAgendaRoute
   '/app/configuracoes': typeof AppConfiguracoesRoute
+  '/app/conta': typeof AppContaRoute
   '/app/financeiro': typeof AppFinanceiroRoute
   '/app/meu-perfil': typeof AppMeuPerfilRoute
   '/app/meus-pacientes': typeof AppMeusPacientesRoute
@@ -200,6 +207,7 @@ export interface FileRoutesByTo {
   '/sobre': typeof SobreRoute
   '/app/agenda': typeof AppAgendaRoute
   '/app/configuracoes': typeof AppConfiguracoesRoute
+  '/app/conta': typeof AppContaRoute
   '/app/financeiro': typeof AppFinanceiroRoute
   '/app/meu-perfil': typeof AppMeuPerfilRoute
   '/app/meus-pacientes': typeof AppMeusPacientesRoute
@@ -228,6 +236,7 @@ export interface FileRoutesById {
   '/sobre': typeof SobreRoute
   '/app/agenda': typeof AppAgendaRoute
   '/app/configuracoes': typeof AppConfiguracoesRoute
+  '/app/conta': typeof AppContaRoute
   '/app/financeiro': typeof AppFinanceiroRoute
   '/app/meu-perfil': typeof AppMeuPerfilRoute
   '/app/meus-pacientes': typeof AppMeusPacientesRoute
@@ -257,6 +266,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/app/agenda'
     | '/app/configuracoes'
+    | '/app/conta'
     | '/app/financeiro'
     | '/app/meu-perfil'
     | '/app/meus-pacientes'
@@ -282,6 +292,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/app/agenda'
     | '/app/configuracoes'
+    | '/app/conta'
     | '/app/financeiro'
     | '/app/meu-perfil'
     | '/app/meus-pacientes'
@@ -309,6 +320,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/app/agenda'
     | '/app/configuracoes'
+    | '/app/conta'
     | '/app/financeiro'
     | '/app/meu-perfil'
     | '/app/meus-pacientes'
@@ -500,6 +512,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFinanceiroRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/conta': {
+      id: '/app/conta'
+      path: '/conta'
+      fullPath: '/app/conta'
+      preLoaderRoute: typeof AppContaRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/configuracoes': {
       id: '/app/configuracoes'
       path: '/configuracoes'
@@ -520,6 +539,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppAgendaRoute: typeof AppAgendaRoute
   AppConfiguracoesRoute: typeof AppConfiguracoesRoute
+  AppContaRoute: typeof AppContaRoute
   AppFinanceiroRoute: typeof AppFinanceiroRoute
   AppMeuPerfilRoute: typeof AppMeuPerfilRoute
   AppMeusPacientesRoute: typeof AppMeusPacientesRoute
@@ -535,6 +555,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAgendaRoute: AppAgendaRoute,
   AppConfiguracoesRoute: AppConfiguracoesRoute,
+  AppContaRoute: AppContaRoute,
   AppFinanceiroRoute: AppFinanceiroRoute,
   AppMeuPerfilRoute: AppMeuPerfilRoute,
   AppMeusPacientesRoute: AppMeusPacientesRoute,

@@ -36,6 +36,7 @@ import { STATUS_COLOR, STATUS_LABEL, addMinutes, fmtHora, todayISO } from "@/lib
 import { cn } from "@/lib/utils";
 import { AvatarUploader } from "@/components/media/AvatarUploader";
 import { PersonAvatar } from "@/lib/avatar";
+import { SecurityCard } from "@/components/security/SecurityCard";
 
 export const Route = createFileRoute("/cliente/")({
   head: () => ({
