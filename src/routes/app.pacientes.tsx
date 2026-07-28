@@ -92,10 +92,13 @@ function PacientesPage() {
               </CardHeader>
               <CardContent className="space-y-1 text-sm text-muted-foreground">
                 {p.email && <p className="truncate">{p.email}</p>}
-                {p.telefone && <p>{p.telefone}</p>}
+                {p.telefone && <p>Tel.: {p.telefone}</p>}
+                <p><WhatsAppLinha valor={p.whatsapp} /></p>
                 {p.data_nascimento && <p>Nasc.: {new Date(p.data_nascimento).toLocaleDateString("pt-BR")}</p>}
+                <EditarContatoPacienteDialog id={p.id} nome={p.nome} telefone={p.telefone} whatsapp={p.whatsapp} />
                 <FotoPacienteDialog id={p.id} nome={p.nome} fotoUrl={p.foto_url} />
               </CardContent>
+
             </Card>
           ))}
         </div>
