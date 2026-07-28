@@ -169,17 +169,33 @@ export async function processOne(id: string, opts?: { ignorarJanela?: boolean })
 
 export async function processQueue(limit = 20, opts?: { ignorarJanela?: boolean }) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data: pend, error } = await (supabaseAdmin as any)
-    .from("notificacoes")
-    .select("id")
-    .eq("status_envio", "PENDENTE")
-    .in("canal", ["WHATSAPP", "EMAIL"])
-    .order("created_at", { ascending: true })
-    .limit(limit);
+  const agora = new Date().toISOString();
+  const [{ data: pend, error }, { data: retry }] = await Promise.all([
+    (supabaseAdmin as any)
+      .from("notificacoes")
+      .select("id")
+      .eq("status_envio", "PENDENTE")
+      .in("canal", ["WHATSAPP", "EMAIL"])
+      .order("created_at", { ascending: true })
+      .limit(limit),
+    // Reenvio automático: erros cujo intervalo de espera já venceu.
+    (supabaseAdmin as any)
+      .from("notificacoes")
+      .select("id")
+      .eq("status_envio", "ERRO")
+      .eq("definitivo", false)
+      .not("proxima_tentativa_em", "is", null)
+      .lte("proxima_tentativa_em", agora)
+      .in("canal", ["WHATSAPP", "EMAIL"])
+      .order("proxima_tentativa_em", { ascending: true })
+      .limit(limit),
+  ]);
   if (error) throw new Error(error.message);
 
+  const fila = [...(pend ?? []), ...(retry ?? [])];
+
   const results: Array<{ id: string } & ProcessResult> = [];
-  for (const row of pend ?? []) {
+  for (const row of fila) {
     const r = await processOne(row.id, opts);
     results.push({ id: row.id, ...r });
   }
