@@ -29,7 +29,7 @@ GRANT SELECT ON public.profissionais_public TO anon, authenticated;
 -- 3) Configurações da clínica (singleton)
 CREATE TABLE IF NOT EXISTS public.configuracoes_clinica (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  nome text NOT NULL DEFAULT 'Clínica Zoe',
+  nome text NOT NULL DEFAULT 'Clínica',
   tagline text,
   logo_url text,
   hero_titulo text,
@@ -79,9 +79,9 @@ INSERT INTO public.configuracoes_clinica (
   horarios, redes_sociais, latitude, longitude, hero_titulo, hero_subtitulo
 )
 SELECT
-  'Clínica Zoe',
+  'Clínica',
   'Cuidado clínico com estética premium',
-  'Na Clínica Zoe unimos tecnologia, acolhimento e excelência clínica para oferecer uma experiência de cuidado completa.',
+  'Na Clínica unimos tecnologia, acolhimento e excelência clínica para oferecer uma experiência de cuidado completa.',
   'Av. Paulista, 1000 — Bela Vista, São Paulo — SP, 01310-100',
   '+55 (11) 4000-0000',
   '+55 (11) 99999-0000',

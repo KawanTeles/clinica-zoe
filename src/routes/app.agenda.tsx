@@ -6,9 +6,9 @@ import { AgendaView } from "@/components/agenda/AgendaView";
 export const Route = createFileRoute("/app/agenda")({
   head: () => ({
     meta: [
-      { title: "Agenda — Clínica Zoe" },
+      { title: "Agenda — Clínica" },
       { name: "description", content: "Agenda geral da clínica." },
-      { property: "og:title", content: "Agenda — Clínica Zoe" },
+      { property: "og:title", content: "Agenda — Clínica" },
       { property: "og:description", content: "Agenda geral da clínica." },
       { name: "robots", content: "noindex" },
     ],

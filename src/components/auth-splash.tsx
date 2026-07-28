@@ -21,7 +21,7 @@ export function AuthSplash({ message = "Preparando seu ambiente..." }: AuthSplas
         </div>
 
         <div className="text-center">
-          <p className="text-lg font-semibold tracking-tight sm:text-xl">Clínica Zoe</p>
+          <p className="text-lg font-semibold tracking-tight sm:text-xl">Clínica</p>
           <p className="mt-1 text-sm text-muted-foreground">{message}</p>
         </div>
 

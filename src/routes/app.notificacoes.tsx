@@ -42,10 +42,10 @@ import {
 export const Route = createFileRoute("/app/notificacoes")({
   head: () => ({
     meta: [
-      { title: "Notificações — Clínica Zoe" },
+      { title: "Notificações — Clínica" },
       { name: "description", content: "Central de notificações e envio pela clínica." },
-      { property: "og:title", content: "Notificações — Clínica Zoe" },
-      { property: "og:description", content: "Central de notificações da Clínica Zoe." },
+      { property: "og:title", content: "Notificações — Clínica" },
+      { property: "og:description", content: "Central de notificações da Clínica." },
       { name: "robots", content: "noindex" },
     ],
   }),

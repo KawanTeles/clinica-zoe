@@ -26,9 +26,9 @@ import { WhatsAppLinha } from "@/components/contato/WhatsAppAviso";
 export const Route = createFileRoute("/app/pacientes")({
   head: () => ({
     meta: [
-      { title: "Pacientes — Clínica Zoe" },
+      { title: "Pacientes — Clínica" },
       { name: "description", content: "Cadastro de pacientes." },
-      { property: "og:title", content: "Pacientes — Clínica Zoe" },
+      { property: "og:title", content: "Pacientes — Clínica" },
       { property: "og:description", content: "Cadastro de pacientes." },
       { name: "robots", content: "noindex" },
     ],

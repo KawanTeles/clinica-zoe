@@ -264,6 +264,19 @@ export function SiteShell({ children }: { children: ReactNode }) {
             <span>© {new Date().getFullYear()} {settings.nome}. Todos os direitos reservados.</span>
             <span>Feito com cuidado.</span>
           </div>
+          <div className="border-t border-border/40 py-3 text-center text-xs text-muted-foreground">
+            <span>
+              Feito por{" "}
+              <a
+                href="https://portfolio-rvm8.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-foreground transition-colors duration-200 hover:text-primary hover:underline decoration-primary/50 underline-offset-4"
+              >
+                Kawan Teles
+              </a>
+            </span>
+          </div>
         </div>
       </footer>
     </div>

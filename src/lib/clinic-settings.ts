@@ -32,7 +32,7 @@ export type ClinicSettings = {
 
 /** Valores usados enquanto as configurações não carregam (ou se ainda não existirem). */
 export const CLINIC_DEFAULTS: ClinicSettings = {
-  nome: "Clínica Zoe",
+  nome: "Clínica",
   tagline: "Cuidado clínico com estética premium",
   logo_url: null,
   hero_titulo: "Cuidado clínico com estética premium",

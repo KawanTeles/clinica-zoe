@@ -8,12 +8,12 @@ import { Sparkles, Loader2 } from "lucide-react";
 export const Route = createFileRoute("/especialidades")({
   head: () => ({
     meta: [
-      { title: "Especialidades — Clínica Zoe" },
+      { title: "Especialidades — Clínica" },
       {
         name: "description",
-        content: "Conheça todas as especialidades disponíveis na Clínica Zoe e agende sua consulta.",
+        content: "Conheça todas as especialidades disponíveis na Clínica e agende sua consulta.",
       },
-      { property: "og:title", content: "Especialidades — Clínica Zoe" },
+      { property: "og:title", content: "Especialidades — Clínica" },
       { property: "og:description", content: "Especialidades disponíveis para agendamento." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://clinicazoe.lovable.app/especialidades" },
@@ -25,10 +25,10 @@ export const Route = createFileRoute("/especialidades")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-          name: "Especialidades — Clínica Zoe",
+          name: "Especialidades — Clínica",
           url: "https://clinicazoe.lovable.app/especialidades",
-          description: "Especialidades disponíveis para agendamento na Clínica Zoe.",
-          about: { "@type": "MedicalBusiness", name: "Clínica Zoe" },
+          description: "Especialidades disponíveis para agendamento na Clínica.",
+          about: { "@type": "MedicalBusiness", name: "Clínica" },
         }),
       },
     ],

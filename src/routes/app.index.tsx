@@ -13,9 +13,9 @@ function valorLancamento(row: any) {
 export const Route = createFileRoute("/app/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Clínica Zoe" },
+      { title: "Dashboard — Clínica" },
       { name: "description", content: "Visão geral da clínica." },
-      { property: "og:title", content: "Dashboard — Clínica Zoe" },
+      { property: "og:title", content: "Dashboard — Clínica" },
       { property: "og:description", content: "Visão geral da clínica." },
       { name: "robots", content: "noindex" },
     ],

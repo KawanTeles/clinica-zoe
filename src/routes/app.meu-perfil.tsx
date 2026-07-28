@@ -19,9 +19,9 @@ import { NotificacoesTimeline } from "@/components/notificacoes/NotificacoesTime
 export const Route = createFileRoute("/app/meu-perfil")({
   head: () => ({
     meta: [
-      { title: "Meu Perfil — Clínica Zoe" },
+      { title: "Meu Perfil — Clínica" },
       { name: "description", content: "Seus dados profissionais." },
-      { property: "og:title", content: "Meu Perfil — Clínica Zoe" },
+      { property: "og:title", content: "Meu Perfil — Clínica" },
       { property: "og:description", content: "Seus dados profissionais." },
       { name: "robots", content: "noindex" },
     ],

@@ -2,7 +2,7 @@ import { getSupabaseFor, type AuthScope } from "@/lib/supabase";
 
 const GENERIC_ERROR = "Credenciais inválidas";
 const DISABLED_ERROR =
-  "Esta conta está desativada. Entre em contato com a Clínica Zoe para reativá-la.";
+  "Esta conta está desativada. Entre em contato com a Clínica para reativá-la.";
 
 /**
  * Login com verificação de status da conta.

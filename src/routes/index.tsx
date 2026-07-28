@@ -45,16 +45,16 @@ const FAQ_ITEMS = [
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Clínica Zoe — Cuidado clínico premium" },
+      { title: "Clínica — Cuidado clínico premium" },
       {
         name: "description",
         content:
-          "Clínica Zoe: agenda inteligente, profissionais qualificados e uma experiência clínica premium. Agende sua consulta em minutos.",
+          "Clínica: agenda inteligente, profissionais qualificados e uma experiência clínica premium. Agende sua consulta em minutos.",
       },
-      { property: "og:title", content: "Clínica Zoe — Cuidado clínico premium" },
+      { property: "og:title", content: "Clínica — Cuidado clínico premium" },
       {
         property: "og:description",
-        content: "Clínica Zoe: agenda inteligente, profissionais qualificados e uma experiência clínica premium. Agende sua consulta em minutos.",
+        content: "Clínica: agenda inteligente, profissionais qualificados e uma experiência clínica premium. Agende sua consulta em minutos.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE_URL}/` },
@@ -66,10 +66,10 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "MedicalBusiness",
-          name: "Clínica Zoe",
+          name: "Clínica",
           url: `${SITE_URL}/`,
           description:
-            "Clínica Zoe: agenda inteligente, profissionais qualificados e uma experiência clínica premium.",
+            "Clínica: agenda inteligente, profissionais qualificados e uma experiência clínica premium.",
           medicalSpecialty: "MedicalClinic",
         }),
       },
@@ -334,7 +334,7 @@ function Depoimentos() {
           <div className="max-w-2xl">
             <p className="text-xs font-semibold uppercase tracking-widest text-primary">Depoimentos</p>
             <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-              Quem cuida com a Zoe recomenda
+              Quem cuida na clínica recomenda
             </h2>
           </div>
         </Reveal>
@@ -460,7 +460,7 @@ function Localizacao() {
           <Reveal delay={80}>
             <div className="overflow-hidden rounded-2xl border border-border shadow-soft">
               <iframe
-                title="Localização da Clínica Zoe"
+                title="Localização da Clínica"
                 src={mapsEmbedUrl(settings)}
                 loading="lazy"
                 className="h-[420px] w-full"
@@ -503,7 +503,7 @@ function CTAFinal() {
 
         <Reveal>
           <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Pronto para cuidar de você com a Zoe?
+            Pronto para cuidar de você conosco?
           </h2>
         </Reveal>
         <Reveal delay={80}>

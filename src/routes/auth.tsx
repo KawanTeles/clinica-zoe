@@ -14,10 +14,10 @@ import { AuthSplash } from "@/components/auth-splash";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Painel da Equipe — Clínica Zoe" },
-      { name: "description", content: "Acesso restrito à equipe da Clínica Zoe." },
-      { property: "og:title", content: "Painel da Equipe — Clínica Zoe" },
-      { property: "og:description", content: "Acesso restrito à equipe da Clínica Zoe." },
+      { title: "Painel da Equipe — Clínica" },
+      { name: "description", content: "Acesso restrito à equipe da Clínica." },
+      { property: "og:title", content: "Painel da Equipe — Clínica" },
+      { property: "og:description", content: "Acesso restrito à equipe da Clínica." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -53,7 +53,7 @@ function AuthPage() {
           <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary-dark text-primary-foreground shadow-soft">
             <ShieldCheck className="h-5 w-5" />
           </div>
-          <span className="text-lg font-semibold tracking-tight">Clínica Zoe</span>
+          <span className="text-lg font-semibold tracking-tight">Clínica</span>
         </Link>
 
         <div className="w-full rounded-xl border border-border bg-surface p-6 shadow-soft sm:p-8">

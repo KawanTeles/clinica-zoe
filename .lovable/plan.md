@@ -1,4 +1,4 @@
-Vou construir o painel administrativo da Clínica Zoe em etapas, validando cada uma antes de avançar. Nesta primeira entrega o foco é a **fundação**: banco de dados, autenticação, permissões e layout administrativo com as 3 áreas (Admin, Recepcionista, Profissional). Os módulos de negócio (agenda, financeiro, WhatsApp) vêm nas etapas seguintes, sobre essa base já testada.
+Vou construir o painel administrativo da Clínica em etapas, validando cada uma antes de avançar. Nesta primeira entrega o foco é a **fundação**: banco de dados, autenticação, permissões e layout administrativo com as 3 áreas (Admin, Recepcionista, Profissional). Os módulos de negócio (agenda, financeiro, WhatsApp) vêm nas etapas seguintes, sobre essa base já testada.
 
 ## Escopo desta entrega (Etapa 1 + 2)
 

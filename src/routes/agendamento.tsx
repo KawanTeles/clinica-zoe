@@ -34,13 +34,13 @@ import { addMinutes, fmtHora, todayISO } from "@/lib/agenda-utils";
 export const Route = createFileRoute("/agendamento")({
   head: () => ({
     meta: [
-      { title: "Agendar consulta — Clínica Zoe" },
+      { title: "Agendar consulta — Clínica" },
       {
         name: "description",
         content:
-          "Agende sua consulta na Clínica Zoe em minutos: escolha especialidade, profissional, dia, horário e forma de pagamento.",
+          "Agende sua consulta na Clínica em minutos: escolha especialidade, profissional, dia, horário e forma de pagamento.",
       },
-      { property: "og:title", content: "Agendar consulta — Clínica Zoe" },
+      { property: "og:title", content: "Agendar consulta — Clínica" },
       { property: "og:description", content: "Agende sua consulta em minutos." },
       { property: "og:type", content: "website" },
       { name: "robots", content: "noindex" },

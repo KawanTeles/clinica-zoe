@@ -19,9 +19,9 @@ import { AuthSplash } from "@/components/auth-splash";
 export const Route = createFileRoute("/app")({
   head: () => ({
     meta: [
-      { title: "Painel — Clínica Zoe" },
+      { title: "Painel — Clínica" },
       { name: "description", content: "Painel administrativo." },
-      { property: "og:title", content: "Painel — Clínica Zoe" },
+      { property: "og:title", content: "Painel — Clínica" },
       { property: "og:description", content: "Painel administrativo." },
       { name: "robots", content: "noindex" },
     ],

@@ -73,7 +73,7 @@ export async function buildVars(agendamentoId: string | null): Promise<Record<st
     hora: "—",
     endereco: "consulte a clínica",
     valor: "0,00",
-    clinica: "Clínica Zoe",
+    clinica: "Clínica",
   };
 
   const { data: clinica } = await (supabaseAdmin as any)

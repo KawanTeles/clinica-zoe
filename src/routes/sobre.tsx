@@ -6,13 +6,13 @@ import { HeartHandshake, ShieldCheck, Sparkles, Users } from "lucide-react";
 export const Route = createFileRoute("/sobre")({
   head: () => ({
     meta: [
-      { title: "Sobre — Clínica Zoe" },
+      { title: "Sobre — Clínica" },
       {
         name: "description",
         content:
-          "Conheça a história, a missão e os valores da Clínica Zoe: um espaço clínico premium dedicado ao cuidado humano e à excelência.",
+          "Conheça a história, a missão e os valores da Clínica: um espaço clínico premium dedicado ao cuidado humano e à excelência.",
       },
-      { property: "og:title", content: "Sobre — Clínica Zoe" },
+      { property: "og:title", content: "Sobre — Clínica" },
       { property: "og:description", content: "Nossa história, missão e valores." },
       { property: "og:type", content: "article" },
     ],
@@ -36,7 +36,7 @@ function SobrePage() {
           </Reveal>
           <Reveal delay={160}>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-              A Clínica Zoe nasceu para reunir profissionais qualificados, tecnologia e um ambiente
+              A Clínica nasceu para reunir profissionais qualificados, tecnologia e um ambiente
               sofisticado em uma jornada de atendimento verdadeiramente humana.
             </p>
           </Reveal>
@@ -72,7 +72,7 @@ function SobrePage() {
               </div>
               <h2 className="mt-4 text-3xl font-bold tracking-tight">Cuidado que faz diferença</h2>
               <p className="mt-4 text-muted-foreground">
-                Cada detalhe da Zoe foi pensado para você: agendamento inteligente sem filas, uma
+                Cada detalhe da nossa clínica foi pensado para você: agendamento inteligente sem filas, uma
                 agenda profissional que evita conflitos e uma equipe preparada para cuidar de cada
                 paciente com atenção plena.
               </p>

@@ -8,9 +8,9 @@ import { SecurityCard } from "@/components/security/SecurityCard";
 export const Route = createFileRoute("/app/conta")({
   head: () => ({
     meta: [
-      { title: "Minha Conta — Clínica Zoe" },
+      { title: "Minha Conta — Clínica" },
       { name: "description", content: "Dados da sua conta e segurança de acesso." },
-      { property: "og:title", content: "Minha Conta — Clínica Zoe" },
+      { property: "og:title", content: "Minha Conta — Clínica" },
       { property: "og:description", content: "Dados da sua conta e segurança de acesso." },
       { name: "robots", content: "noindex" },
     ],

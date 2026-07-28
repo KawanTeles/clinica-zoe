@@ -19,10 +19,10 @@ export const Route = createFileRoute("/cliente/login")({
   }),
   head: () => ({
     meta: [
-      { title: "Área do Paciente — Clínica Zoe" },
-      { name: "description", content: "Acesse sua área do paciente na Clínica Zoe: consultas, notificações e mais." },
-      { property: "og:title", content: "Área do Paciente — Clínica Zoe" },
-      { property: "og:description", content: "Entre na sua área de paciente da Clínica Zoe." },
+      { title: "Área do Paciente — Clínica" },
+      { name: "description", content: "Acesse sua área do paciente na Clínica: consultas, notificações e mais." },
+      { property: "og:title", content: "Área do Paciente — Clínica" },
+      { property: "og:description", content: "Entre na sua área de paciente da Clínica." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -66,7 +66,7 @@ function ClienteLoginPage() {
           <div className="grid h-11 w-11 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-elegant">
             <HeartPulse className="h-5 w-5" />
           </div>
-          <span className="text-lg font-semibold tracking-tight">Clínica Zoe</span>
+          <span className="text-lg font-semibold tracking-tight">Clínica</span>
         </Link>
 
         <div className="w-full rounded-3xl border border-border bg-surface/90 p-6 shadow-elegant backdrop-blur sm:p-8">

@@ -89,7 +89,7 @@ export function AppSidebar() {
             <Sparkles className="h-5 w-5" />
           </div>
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold">Clínica Zoe</p>
+            <p className="truncate text-sm font-semibold">Clínica</p>
             <p className="truncate text-xs text-muted-foreground">Painel administrativo</p>
           </div>
         </div>

@@ -6,12 +6,12 @@ import { ProfissionalCard, useProfissionaisPublicos } from "@/lib/profissionais-
 export const Route = createFileRoute("/profissionais")({
   head: () => ({
     meta: [
-      { title: "Profissionais — Clínica Zoe" },
+      { title: "Profissionais — Clínica" },
       {
         name: "description",
-        content: "Conheça os profissionais da Clínica Zoe e escolha o especialista ideal para você.",
+        content: "Conheça os profissionais da Clínica e escolha o especialista ideal para você.",
       },
-      { property: "og:title", content: "Profissionais — Clínica Zoe" },
+      { property: "og:title", content: "Profissionais — Clínica" },
       { property: "og:description", content: "Nosso time de especialistas." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://clinicazoe.lovable.app/profissionais" },
@@ -24,10 +24,10 @@ export const Route = createFileRoute("/profissionais")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-          name: "Profissionais — Clínica Zoe",
+          name: "Profissionais — Clínica",
           url: "https://clinicazoe.lovable.app/profissionais",
-          description: "Time de especialistas da Clínica Zoe.",
-          about: { "@type": "MedicalBusiness", name: "Clínica Zoe" },
+          description: "Time de especialistas da Clínica.",
+          about: { "@type": "MedicalBusiness", name: "Clínica" },
         }),
       },
     ],

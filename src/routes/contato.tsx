@@ -7,12 +7,12 @@ import { MapPin, Phone, Mail, Clock, Navigation, MessageCircle } from "lucide-re
 export const Route = createFileRoute("/contato")({
   head: () => ({
     meta: [
-      { title: "Contato — Clínica Zoe" },
+      { title: "Contato — Clínica" },
       {
         name: "description",
-        content: "Fale com a Clínica Zoe: endereço, telefone, WhatsApp, e-mail e horário de funcionamento.",
+        content: "Fale com a Clínica: endereço, telefone, WhatsApp, e-mail e horário de funcionamento.",
       },
-      { property: "og:title", content: "Contato — Clínica Zoe" },
+      { property: "og:title", content: "Contato — Clínica" },
       { property: "og:description", content: "Endereço, telefone, WhatsApp e horário de funcionamento." },
       { property: "og:type", content: "website" },
     ],
@@ -35,7 +35,7 @@ function ContatoPage() {
           </Reveal>
           <Reveal delay={160}>
             <p className="mx-auto mt-6 max-w-xl text-muted-foreground">
-              Escolha o canal que preferir para falar com a Clínica Zoe.
+              Escolha o canal que preferir para falar com a Clínica.
             </p>
           </Reveal>
         </div>
@@ -87,7 +87,7 @@ function ContatoPage() {
           <Reveal delay={80}>
             <div className="overflow-hidden rounded-2xl border border-border shadow-soft">
               <iframe
-                title="Localização da Clínica Zoe"
+                title="Localização da Clínica"
                 src={mapsEmbedUrl(settings)}
                 loading="lazy"
                 className="h-[460px] w-full"
