@@ -8,7 +8,19 @@ export type ProcessResult = {
   error?: string;
   providerId?: string;
   adiada?: boolean;
+  definitivo?: boolean;
 };
+
+/**
+ * Política de reenvio automático: 1ª tentativa → +2 min → 2ª → +5 min → 3ª →
+ * +15 min → 4ª falha marca ERRO DEFINITIVO.
+ */
+export const RETRY_DELAYS_MIN = [2, 5, 15] as const;
+
+/** Minutos até a próxima tentativa, ou null quando o erro é definitivo. */
+export function proximoIntervaloMin(tentativas: number): number | null {
+  return RETRY_DELAYS_MIN[tentativas - 1] ?? null;
+}
 
 /** Hora atual (HH:MM) no fuso da clínica. */
 function horaLocal(): string {
@@ -29,6 +41,7 @@ export function dentroDaJanela(cfg: ProviderConfig): boolean {
   if (ini === fim) return true;
   return ini < fim ? agora >= ini && agora <= fim : agora >= ini || agora <= fim;
 }
+
 
 export async function processOne(id: string, opts?: { ignorarJanela?: boolean }): Promise<ProcessResult> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -58,10 +71,15 @@ export async function processOne(id: string, opts?: { ignorarJanela?: boolean })
         status_envio: "ERRO",
         ultimo_erro: "Destinatário sem contato",
         tentativas: (n.tentativas ?? 0) + 1,
+        definitivo: true,
+        proxima_tentativa_em: null,
       })
       .eq("id", id);
     return { ok: false, error: "Destinatário sem contato" };
   }
+
+  /** Reenvio manual: ignora a janela e reinicia o ciclo de tentativas. */
+  const manual = !!opts?.ignorarJanela;
 
   const cfg: ProviderConfig = await loadConfig();
 
@@ -79,7 +97,7 @@ export async function processOne(id: string, opts?: { ignorarJanela?: boolean })
 
   await (supabaseAdmin as any)
     .from("notificacoes")
-    .update({ status_envio: "ENVIANDO" })
+    .update({ status_envio: "ENVIANDO", ...(manual ? { definitivo: false } : {}) })
     .eq("id", id);
 
   // Texto: template personalizado do evento (se houver) ou o texto original.
@@ -104,6 +122,11 @@ export async function processOne(id: string, opts?: { ignorarJanela?: boolean })
   );
   const duracao = Date.now() - t0;
 
+  // Reenvio manual reinicia o ciclo automático de tentativas.
+  const tentativas = manual ? 1 : (n.tentativas ?? 0) + 1;
+  const esperaMin = result.ok ? null : proximoIntervaloMin(tentativas);
+  const definitivo = !result.ok && esperaMin === null;
+
   await (supabaseAdmin as any)
     .from("notificacoes")
     .update(
@@ -111,42 +134,68 @@ export async function processOne(id: string, opts?: { ignorarJanela?: boolean })
         ? {
             status_envio: "ENVIADA",
             enviado_em: new Date().toISOString(),
-            tentativas: (n.tentativas ?? 0) + 1,
+            tentativas,
             ultimo_erro: null,
             provider: provider.id,
+            provider_message_id: result.providerId ?? null,
             duracao_ms: duracao,
+            proxima_tentativa_em: null,
+            definitivo: false,
             mensagem: body,
           }
         : {
             status_envio: "ERRO",
-            tentativas: (n.tentativas ?? 0) + 1,
-            ultimo_erro: result.error ?? "Falha desconhecida",
+            tentativas,
+            ultimo_erro: definitivo
+              ? `ERRO DEFINITIVO após ${tentativas} tentativas: ${result.error ?? "Falha desconhecida"}`
+              : result.error ?? "Falha desconhecida",
             provider: provider.id,
             duracao_ms: duracao,
+            definitivo,
+            proxima_tentativa_em: esperaMin
+              ? new Date(Date.now() + esperaMin * 60_000).toISOString()
+              : null,
           },
     )
     .eq("id", id);
 
   console.log(
-    `[notif] ${new Date().toISOString()} id=${id} canal=${n.canal} para=${to} provider=${provider.id} ms=${duracao} status=${result.ok ? "ENVIADA" : "ERRO"}${result.ok ? "" : ` erro=${result.error}`}`,
+    `[notif] ${new Date().toISOString()} id=${id} canal=${n.canal} para=${to} provider=${provider.id} tentativa=${tentativas} ms=${duracao} status=${result.ok ? "ENVIADA" : definitivo ? "ERRO_DEFINITIVO" : `ERRO (retry em ${esperaMin}min)`}${result.ok ? "" : ` erro=${result.error}`}`,
   );
 
-  return { ok: result.ok, error: result.error, providerId: result.providerId };
+  return { ok: result.ok, error: result.error, providerId: result.providerId, definitivo };
 }
+
 
 export async function processQueue(limit = 20, opts?: { ignorarJanela?: boolean }) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data: pend, error } = await (supabaseAdmin as any)
-    .from("notificacoes")
-    .select("id")
-    .eq("status_envio", "PENDENTE")
-    .in("canal", ["WHATSAPP", "EMAIL"])
-    .order("created_at", { ascending: true })
-    .limit(limit);
+  const agora = new Date().toISOString();
+  const [{ data: pend, error }, { data: retry }] = await Promise.all([
+    (supabaseAdmin as any)
+      .from("notificacoes")
+      .select("id")
+      .eq("status_envio", "PENDENTE")
+      .in("canal", ["WHATSAPP", "EMAIL"])
+      .order("created_at", { ascending: true })
+      .limit(limit),
+    // Reenvio automático: erros cujo intervalo de espera já venceu.
+    (supabaseAdmin as any)
+      .from("notificacoes")
+      .select("id")
+      .eq("status_envio", "ERRO")
+      .eq("definitivo", false)
+      .not("proxima_tentativa_em", "is", null)
+      .lte("proxima_tentativa_em", agora)
+      .in("canal", ["WHATSAPP", "EMAIL"])
+      .order("proxima_tentativa_em", { ascending: true })
+      .limit(limit),
+  ]);
   if (error) throw new Error(error.message);
 
+  const fila = [...(pend ?? []), ...(retry ?? [])];
+
   const results: Array<{ id: string } & ProcessResult> = [];
-  for (const row of pend ?? []) {
+  for (const row of fila) {
     const r = await processOne(row.id, opts);
     results.push({ id: row.id, ...r });
   }

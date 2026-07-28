@@ -29,6 +29,12 @@ export interface ProviderConfig {
   provider_url: string | null;
   provider_token: string | null;
   remetente: string | null;
+  /** Evolution: nome da instância. */
+  provider_instancia: string | null;
+  /** Meta Cloud: phone_number_id. */
+  provider_phone_number_id: string | null;
+  /** Segredo usado para validar o webhook de status do provider. */
+  webhook_secret: string | null;
   destinatario_solicitacao: string;
   lembrete_24h_ativo: boolean;
   lembrete_2h_ativo: boolean;
@@ -42,6 +48,7 @@ export interface ProviderConfig {
 }
 
 
+
 export interface MessageProvider {
   id: string;
   supports(channel: OutboundChannel): boolean;
@@ -51,6 +58,12 @@ export interface MessageProvider {
 }
 
 const digits = (v: string) => v.replace(/\D/g, "");
+
+/** Mensagem de erro legível, distinguindo falha de autenticação. */
+function httpErro(status: number) {
+  if (status === 401 || status === 403) return `Erro de autenticação (HTTP ${status})`;
+  return `HTTP ${status}`;
+}
 
 /** Fallback: apenas registra em log. Útil em desenvolvimento. */
 class ConsoleProvider implements MessageProvider {
@@ -79,7 +92,7 @@ class EvolutionProvider implements MessageProvider {
   async send(msg: OutboundMessage, cfg: ProviderConfig): Promise<DeliveryResult> {
     const url = this.base(cfg);
     const key = cfg.provider_token;
-    const instance = cfg.remetente;
+    const instance = cfg.provider_instancia || cfg.remetente;
     if (!url || !key || !instance) return { ok: false, error: "Evolution API não configurada" };
     try {
       const resp = await fetch(`${url}/message/sendText/${instance}`, {
@@ -88,7 +101,7 @@ class EvolutionProvider implements MessageProvider {
         body: JSON.stringify({ number: digits(msg.to), text: `${msg.title}\n\n${msg.body}` }),
       });
       const raw = await resp.json().catch(() => null);
-      if (!resp.ok) return { ok: false, error: `HTTP ${resp.status}`, raw };
+      if (!resp.ok) return { ok: false, error: httpErro(resp.status), raw };
       return { ok: true, providerId: (raw as any)?.key?.id, raw };
     } catch (e) {
       return { ok: false, error: (e as Error).message };
@@ -96,14 +109,15 @@ class EvolutionProvider implements MessageProvider {
   }
   async test(cfg: ProviderConfig): Promise<DeliveryResult> {
     const url = this.base(cfg);
-    if (!url || !cfg.provider_token || !cfg.remetente)
-      return { ok: false, error: "Informe URL, token e instância/remetente." };
+    const inst = cfg.provider_instancia || cfg.remetente;
+    if (!url || !cfg.provider_token || !inst)
+      return { ok: false, error: "Informe URL, token e instância." };
     try {
-      const resp = await fetch(`${url}/instance/connectionState/${cfg.remetente}`, {
+      const resp = await fetch(`${url}/instance/connectionState/${inst}`, {
         headers: { apikey: cfg.provider_token },
       });
       const raw = await resp.json().catch(() => null);
-      if (!resp.ok) return { ok: false, error: `HTTP ${resp.status}`, raw };
+      if (!resp.ok) return { ok: false, error: httpErro(resp.status), raw };
       return { ok: true, raw };
     } catch (e) {
       return { ok: false, error: (e as Error).message };
@@ -121,10 +135,11 @@ class MetaCloudProvider implements MessageProvider {
     return (cfg.provider_url || "https://graph.facebook.com/v20.0").replace(/\/+$/, "");
   }
   async send(msg: OutboundMessage, cfg: ProviderConfig): Promise<DeliveryResult> {
-    if (!cfg.provider_token || !cfg.remetente)
+    const phoneId = cfg.provider_phone_number_id || cfg.remetente;
+    if (!cfg.provider_token || !phoneId)
       return { ok: false, error: "Meta Cloud API não configurada" };
     try {
-      const resp = await fetch(`${this.base(cfg)}/${cfg.remetente}/messages`, {
+      const resp = await fetch(`${this.base(cfg)}/${phoneId}/messages`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -138,21 +153,22 @@ class MetaCloudProvider implements MessageProvider {
         }),
       });
       const raw = await resp.json().catch(() => null);
-      if (!resp.ok) return { ok: false, error: `HTTP ${resp.status}`, raw };
+      if (!resp.ok) return { ok: false, error: httpErro(resp.status), raw };
       return { ok: true, providerId: (raw as any)?.messages?.[0]?.id, raw };
     } catch (e) {
       return { ok: false, error: (e as Error).message };
     }
   }
   async test(cfg: ProviderConfig): Promise<DeliveryResult> {
-    if (!cfg.provider_token || !cfg.remetente)
-      return { ok: false, error: "Informe token e ID do número remetente." };
+    const phoneId = cfg.provider_phone_number_id || cfg.remetente;
+    if (!cfg.provider_token || !phoneId)
+      return { ok: false, error: "Informe token e Phone Number ID." };
     try {
-      const resp = await fetch(`${this.base(cfg)}/${cfg.remetente}`, {
+      const resp = await fetch(`${this.base(cfg)}/${phoneId}`, {
         headers: { Authorization: `Bearer ${cfg.provider_token}` },
       });
       const raw = await resp.json().catch(() => null);
-      if (!resp.ok) return { ok: false, error: `HTTP ${resp.status}`, raw };
+      if (!resp.ok) return { ok: false, error: httpErro(resp.status), raw };
       return { ok: true, raw };
     } catch (e) {
       return { ok: false, error: (e as Error).message };
@@ -195,7 +211,7 @@ class TwilioProvider implements MessageProvider {
         },
       );
       const raw = await resp.json().catch(() => null);
-      if (!resp.ok) return { ok: false, error: `HTTP ${resp.status}`, raw };
+      if (!resp.ok) return { ok: false, error: httpErro(resp.status), raw };
       return { ok: true, providerId: (raw as any)?.sid, raw };
     } catch (e) {
       return { ok: false, error: (e as Error).message };
@@ -208,7 +224,7 @@ class TwilioProvider implements MessageProvider {
       const resp = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}.json`, {
         headers: { Authorization: `Basic ${btoa(`${sid}:${token}`)}` },
       });
-      if (!resp.ok) return { ok: false, error: `HTTP ${resp.status}` };
+      if (!resp.ok) return { ok: false, error: httpErro(resp.status) };
       return { ok: true };
     } catch (e) {
       return { ok: false, error: (e as Error).message };
@@ -230,6 +246,9 @@ export const DEFAULT_CONFIG: ProviderConfig = {
   provider_url: null,
   provider_token: null,
   remetente: null,
+  provider_instancia: null,
+  provider_phone_number_id: null,
+  webhook_secret: null,
   destinatario_solicitacao: "PROFISSIONAL",
   lembrete_24h_ativo: true,
   lembrete_2h_ativo: false,
