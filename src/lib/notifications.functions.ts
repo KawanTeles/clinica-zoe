@@ -158,3 +158,34 @@ export const testarConexaoNotificacoes = createServerFn({ method: "POST" })
 
     return { ok: r.ok, error: r.error, provider: provider.id };
   });
+
+/**
+ * Envia imediatamente as notificações externas pendentes de um agendamento,
+ * sem esperar a rotina agendada. Qualquer usuário autenticado envolvido no
+ * fluxo pode acionar, mas apenas para o agendamento informado.
+ */
+export const dispararNotificacoesAgendamento = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { agendamentoId: string }) =>
+    z.object({ agendamentoId: z.string().uuid() }).parse(data),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { processOne } = await import("@/lib/notifications/queue.server");
+
+    const { data: pend, error } = await (supabaseAdmin as any)
+      .from("notificacoes")
+      .select("id")
+      .eq("agendamento_id", data.agendamentoId)
+      .eq("status_envio", "PENDENTE")
+      .in("canal", ["WHATSAPP", "EMAIL"])
+      .limit(20);
+    if (error) throw new Error(error.message);
+
+    let enviados = 0;
+    for (const row of pend ?? []) {
+      const r = await processOne(row.id);
+      if (r.ok) enviados += 1;
+    }
+    return { enviados, total: pend?.length ?? 0 };
+  });
