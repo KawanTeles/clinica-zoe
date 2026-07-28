@@ -9,14 +9,20 @@ export function semWhatsapp(valor?: string | null) {
  * Aviso discreto exibido no painel quando um usuário não possui WhatsApp
  * cadastrado e, portanto, não receberá notificações automáticas.
  */
-export function WhatsAppAviso({ className = "" }: { className?: string }) {
+export function WhatsAppAviso({
+  className = "",
+  label = "Sem WhatsApp",
+}: {
+  className?: string;
+  label?: string;
+}) {
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-md bg-amber-500/10 px-1.5 py-0.5 text-[11px] font-medium text-amber-600 dark:text-amber-400 ${className}`}
       title="Sem WhatsApp cadastrado — este usuário não receberá notificações automáticas."
     >
       <AlertTriangle className="h-3 w-3" aria-hidden />
-      Sem WhatsApp
+      {label}
     </span>
   );
 }
