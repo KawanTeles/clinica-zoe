@@ -256,10 +256,24 @@ function NotificacoesPage() {
               )}
               Gerar lembretes
             </Button>
+            <Button
+              variant="outline"
+              onClick={() => mReenviarErros.mutate()}
+              disabled={mReenviarErros.isPending || stats.erro === 0}
+              className="gap-2"
+            >
+              {mReenviarErros.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4" />
+              )}
+              Reenviar erros ({stats.erro})
+            </Button>
             <Button onClick={() => mProcessar.mutate()} disabled={mProcessar.isPending} className="gap-2">
               {mProcessar.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               Processar fila
             </Button>
+
           </div>
         )}
       </div>
