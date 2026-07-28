@@ -37,6 +37,7 @@ export const Route = createFileRoute("/app/pacientes")({
 const schema = z.object({
   nome: z.string().trim().min(2, "Informe o nome"),
   telefone: z.string().trim().optional(),
+  whatsapp: z.string().trim().optional(),
   email: z.string().trim().email("Email inválido").optional().or(z.literal("")),
   data_nascimento: z.string().optional(),
   observacoes: z.string().optional(),
@@ -48,12 +49,13 @@ function PacientesPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pacientes")
-        .select("id, nome, email, telefone, data_nascimento, observacoes, foto_url, created_at")
+        .select("id, nome, email, telefone, whatsapp, data_nascimento, observacoes, foto_url, created_at")
         .order("nome");
       if (error) throw error;
       return data;
     },
   });
+
 
   return (
     <div className="space-y-6">
