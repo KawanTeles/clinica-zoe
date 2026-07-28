@@ -370,16 +370,16 @@ function AgendamentoPage() {
                       <Loader2 className="h-5 w-5 animate-spin text-primary" />
                     </div>
                   ) : slots?.length ? (
-                    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                    <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4">
                       {slots.map((s) => (
                         <button
                           key={s.hora_inicio}
                           onClick={() => setHora(s.hora_inicio.slice(0, 5))}
                           className={cn(
-                            "rounded-lg border px-3 py-2 text-sm font-medium transition",
+                            "rounded-xl border px-3.5 py-2.5 text-sm font-semibold transition-all duration-150 active:scale-[0.97]",
                             hora === s.hora_inicio.slice(0, 5)
-                              ? "border-primary bg-primary text-primary-foreground"
-                              : "border-border bg-surface hover:border-primary/40 hover:bg-secondary/50",
+                              ? "border-primary bg-primary text-primary-foreground shadow-soft"
+                              : "border-border/80 bg-background/60 hover:border-primary/50 hover:bg-secondary/60 text-foreground",
                           )}
                         >
                           {fmtHora(s.hora_inicio)}
@@ -387,8 +387,8 @@ function AgendamentoPage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="rounded-lg border border-dashed border-border bg-surface-muted p-4 text-center text-sm text-muted-foreground">
-                      Sem horários disponíveis neste dia. Escolha outra data.
+                    <p className="rounded-2xl border border-dashed border-border/80 bg-surface-muted p-6 text-center text-sm text-muted-foreground">
+                      Sem horários disponíveis neste dia. Escolha outra data no calendário acima.
                     </p>
                   )}
                 </div>
