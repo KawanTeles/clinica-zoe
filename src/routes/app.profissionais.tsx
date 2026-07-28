@@ -220,6 +220,8 @@ function NovoProfissionalDialog() {
         email: "",
         senha: "",
         telefone: "",
+        whatsapp: "",
+
         especialidade_id: "",
         registro_profissional: "",
         descricao: "",
