@@ -19,7 +19,7 @@ export const reenviarNotificacao = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { processOne } = await import("@/lib/notifications/queue.server");
-    const r = await processOne(data.id);
+    const r = await processOne(data.id, { ignorarJanela: true });
     return { ok: r.ok, error: r.error, providerId: r.providerId };
   });
 
@@ -31,7 +31,7 @@ export const processarFilaNotificacoes = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { processQueue } = await import("@/lib/notifications/queue.server");
-    return await processQueue(data.limit);
+    return await processQueue(data.limit, { ignorarJanela: true });
   });
 
 export const cancelarNotificacao = createServerFn({ method: "POST" })
