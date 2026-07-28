@@ -47,8 +47,9 @@ function ConfigPage() {
         </p>
       </div>
       <ClinicaCard />
+      <NotificacoesConfigCard />
       <EspecialidadesCard />
-    </div>
+
   );
 }
 
