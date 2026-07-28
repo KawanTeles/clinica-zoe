@@ -260,7 +260,63 @@ export function NotificacoesConfigCard() {
           )}
         </section>
 
+        <section className="space-y-3">
+          <h3 className="text-sm font-semibold">Horário de envio</h3>
+          <ToggleRow
+            label="Enviar somente dentro do horário permitido"
+            checked={form.janela_ativa}
+            onChange={(v) => set("janela_ativa", v)}
+          />
+          <div className="grid max-w-md gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label>Início</Label>
+              <Input
+                type="time"
+                value={form.janela_inicio}
+                onChange={(e) => set("janela_inicio", e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Fim</Label>
+              <Input
+                type="time"
+                value={form.janela_fim}
+                onChange={(e) => set("janela_fim", e.target.value)}
+              />
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Mensagens geradas fora da janela ficam na fila e são enviadas no próximo horário
+            permitido (fuso de São Paulo). Reenvios manuais ignoram a janela.
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h3 className="text-sm font-semibold">Textos das mensagens</h3>
+          <p className="text-xs text-muted-foreground">
+            Deixe em branco para usar o texto padrão. Variáveis disponíveis: {"{nome}"},{" "}
+            {"{profissional}"}, {"{especialidade}"}, {"{data}"}, {"{hora}"}, {"{endereco}"},{" "}
+            {"{valor}"}, {"{clinica}"}.
+          </p>
+          <div className="grid gap-4">
+            {EVENTOS.map((ev) => (
+              <div key={ev.key} className="space-y-1.5">
+                <Label>{ev.label}</Label>
+                <Textarea
+                  rows={3}
+                  placeholder="Texto padrão do sistema"
+                  value={form.templates?.[ev.key] ?? ""}
+                  onChange={(e) =>
+                    set("templates", { ...(form.templates ?? {}), [ev.key]: e.target.value })
+                  }
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+
         <div className="flex flex-wrap justify-end gap-2">
+
           <Button variant="outline" onClick={() => mTestar.mutate()} disabled={mTestar.isPending}>
             {mTestar.isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
