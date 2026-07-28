@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import { signInGuarded } from "@/lib/auth-login";
+import { ForgotPasswordDialog } from "@/components/security/ForgotPasswordDialog";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -121,27 +123,13 @@ function LoginForm() {
       }
     }
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const result = await signInGuarded("client", email, password);
     setBusy(false);
-    if (error) {
-      toast.error("Credenciais inválidas");
+    if (!result.ok) {
+      toast.error(result.message);
       return;
     }
     toast.success("Bem-vindo(a)!");
-  };
-
-  const onForgot = async () => {
-    try {
-      emailSchema.parse(email);
-    } catch {
-      toast.error("Informe seu email para recuperar a senha.");
-      return;
-    }
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/cliente/login`,
-    });
-    if (error) toast.error(error.message);
-    else toast.success("Enviamos um email com instruções para redefinir sua senha.");
   };
 
   return (
@@ -153,13 +141,7 @@ function LoginForm() {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label htmlFor="cl-pass">Senha</Label>
-          <button
-            type="button"
-            onClick={onForgot}
-            className="text-xs font-medium text-primary hover:underline"
-          >
-            Esqueci minha senha
-          </button>
+          <ForgotPasswordDialog scope="client" defaultEmail={email} />
         </div>
         <Input id="cl-pass" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
       </div>
