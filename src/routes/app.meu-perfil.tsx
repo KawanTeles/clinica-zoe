@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { AvatarUploader } from "@/components/media/AvatarUploader";
+import { SecurityCard } from "@/components/security/SecurityCard";
 
 
 export const Route = createFileRoute("/app/meu-perfil")({
@@ -148,6 +149,8 @@ function MeuPerfil() {
           </div>
         </CardContent>
       </Card>
+
+      <SecurityCard className="border-border shadow-soft" />
     </div>
   );
 }

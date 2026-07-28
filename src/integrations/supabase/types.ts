@@ -356,29 +356,47 @@ export type Database = {
       }
       profiles: {
         Row: {
+          ativo: boolean
           created_at: string
+          criado_por: string | null
+          desativado_em: string | null
+          desativado_por: string | null
           email: string
           foto_url: string | null
           id: string
           nome: string
+          removido_em: string | null
+          removido_por: string | null
           telefone: string | null
           updated_at: string
         }
         Insert: {
+          ativo?: boolean
           created_at?: string
+          criado_por?: string | null
+          desativado_em?: string | null
+          desativado_por?: string | null
           email: string
           foto_url?: string | null
           id: string
           nome?: string
+          removido_em?: string | null
+          removido_por?: string | null
           telefone?: string | null
           updated_at?: string
         }
         Update: {
+          ativo?: boolean
           created_at?: string
+          criado_por?: string | null
+          desativado_em?: string | null
+          desativado_por?: string | null
           email?: string
           foto_url?: string | null
           id?: string
           nome?: string
+          removido_em?: string | null
+          removido_por?: string | null
           telefone?: string | null
           updated_at?: string
         }
@@ -538,6 +556,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_audit_log: {
+        Row: {
+          acao: string
+          actor_id: string | null
+          actor_nome: string | null
+          created_at: string
+          detalhes: string | null
+          id: string
+          target_nome: string | null
+          target_user_id: string | null
+        }
+        Insert: {
+          acao: string
+          actor_id?: string | null
+          actor_nome?: string | null
+          created_at?: string
+          detalhes?: string | null
+          id?: string
+          target_nome?: string | null
+          target_user_id?: string | null
+        }
+        Update: {
+          acao?: string
+          actor_id?: string | null
+          actor_nome?: string | null
+          created_at?: string
+          detalhes?: string | null
+          id?: string
+          target_nome?: string | null
+          target_user_id?: string | null
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {

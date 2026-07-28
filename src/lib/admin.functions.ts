@@ -70,6 +70,7 @@ export const adminCreateUser = createServerFn({ method: "POST" })
         email: data.email,
         telefone: data.telefone ?? null,
         foto_url: data.profissional?.foto_url ?? null,
+        criado_por: context.userId,
       });
 
     let profissionalId: string | null = null;
@@ -103,6 +104,14 @@ export const adminCreateUser = createServerFn({ method: "POST" })
       profissionalId = prof.id;
     }
 
+    const { registrarAuditoriaExterna } = await import("@/lib/users.server");
+    await registrarAuditoriaExterna({
+      actorId: context.userId,
+      targetId: newUserId,
+      acao: "USUARIO_CRIADO",
+      detalhes: `Conta criada com o perfil ${data.role}.`,
+    });
+
     return { userId: newUserId, profissionalId };
   });
 
@@ -122,5 +131,14 @@ export const adminSetRole = createServerFn({ method: "POST" })
       .from("user_roles")
       .insert({ user_id: data.user_id, role: data.role });
     if (error) throw new Error(error.message);
+
+    const { registrarAuditoriaExterna } = await import("@/lib/users.server");
+    await registrarAuditoriaExterna({
+      actorId: context.userId,
+      targetId: data.user_id,
+      acao: "PAPEL_ALTERADO",
+      detalhes: `Perfil alterado para ${data.role}.`,
+    });
+
     return { ok: true };
   });

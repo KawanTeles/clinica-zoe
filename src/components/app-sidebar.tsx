@@ -10,6 +10,7 @@ import {
   Bell,
   ClipboardList,
   UserCircle2,
+  ShieldCheck,
   Sparkles,
 } from "lucide-react";
 import {
@@ -50,6 +51,7 @@ const items: Item[] = [
   { title: "Meus Pacientes", url: "/app/meus-pacientes", icon: Users, roles: ["PROFISSIONAL"] },
   { title: "Solicitações", url: "/app/solicitacoes", icon: ClipboardList, roles: ["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"], badge: "solicitacoes", badgeTone: "danger" },
   { title: "Meu Perfil", url: "/app/meu-perfil", icon: UserCircle2, roles: ["PROFISSIONAL"] },
+  { title: "Minha Conta", url: "/app/conta", icon: ShieldCheck, roles: ["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"] },
 ];
 
 const TONE: Record<NonNullable<Item["badgeTone"]>, string> = {

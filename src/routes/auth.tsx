@@ -2,7 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
+import { signInGuarded } from "@/lib/auth-login";
+import { ForgotPasswordDialog } from "@/components/security/ForgotPasswordDialog";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -96,10 +97,10 @@ function LoginForm() {
       }
     }
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const result = await signInGuarded("staff", email, password);
     setBusy(false);
-    if (error) {
-      toast.error("Credenciais inválidas");
+    if (!result.ok) {
+      toast.error(result.message);
       return;
     }
     toast.success("Bem-vindo(a)!");
@@ -112,7 +113,10 @@ function LoginForm() {
         <Input id="l-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="l-pass">Senha</Label>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="l-pass">Senha</Label>
+          <ForgotPasswordDialog scope="staff" defaultEmail={email} />
+        </div>
         <Input id="l-pass" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
       </div>
       <Button type="submit" disabled={busy} className="w-full">
