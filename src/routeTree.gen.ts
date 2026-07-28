@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as ProfissionaisRouteImport } from './routes/profissionais'
 import { Route as EspecialidadesRouteImport } from './routes/especialidades'
 import { Route as ContatoRouteImport } from './routes/contato'
@@ -42,6 +43,11 @@ const SobreRoute = SobreRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
+  id: '/redefinir-senha',
+  path: '/redefinir-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfissionaisRoute = ProfissionaisRouteImport.update({
@@ -164,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/contato': typeof ContatoRoute
   '/especialidades': typeof EspecialidadesRoute
   '/profissionais': typeof ProfissionaisRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre': typeof SobreRoute
   '/app/agenda': typeof AppAgendaRoute
@@ -188,6 +195,7 @@ export interface FileRoutesByTo {
   '/contato': typeof ContatoRoute
   '/especialidades': typeof EspecialidadesRoute
   '/profissionais': typeof ProfissionaisRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre': typeof SobreRoute
   '/app/agenda': typeof AppAgendaRoute
@@ -215,6 +223,7 @@ export interface FileRoutesById {
   '/contato': typeof ContatoRoute
   '/especialidades': typeof EspecialidadesRoute
   '/profissionais': typeof ProfissionaisRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sobre': typeof SobreRoute
   '/app/agenda': typeof AppAgendaRoute
@@ -243,6 +252,7 @@ export interface FileRouteTypes {
     | '/contato'
     | '/especialidades'
     | '/profissionais'
+    | '/redefinir-senha'
     | '/sitemap.xml'
     | '/sobre'
     | '/app/agenda'
@@ -267,6 +277,7 @@ export interface FileRouteTypes {
     | '/contato'
     | '/especialidades'
     | '/profissionais'
+    | '/redefinir-senha'
     | '/sitemap.xml'
     | '/sobre'
     | '/app/agenda'
@@ -293,6 +304,7 @@ export interface FileRouteTypes {
     | '/contato'
     | '/especialidades'
     | '/profissionais'
+    | '/redefinir-senha'
     | '/sitemap.xml'
     | '/sobre'
     | '/app/agenda'
@@ -320,6 +332,7 @@ export interface RootRouteChildren {
   ContatoRoute: typeof ContatoRoute
   EspecialidadesRoute: typeof EspecialidadesRoute
   ProfissionaisRoute: typeof ProfissionaisRoute
+  RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SobreRoute: typeof SobreRoute
 }
@@ -338,6 +351,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/redefinir-senha': {
+      id: '/redefinir-senha'
+      path: '/redefinir-senha'
+      fullPath: '/redefinir-senha'
+      preLoaderRoute: typeof RedefinirSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profissionais': {
@@ -551,6 +571,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContatoRoute: ContatoRoute,
   EspecialidadesRoute: EspecialidadesRoute,
   ProfissionaisRoute: ProfissionaisRoute,
+  RedefinirSenhaRoute: RedefinirSenhaRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SobreRoute: SobreRoute,
 }
