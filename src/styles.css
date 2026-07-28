@@ -212,3 +212,12 @@
     letter-spacing: -0.02em;
   }
 }
+
+/* Hide the "Made with Lovable" badge without breaking layout */
+a[href*="lovable.dev"],
+a[href*="lovable.app"],
+div[class*="lovable-badge"],
+iframe[src*="lovable"],
+[data-lovable-badge] {
+  display: none !important;
+}
