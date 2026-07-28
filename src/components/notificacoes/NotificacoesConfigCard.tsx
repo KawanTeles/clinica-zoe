@@ -20,7 +20,9 @@ import {
   salvarConfigNotificacoes,
   testarConexaoNotificacoes,
 } from "@/lib/notifications.functions";
+import { Textarea } from "@/components/ui/textarea";
 import { Loader2, MessageSquare, Save, PlugZap } from "lucide-react";
+
 
 type Cfg = {
   destinatario_solicitacao: "PROFISSIONAL" | "RECEPCIONISTA" | "AMBOS";
