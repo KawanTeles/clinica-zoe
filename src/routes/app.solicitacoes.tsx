@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CalendarDays, CheckCircle2, XCircle, Loader2, Clock, User, Stethoscope, CreditCard } from "lucide-react";
+import { CalendarDays, CheckCircle2, XCircle, Loader2, Clock, User, Stethoscope, CreditCard, Send } from "lucide-react";
 import { STATUS_COLOR, STATUS_LABEL, fmtHora } from "@/lib/agenda-utils";
 import { WhatsAppAviso, semWhatsapp } from "@/components/contato/WhatsAppAviso";
 import { PersonAvatar } from "@/lib/avatar";
