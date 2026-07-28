@@ -252,15 +252,20 @@ export type Database = {
           agendamento_id: string | null
           canal: Database["public"]["Enums"]["notif_canal"]
           created_at: string
+          definitivo: boolean
           destinatario_email: string | null
           destinatario_telefone: string | null
           duracao_ms: number | null
+          entregue_em: string | null
           enviado_em: string | null
           evento: Database["public"]["Enums"]["notif_evento"] | null
           id: string
           lida: boolean
+          lido_em: string | null
           mensagem: string
           provider: string | null
+          provider_message_id: string | null
+          proxima_tentativa_em: string | null
           status_envio: Database["public"]["Enums"]["notif_status_envio"]
           tentativas: number
           tipo: string
@@ -273,15 +278,20 @@ export type Database = {
           agendamento_id?: string | null
           canal?: Database["public"]["Enums"]["notif_canal"]
           created_at?: string
+          definitivo?: boolean
           destinatario_email?: string | null
           destinatario_telefone?: string | null
           duracao_ms?: number | null
+          entregue_em?: string | null
           enviado_em?: string | null
           evento?: Database["public"]["Enums"]["notif_evento"] | null
           id?: string
           lida?: boolean
+          lido_em?: string | null
           mensagem: string
           provider?: string | null
+          provider_message_id?: string | null
+          proxima_tentativa_em?: string | null
           status_envio?: Database["public"]["Enums"]["notif_status_envio"]
           tentativas?: number
           tipo?: string
@@ -294,15 +304,20 @@ export type Database = {
           agendamento_id?: string | null
           canal?: Database["public"]["Enums"]["notif_canal"]
           created_at?: string
+          definitivo?: boolean
           destinatario_email?: string | null
           destinatario_telefone?: string | null
           duracao_ms?: number | null
+          entregue_em?: string | null
           enviado_em?: string | null
           evento?: Database["public"]["Enums"]["notif_evento"] | null
           id?: string
           lida?: boolean
+          lido_em?: string | null
           mensagem?: string
           provider?: string | null
+          provider_message_id?: string | null
+          proxima_tentativa_em?: string | null
           status_envio?: Database["public"]["Enums"]["notif_status_envio"]
           tentativas?: number
           tipo?: string
@@ -335,11 +350,14 @@ export type Database = {
           lembrete_24h_ativo: boolean
           lembrete_2h_ativo: boolean
           provider: string
+          provider_instancia: string | null
+          provider_phone_number_id: string | null
           provider_token: string | null
           provider_url: string | null
           remetente: string | null
           templates: Json
           updated_at: string
+          webhook_secret: string | null
         }
         Insert: {
           conexao_erro?: string | null
@@ -354,11 +372,14 @@ export type Database = {
           lembrete_24h_ativo?: boolean
           lembrete_2h_ativo?: boolean
           provider?: string
+          provider_instancia?: string | null
+          provider_phone_number_id?: string | null
           provider_token?: string | null
           provider_url?: string | null
           remetente?: string | null
           templates?: Json
           updated_at?: string
+          webhook_secret?: string | null
         }
         Update: {
           conexao_erro?: string | null
@@ -373,11 +394,14 @@ export type Database = {
           lembrete_24h_ativo?: boolean
           lembrete_2h_ativo?: boolean
           provider?: string
+          provider_instancia?: string | null
+          provider_phone_number_id?: string | null
           provider_token?: string | null
           provider_url?: string | null
           remetente?: string | null
           templates?: Json
           updated_at?: string
+          webhook_secret?: string | null
         }
         Relationships: []
       }
@@ -438,6 +462,7 @@ export type Database = {
           removido_por: string | null
           telefone: string | null
           updated_at: string
+          whatsapp: string | null
         }
         Insert: {
           ativo?: boolean
@@ -453,6 +478,7 @@ export type Database = {
           removido_por?: string | null
           telefone?: string | null
           updated_at?: string
+          whatsapp?: string | null
         }
         Update: {
           ativo?: boolean
@@ -468,6 +494,7 @@ export type Database = {
           removido_por?: string | null
           telefone?: string | null
           updated_at?: string
+          whatsapp?: string | null
         }
         Relationships: []
       }
@@ -808,6 +835,7 @@ export type Database = {
           hora_inicio: string
         }[]
       }
+      normalizar_whatsapp: { Args: { _valor: string }; Returns: string }
       notif_config: {
         Args: never
         Returns: {
@@ -823,11 +851,14 @@ export type Database = {
           lembrete_24h_ativo: boolean
           lembrete_2h_ativo: boolean
           provider: string
+          provider_instancia: string | null
+          provider_phone_number_id: string | null
           provider_token: string | null
           provider_url: string | null
           remetente: string | null
           templates: Json
           updated_at: string
+          webhook_secret: string | null
         }
         SetofOptions: {
           from: "*"
