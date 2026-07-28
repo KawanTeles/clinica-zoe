@@ -57,6 +57,15 @@ export const gerarLembretesAgora = createServerFn({ method: "POST" })
     return { criados: await gerarLembretes() };
   });
 
+/** Reenvia em massa todas as notificações externas com erro. */
+export const reenviarErros = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { reprocessarErros } = await import("@/lib/notifications/queue.server");
+    return await reprocessarErros(100);
+  });
+
 /** Configuração de notificações — o token nunca é devolvido, apenas se está definido. */
 export const obterConfigNotificacoes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -75,6 +84,10 @@ export const obterConfigNotificacoes = createServerFn({ method: "POST" })
       conexao_status: cfg.conexao_status,
       conexao_testada_em: cfg.conexao_testada_em,
       conexao_erro: cfg.conexao_erro,
+      janela_ativa: cfg.janela_ativa,
+      janela_inicio: (cfg.janela_inicio ?? "08:00").slice(0, 5),
+      janela_fim: (cfg.janela_fim ?? "20:00").slice(0, 5),
+      templates: cfg.templates ?? {},
     };
   });
 
@@ -87,6 +100,10 @@ const configSchema = z.object({
   remetente: z.string().max(120).optional().default(""),
   /** Enviado apenas quando o admin digita um novo token. */
   provider_token: z.string().max(2000).optional(),
+  janela_ativa: z.boolean().optional().default(true),
+  janela_inicio: z.string().regex(/^\d{2}:\d{2}$/).optional().default("08:00"),
+  janela_fim: z.string().regex(/^\d{2}:\d{2}$/).optional().default("20:00"),
+  templates: z.record(z.string(), z.string().max(2000)).optional().default({}),
 });
 
 export const salvarConfigNotificacoes = createServerFn({ method: "POST" })
@@ -103,8 +120,13 @@ export const salvarConfigNotificacoes = createServerFn({ method: "POST" })
       provider: data.provider,
       provider_url: data.provider_url || null,
       remetente: data.remetente || null,
+      janela_ativa: data.janela_ativa,
+      janela_inicio: data.janela_inicio,
+      janela_fim: data.janela_fim,
+      templates: data.templates,
     };
     if (data.provider_token) payload.provider_token = data.provider_token;
+
 
     const { data: existing } = await (supabaseAdmin as any)
       .from("notificacoes_config")
