@@ -117,6 +117,10 @@ export async function processOne(id: string, opts?: { ignorarJanela?: boolean })
   );
   const duracao = Date.now() - t0;
 
+  const tentativas = (n.tentativas ?? 0) + 1;
+  const esperaMin = result.ok ? null : proximoIntervaloMin(tentativas);
+  const definitivo = !result.ok && esperaMin === null;
+
   await (supabaseAdmin as any)
     .from("notificacoes")
     .update(
@@ -124,28 +128,38 @@ export async function processOne(id: string, opts?: { ignorarJanela?: boolean })
         ? {
             status_envio: "ENVIADA",
             enviado_em: new Date().toISOString(),
-            tentativas: (n.tentativas ?? 0) + 1,
+            tentativas,
             ultimo_erro: null,
             provider: provider.id,
+            provider_message_id: result.providerId ?? null,
             duracao_ms: duracao,
+            proxima_tentativa_em: null,
+            definitivo: false,
             mensagem: body,
           }
         : {
             status_envio: "ERRO",
-            tentativas: (n.tentativas ?? 0) + 1,
-            ultimo_erro: result.error ?? "Falha desconhecida",
+            tentativas,
+            ultimo_erro: definitivo
+              ? `ERRO DEFINITIVO após ${tentativas} tentativas: ${result.error ?? "Falha desconhecida"}`
+              : result.error ?? "Falha desconhecida",
             provider: provider.id,
             duracao_ms: duracao,
+            definitivo,
+            proxima_tentativa_em: esperaMin
+              ? new Date(Date.now() + esperaMin * 60_000).toISOString()
+              : null,
           },
     )
     .eq("id", id);
 
   console.log(
-    `[notif] ${new Date().toISOString()} id=${id} canal=${n.canal} para=${to} provider=${provider.id} ms=${duracao} status=${result.ok ? "ENVIADA" : "ERRO"}${result.ok ? "" : ` erro=${result.error}`}`,
+    `[notif] ${new Date().toISOString()} id=${id} canal=${n.canal} para=${to} provider=${provider.id} tentativa=${tentativas} ms=${duracao} status=${result.ok ? "ENVIADA" : definitivo ? "ERRO_DEFINITIVO" : `ERRO (retry em ${esperaMin}min)`}${result.ok ? "" : ` erro=${result.error}`}`,
   );
 
-  return { ok: result.ok, error: result.error, providerId: result.providerId };
+  return { ok: result.ok, error: result.error, providerId: result.providerId, definitivo };
 }
+
 
 export async function processQueue(limit = 20, opts?: { ignorarJanela?: boolean }) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
