@@ -254,11 +254,13 @@ export type Database = {
           created_at: string
           destinatario_email: string | null
           destinatario_telefone: string | null
+          duracao_ms: number | null
           enviado_em: string | null
           evento: Database["public"]["Enums"]["notif_evento"] | null
           id: string
           lida: boolean
           mensagem: string
+          provider: string | null
           status_envio: Database["public"]["Enums"]["notif_status_envio"]
           tentativas: number
           tipo: string
@@ -273,11 +275,13 @@ export type Database = {
           created_at?: string
           destinatario_email?: string | null
           destinatario_telefone?: string | null
+          duracao_ms?: number | null
           enviado_em?: string | null
           evento?: Database["public"]["Enums"]["notif_evento"] | null
           id?: string
           lida?: boolean
           mensagem: string
+          provider?: string | null
           status_envio?: Database["public"]["Enums"]["notif_status_envio"]
           tentativas?: number
           tipo?: string
@@ -292,11 +296,13 @@ export type Database = {
           created_at?: string
           destinatario_email?: string | null
           destinatario_telefone?: string | null
+          duracao_ms?: number | null
           enviado_em?: string | null
           evento?: Database["public"]["Enums"]["notif_evento"] | null
           id?: string
           lida?: boolean
           mensagem?: string
+          provider?: string | null
           status_envio?: Database["public"]["Enums"]["notif_status_envio"]
           tentativas?: number
           tipo?: string
@@ -323,12 +329,16 @@ export type Database = {
           created_at: string
           destinatario_solicitacao: string
           id: string
+          janela_ativa: boolean
+          janela_fim: string
+          janela_inicio: string
           lembrete_24h_ativo: boolean
           lembrete_2h_ativo: boolean
           provider: string
           provider_token: string | null
           provider_url: string | null
           remetente: string | null
+          templates: Json
           updated_at: string
         }
         Insert: {
@@ -338,12 +348,16 @@ export type Database = {
           created_at?: string
           destinatario_solicitacao?: string
           id?: string
+          janela_ativa?: boolean
+          janela_fim?: string
+          janela_inicio?: string
           lembrete_24h_ativo?: boolean
           lembrete_2h_ativo?: boolean
           provider?: string
           provider_token?: string | null
           provider_url?: string | null
           remetente?: string | null
+          templates?: Json
           updated_at?: string
         }
         Update: {
@@ -353,12 +367,16 @@ export type Database = {
           created_at?: string
           destinatario_solicitacao?: string
           id?: string
+          janela_ativa?: boolean
+          janela_fim?: string
+          janela_inicio?: string
           lembrete_24h_ativo?: boolean
           lembrete_2h_ativo?: boolean
           provider?: string
           provider_token?: string | null
           provider_url?: string | null
           remetente?: string | null
+          templates?: Json
           updated_at?: string
         }
         Relationships: []
@@ -799,12 +817,16 @@ export type Database = {
           created_at: string
           destinatario_solicitacao: string
           id: string
+          janela_ativa: boolean
+          janela_fim: string
+          janela_inicio: string
           lembrete_24h_ativo: boolean
           lembrete_2h_ativo: boolean
           provider: string
           provider_token: string | null
           provider_url: string | null
           remetente: string | null
+          templates: Json
           updated_at: string
         }
         SetofOptions: {
