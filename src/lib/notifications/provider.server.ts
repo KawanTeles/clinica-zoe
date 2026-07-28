@@ -29,6 +29,12 @@ export interface ProviderConfig {
   provider_url: string | null;
   provider_token: string | null;
   remetente: string | null;
+  /** Evolution: nome da instância. */
+  provider_instancia: string | null;
+  /** Meta Cloud: phone_number_id. */
+  provider_phone_number_id: string | null;
+  /** Segredo usado para validar o webhook de status do provider. */
+  webhook_secret: string | null;
   destinatario_solicitacao: string;
   lembrete_24h_ativo: boolean;
   lembrete_2h_ativo: boolean;
@@ -40,6 +46,7 @@ export interface ProviderConfig {
   janela_fim: string;
   templates: Record<string, string>;
 }
+
 
 
 export interface MessageProvider {
