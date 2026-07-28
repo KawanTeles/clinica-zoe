@@ -150,7 +150,17 @@ function NotificacoesPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+  const reenviarErrosFn = useServerFn(reenviarErros);
+  const mReenviarErros = useMutation({
+    mutationFn: () => reenviarErrosFn({ data: undefined as any }),
+    onSuccess: (r: any) => {
+      toast.success(`${r?.reenviados ?? r?.processed ?? 0} notificação(ões) reprocessada(s)`);
+      qc.invalidateQueries({ queryKey: ["notificacoes"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
   const lembretesFn = useServerFn(gerarLembretesAgora);
+
   const mLembretes = useMutation({
     mutationFn: () => lembretesFn({ data: undefined as any }),
     onSuccess: (r: any) => {
