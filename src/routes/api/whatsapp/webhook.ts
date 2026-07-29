@@ -2,10 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { handleWebhookGet, handleWebhookPost } from "@/services/whatsapp/webhook";
 
 /**
- * Endpoint de Webhook Oficial da Meta WhatsApp Cloud API (Graph API)
- * URL: /api/public/hooks/meta
+ * Endpoint alternativo para o Webhook do WhatsApp Cloud API
+ * URL: /api/whatsapp/webhook
  */
-export const Route = createFileRoute("/api/public/hooks/meta")({
+export const Route = createFileRoute("/api/whatsapp/webhook")({
   server: {
     handlers: {
       GET: async ({ request }) => {

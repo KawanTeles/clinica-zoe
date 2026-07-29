@@ -37,6 +37,7 @@ import { Route as AppUsuariosRouteImport } from './routes/app.usuarios'
 import { Route as AppWhatsappRouteImport } from './routes/app.whatsapp'
 import { Route as ClienteIndexRouteImport } from './routes/cliente.index'
 import { Route as ClienteLoginRouteImport } from './routes/cliente.login'
+import { Route as ApiWhatsappWebhookRouteImport } from './routes/api/whatsapp/webhook'
 import { Route as ApiPublicHooksMetaRouteImport } from './routes/api/public/hooks/meta'
 import { Route as ApiPublicHooksNotificacoesRouteImport } from './routes/api/public/hooks/notificacoes'
 
@@ -180,6 +181,11 @@ const ClienteLoginRoute = ClienteLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => ClienteRoute,
 } as any)
+const ApiWhatsappWebhookRoute = ApiWhatsappWebhookRouteImport.update({
+  id: '/api/whatsapp/webhook',
+  path: '/api/whatsapp/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksMetaRoute = ApiPublicHooksMetaRouteImport.update({
   id: '/api/public/hooks/meta',
   path: '/api/public/hooks/meta',
@@ -221,6 +227,7 @@ export interface FileRoutesByFullPath {
   '/cliente/login': typeof ClienteLoginRoute
   '/app/': typeof AppIndexRoute
   '/cliente/': typeof ClienteIndexRoute
+  '/api/whatsapp/webhook': typeof ApiWhatsappWebhookRoute
   '/api/public/hooks/meta': typeof ApiPublicHooksMetaRoute
   '/api/public/hooks/notificacoes': typeof ApiPublicHooksNotificacoesRoute
 }
@@ -251,6 +258,7 @@ export interface FileRoutesByTo {
   '/cliente/login': typeof ClienteLoginRoute
   '/app': typeof AppIndexRoute
   '/cliente': typeof ClienteIndexRoute
+  '/api/whatsapp/webhook': typeof ApiWhatsappWebhookRoute
   '/api/public/hooks/meta': typeof ApiPublicHooksMetaRoute
   '/api/public/hooks/notificacoes': typeof ApiPublicHooksNotificacoesRoute
 }
@@ -284,6 +292,7 @@ export interface FileRoutesById {
   '/cliente/login': typeof ClienteLoginRoute
   '/app/': typeof AppIndexRoute
   '/cliente/': typeof ClienteIndexRoute
+  '/api/whatsapp/webhook': typeof ApiWhatsappWebhookRoute
   '/api/public/hooks/meta': typeof ApiPublicHooksMetaRoute
   '/api/public/hooks/notificacoes': typeof ApiPublicHooksNotificacoesRoute
 }
@@ -318,6 +327,7 @@ export interface FileRouteTypes {
     | '/cliente/login'
     | '/app/'
     | '/cliente/'
+    | '/api/whatsapp/webhook'
     | '/api/public/hooks/meta'
     | '/api/public/hooks/notificacoes'
   fileRoutesByTo: FileRoutesByTo
@@ -348,6 +358,7 @@ export interface FileRouteTypes {
     | '/cliente/login'
     | '/app'
     | '/cliente'
+    | '/api/whatsapp/webhook'
     | '/api/public/hooks/meta'
     | '/api/public/hooks/notificacoes'
   id:
@@ -380,6 +391,7 @@ export interface FileRouteTypes {
     | '/cliente/login'
     | '/app/'
     | '/cliente/'
+    | '/api/whatsapp/webhook'
     | '/api/public/hooks/meta'
     | '/api/public/hooks/notificacoes'
   fileRoutesById: FileRoutesById
@@ -396,6 +408,7 @@ export interface RootRouteChildren {
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SobreRoute: typeof SobreRoute
+  ApiWhatsappWebhookRoute: typeof ApiWhatsappWebhookRoute
   ApiPublicHooksMetaRoute: typeof ApiPublicHooksMetaRoute
   ApiPublicHooksNotificacoesRoute: typeof ApiPublicHooksNotificacoesRoute
 }
@@ -598,6 +611,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClienteLoginRouteImport
       parentRoute: typeof ClienteRoute
     }
+    '/api/whatsapp/webhook': {
+      id: '/api/whatsapp/webhook'
+      path: '/api/whatsapp/webhook'
+      fullPath: '/api/whatsapp/webhook'
+      preLoaderRoute: typeof ApiWhatsappWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/meta': {
       id: '/api/public/hooks/meta'
       path: '/api/public/hooks/meta'
@@ -678,6 +698,7 @@ const rootRouteChildren: RootRouteChildren = {
   RedefinirSenhaRoute: RedefinirSenhaRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SobreRoute: SobreRoute,
+  ApiWhatsappWebhookRoute: ApiWhatsappWebhookRoute,
   ApiPublicHooksMetaRoute: ApiPublicHooksMetaRoute,
   ApiPublicHooksNotificacoesRoute: ApiPublicHooksNotificacoesRoute,
 }

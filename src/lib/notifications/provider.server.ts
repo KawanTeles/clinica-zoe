@@ -1,11 +1,10 @@
 /**
  * Provider abstraction for outbound messaging (WhatsApp/E-mail).
  * Server-only. Never import from client code.
- *
- * A configuração (provider, url, token, remetente) vive na tabela
- * `notificacoes_config`, acessível apenas pelo service role — o token
- * nunca é enviado ao frontend.
+ * Exclusively uses Meta WhatsApp Cloud API for WhatsApp messaging.
  */
+
+import { sendRawCloudApiMessage, loadWhatsAppConfig } from "@/services/whatsapp/cloudApi";
 
 export type OutboundChannel = "WHATSAPP" | "EMAIL";
 
@@ -29,11 +28,8 @@ export interface ProviderConfig {
   provider_url: string | null;
   provider_token: string | null;
   remetente: string | null;
-  /** Evolution: nome da instância. */
   provider_instancia: string | null;
-  /** Meta Cloud: phone_number_id. */
   provider_phone_number_id: string | null;
-  /** Segredo usado para validar o webhook de status do provider. */
   webhook_secret: string | null;
   destinatario_solicitacao: string;
   lembrete_24h_ativo: boolean;
@@ -47,89 +43,56 @@ export interface ProviderConfig {
   templates: Record<string, string>;
 }
 
-
-
 export interface MessageProvider {
   id: string;
   supports(channel: OutboundChannel): boolean;
   send(msg: OutboundMessage, cfg: ProviderConfig): Promise<DeliveryResult>;
-  /** Verificação leve de credenciais, usada pelo botão "Testar conexão". */
   test(cfg: ProviderConfig): Promise<DeliveryResult>;
 }
 
-const digits = (v: string) => v.replace(/\D/g, "");
-
-/** Mensagem de erro legível, distinguindo falha de autenticação. */
-function httpErro(status: number) {
-  if (status === 401 || status === 403) return `Erro de autenticação (HTTP ${status})`;
-  return `HTTP ${status}`;
-}
-
-/** Fallback: apenas registra em log. Útil em desenvolvimento. */
-class ConsoleProvider implements MessageProvider {
-  id = "console";
-  supports() {
-    return true;
-  }
-  async send(msg: OutboundMessage): Promise<DeliveryResult> {
-    console.log(`[notif:${this.id}] ${msg.channel} -> ${msg.to}: ${msg.title}`);
-    return { ok: true, providerId: `console_${Date.now()}` };
-  }
-  async test(): Promise<DeliveryResult> {
-    return { ok: true, providerId: "console" };
-  }
-}
-
-/** Evolution API (auto-hospedada). */
-/** Meta WhatsApp Cloud API (Graph API v20.0+). */
+/** Official Meta WhatsApp Cloud API Provider */
 class MetaCloudProvider implements MessageProvider {
   id = "meta";
   supports(channel: OutboundChannel) {
     return channel === "WHATSAPP";
   }
-  private base(cfg: ProviderConfig) {
-    return (cfg.provider_url || "https://graph.facebook.com/v20.0").replace(/\/+$/, "");
-  }
-  async send(msg: OutboundMessage, cfg: ProviderConfig): Promise<DeliveryResult> {
-    const phoneId = cfg.provider_phone_number_id || cfg.remetente;
-    if (!cfg.provider_token || !phoneId)
-      return { ok: false, error: "Meta Cloud API não configurada (informe Token e Phone Number ID)" };
-    try {
-      const textContent = msg.title && !msg.body.startsWith(msg.title) ? `${msg.title}\n\n${msg.body}` : msg.body;
-      const resp = await fetch(`${this.base(cfg)}/${phoneId}/messages`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cfg.provider_token}`,
+
+  async send(msg: OutboundMessage, _cfg: ProviderConfig): Promise<DeliveryResult> {
+    const textContent = msg.title && !msg.body.startsWith(msg.title) ? `${msg.title}\n\n${msg.body}` : msg.body;
+    const agendamentoId = (msg.metadata?.agendamento_id as string) || undefined;
+
+    const result = await sendRawCloudApiMessage(
+      msg.to,
+      {
+        type: "text",
+        text: {
+          preview_url: true,
+          body: textContent,
         },
-        body: JSON.stringify({
-          messaging_product: "whatsapp",
-          recipient_type: "individual",
-          to: digits(msg.to),
-          type: "text",
-          text: {
-            preview_url: true,
-            body: textContent,
-          },
-        }),
-      });
-      const raw = await resp.json().catch(() => null);
-      if (!resp.ok) return { ok: false, error: httpErro(resp.status), raw };
-      return { ok: true, providerId: (raw as any)?.messages?.[0]?.id, raw };
-    } catch (e) {
-      return { ok: false, error: (e as Error).message };
-    }
+      },
+      { agendamentoId }
+    );
+
+    return {
+      ok: result.ok,
+      providerId: result.wamid,
+      error: result.error,
+      raw: result.raw,
+    };
   }
-  async test(cfg: ProviderConfig): Promise<DeliveryResult> {
-    const phoneId = cfg.provider_phone_number_id || cfg.remetente;
-    if (!cfg.provider_token || !phoneId)
+
+  async test(_cfg: ProviderConfig): Promise<DeliveryResult> {
+    const waConfig = await loadWhatsAppConfig();
+    if (!waConfig.access_token || !waConfig.phone_number_id) {
       return { ok: false, error: "Informe token e Phone Number ID da Meta Cloud API." };
+    }
     try {
-      const resp = await fetch(`${this.base(cfg)}/${phoneId}`, {
-        headers: { Authorization: `Bearer ${cfg.provider_token}` },
+      const version = waConfig.graph_version || "v20.0";
+      const resp = await fetch(`https://graph.facebook.com/${version}/${waConfig.phone_number_id}`, {
+        headers: { Authorization: `Bearer ${waConfig.access_token}` },
       });
       const raw = await resp.json().catch(() => null);
-      if (!resp.ok) return { ok: false, error: httpErro(resp.status), raw };
+      if (!resp.ok) return { ok: false, error: raw?.error?.message || `HTTP ${resp.status}`, raw };
       return { ok: true, raw };
     } catch (e) {
       return { ok: false, error: (e as Error).message };
@@ -137,66 +100,7 @@ class MetaCloudProvider implements MessageProvider {
   }
 }
 
-/**
- * Twilio (WhatsApp/SMS).
- */
-class TwilioProvider implements MessageProvider {
-  id = "twilio";
-  supports(channel: OutboundChannel) {
-    return channel === "WHATSAPP";
-  }
-  private auth(cfg: ProviderConfig) {
-    const raw = cfg.provider_token ?? "";
-    const [sid, token] = raw.includes(":") ? raw.split(":") : ["", raw];
-    return { sid, token };
-  }
-  async send(msg: OutboundMessage, cfg: ProviderConfig): Promise<DeliveryResult> {
-    const { sid, token } = this.auth(cfg);
-    if (!sid || !token || !cfg.remetente)
-      return { ok: false, error: "Twilio não configurado." };
-    try {
-      const resp = await fetch(
-        `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Basic ${btoa(`${sid}:${token}`)}`,
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: new URLSearchParams({
-            To: `whatsapp:+${digits(msg.to)}`,
-            From: `whatsapp:+${digits(cfg.remetente)}`,
-            Body: `${msg.title}\n\n${msg.body}`,
-          }),
-        },
-      );
-      const raw = await resp.json().catch(() => null);
-      if (!resp.ok) return { ok: false, error: httpErro(resp.status), raw };
-      return { ok: true, providerId: (raw as any)?.sid, raw };
-    } catch (e) {
-      return { ok: false, error: (e as Error).message };
-    }
-  }
-  async test(cfg: ProviderConfig): Promise<DeliveryResult> {
-    const { sid, token } = this.auth(cfg);
-    if (!sid || !token) return { ok: false, error: "Informe SID:TOKEN." };
-    try {
-      const resp = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}.json`, {
-        headers: { Authorization: `Basic ${btoa(`${sid}:${token}`)}` },
-      });
-      if (!resp.ok) return { ok: false, error: httpErro(resp.status) };
-      return { ok: true };
-    } catch (e) {
-      return { ok: false, error: (e as Error).message };
-    }
-  }
-}
-
-const providers: MessageProvider[] = [
-  new MetaCloudProvider(),
-  new TwilioProvider(),
-  new ConsoleProvider(),
-];
+const providers: MessageProvider[] = [new MetaCloudProvider()];
 
 export const PROVIDER_IDS = providers.map((p) => p.id);
 
@@ -220,43 +124,20 @@ export const DEFAULT_CONFIG: ProviderConfig = {
   templates: {},
 };
 
-/** Lê a configuração no banco (service role). Nunca exponha o token ao cliente. */
 export async function loadConfig(): Promise<ProviderConfig> {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-  // 1. Tenta carregar da tabela whatsapp_meta_config
-  const { data: metaCfg } = await (supabaseAdmin as any)
-    .from("whatsapp_meta_config")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (metaCfg?.access_token && metaCfg?.phone_number_id) {
-    return {
-      ...DEFAULT_CONFIG,
-      provider: "meta",
-      provider_token: metaCfg.access_token,
-      provider_phone_number_id: metaCfg.phone_number_id,
-      remetente: metaCfg.phone_number_id,
-      webhook_secret: metaCfg.verify_token,
-    };
-  }
-
-  const { data } = await (supabaseAdmin as any)
-    .from("notificacoes_config")
-    .select("*")
-    .order("created_at")
-    .limit(1)
-    .maybeSingle();
-  if (!data) return DEFAULT_CONFIG;
-  return { ...DEFAULT_CONFIG, ...data } as ProviderConfig;
+  const waConfig = await loadWhatsAppConfig();
+  return {
+    ...DEFAULT_CONFIG,
+    provider: "meta",
+    provider_token: waConfig.access_token,
+    provider_phone_number_id: waConfig.phone_number_id,
+    remetente: waConfig.phone_number_id,
+    webhook_secret: waConfig.verify_token,
+  };
 }
 
-export function pickProvider(channel: OutboundChannel, cfg: ProviderConfig): MessageProvider {
-  const match = providers.find((p) => p.id === cfg.provider && p.supports(channel));
-  if (match) return match;
-  const found = providers.find((p) => p.supports(channel));
-  if (!found) throw new Error(`Nenhum provider disponível para canal ${channel}`);
-  return found;
+export function pickProvider(channel: OutboundChannel, _cfg: ProviderConfig): MessageProvider {
+  const match = providers.find((p) => p.supports(channel));
+  if (!match) throw new Error(`Nenhum provider disponível para canal ${channel}`);
+  return match;
 }

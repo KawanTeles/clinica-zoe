@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { dispararNotificacoesAgendamento } from "@/lib/notifications.functions";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/lib/supabase";
@@ -138,13 +140,16 @@ export function AgendaView({
     });
   }, [data]);
 
+  const dispararFn = useServerFn(dispararNotificacoesAgendamento);
+
   const statusMut = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: "PENDENTE" | "APROVADO" | "RECUSADO" | "CANCELADO" | "REMARCADO" | "FINALIZADO" }) => {
       const { error } = await supabase.from("agendamentos").update({ status }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_, vars) => {
       toast.success("Status atualizado");
+      dispararFn({ data: { agendamentoId: vars.id } }).catch(() => {});
       qc.invalidateQueries({ queryKey: ["agenda"] });
       qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
     },
