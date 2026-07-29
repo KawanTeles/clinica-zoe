@@ -134,8 +134,9 @@ export function NotificacoesTimeline({
       let query = supabase
         .from("notificacoes")
         .select(
-          "id, titulo, mensagem, evento, canal, status_envio, created_at, enviado_em, ultimo_erro, provider, duracao_ms, agendamento_id",
+          "id, titulo, mensagem, evento, canal, status_envio, created_at, enviado_em, entregue_em, lido_em, respondido_em, mensagem_recebida, ultimo_erro, provider, duracao_ms, agendamento_id",
         )
+
         .order("created_at", { ascending: false })
         .limit(limit);
 
