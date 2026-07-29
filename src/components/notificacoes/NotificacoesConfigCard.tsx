@@ -183,7 +183,10 @@ export function NotificacoesConfigCard() {
               <SelectContent>
                 <SelectItem value="PROFISSIONAL">Profissional</SelectItem>
                 <SelectItem value="RECEPCIONISTA">Recepcionista</SelectItem>
-                <SelectItem value="AMBOS">Ambos</SelectItem>
+                <SelectItem value="ADMINISTRADOR">Administrador</SelectItem>
+                <SelectItem value="AMBOS">Profissional e recepcionista</SelectItem>
+                <SelectItem value="TODOS">Todos (profissional, recepção e admin)</SelectItem>
+
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
