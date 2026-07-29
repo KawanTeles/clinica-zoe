@@ -263,9 +263,11 @@ export type Database = {
           lida: boolean
           lido_em: string | null
           mensagem: string
+          mensagem_recebida: string | null
           provider: string | null
           provider_message_id: string | null
           proxima_tentativa_em: string | null
+          respondido_em: string | null
           status_envio: Database["public"]["Enums"]["notif_status_envio"]
           tentativas: number
           tipo: string
@@ -289,9 +291,11 @@ export type Database = {
           lida?: boolean
           lido_em?: string | null
           mensagem: string
+          mensagem_recebida?: string | null
           provider?: string | null
           provider_message_id?: string | null
           proxima_tentativa_em?: string | null
+          respondido_em?: string | null
           status_envio?: Database["public"]["Enums"]["notif_status_envio"]
           tentativas?: number
           tipo?: string
@@ -315,9 +319,11 @@ export type Database = {
           lida?: boolean
           lido_em?: string | null
           mensagem?: string
+          mensagem_recebida?: string | null
           provider?: string | null
           provider_message_id?: string | null
           proxima_tentativa_em?: string | null
+          respondido_em?: string | null
           status_envio?: Database["public"]["Enums"]["notif_status_envio"]
           tentativas?: number
           tipo?: string
@@ -904,6 +910,9 @@ export type Database = {
         | "ENVIADA"
         | "ERRO"
         | "CANCELADA"
+        | "ENTREGUE"
+        | "LIDO"
+        | "RESPONDIDO"
       profissional_status: "ATIVO" | "INATIVO"
       wa_status: "PENDENTE" | "ENVIADO" | "FALHOU"
     }
@@ -1067,6 +1076,9 @@ export const Constants = {
         "ENVIADA",
         "ERRO",
         "CANCELADA",
+        "ENTREGUE",
+        "LIDO",
+        "RESPONDIDO",
       ],
       profissional_status: ["ATIVO", "INATIVO"],
       wa_status: ["PENDENTE", "ENVIADO", "FALHOU"],
