@@ -122,6 +122,8 @@ function ProfissionaisPage() {
                 </div>
                 <EditarContatoProfissionalDialog id={p.id} nome={p.nome} telefone={p.telefone} whatsapp={p.whatsapp} />
                 <FotoProfissionalDialog id={p.id} nome={p.nome} fotoUrl={p.foto_url} />
+                <HistoricoNotificacoesDialog nome={p.nome} profissionalId={p.id} />
+
 
               </CardContent>
             </Card>
