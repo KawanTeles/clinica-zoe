@@ -253,6 +253,15 @@ export function NotificacoesConfigCard() {
               />
             </div>
             <div className="space-y-1.5">
+              <Label>Instância / conta</Label>
+              <Input
+                value={form.provider_instancia}
+                placeholder="Nome da instância (Evolution) ou conta do provider"
+                onChange={(e) => set("provider_instancia", e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-1.5">
               <Label>Access Token (Permanent System User Token)</Label>
               <Input
                 type="password"
