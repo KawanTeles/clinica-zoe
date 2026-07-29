@@ -161,6 +161,29 @@ function MetaWhatsAppAdminPage() {
         </div>
       </div>
 
+      {/* Banner Informativo de Modo Development / Allowed List */}
+      <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-900 shadow-soft dark:border-amber-500/30 dark:bg-amber-900/20 dark:text-amber-200">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
+          <div className="space-y-1 text-sm">
+            <p className="font-semibold">
+              Aviso Importante — Modo de Desenvolvimento (Development Mode)
+            </p>
+            <p className="text-xs leading-relaxed">
+              O aplicativo da Meta está configurado em modo <strong>Development</strong>. Apenas números cadastrados na <strong>Allowed List (Destinatários de Teste)</strong> no painel da Meta podem receber mensagens.
+            </p>
+            <div className="pt-1 text-xs">
+              <span className="font-medium">Como cadastrar números de teste:</span>
+              <ol className="list-decimal pl-4 mt-0.5 space-y-0.5 text-[11px] opacity-90">
+                <li>Acesse o <strong>Meta Developers Console</strong> &gt; seu App &gt; <strong>WhatsApp API Setup</strong>.</li>
+                <li>No campo <strong>"To" (Destinatário)</strong>, selecione <em>"Manage Phone Number List"</em>.</li>
+                <li>Adicione seu número de WhatsApp com DDD e valide o código SMS de verificação recebido.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Grid de Cards Superiores */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* CARD 1: Status da Meta Cloud API */}

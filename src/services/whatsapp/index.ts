@@ -1,8 +1,12 @@
 /**
  * Meta WhatsApp Cloud API - Service Index
- * Centralized Service export for Meta WhatsApp Cloud API integration.
+ * Exportação centralizada de todos os submódulos da integração Meta WhatsApp Cloud API.
  */
 
+export * from "./validator";
+export * from "./errors";
+export * from "./logger";
+export * from "./retry";
 export * from "./cloudApi";
 export * from "./templates";
 export * from "./send";

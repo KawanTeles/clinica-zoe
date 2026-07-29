@@ -4,6 +4,11 @@
  * Server-only module.
  */
 
+import { validateAndFormatPhone } from "./validator";
+import { parseMetaApiError, MetaParsedError } from "./errors";
+import { logWhatsAppExecution } from "./logger";
+import { executeWithRetry } from "./retry";
+
 export interface WhatsAppConfig {
   access_token: string;
   phone_number_id: string;
@@ -20,15 +25,15 @@ export interface CloudApiSendResult {
   duracaoMs: number;
   status: number;
   error?: string;
+  parsedError?: MetaParsedError;
   raw?: any;
+  formattedPhone?: string;
+  isDevelopmentMode?: boolean;
 }
 
-const digits = (v: string) => v.replace(/\D/g, "");
-
 /**
- * Loads WhatsApp configuration securely from environment variables or DB fallback.
- * Priority: DB `whatsapp_meta_config` if explicitly updated -> Environment Variables -> Default Fallback.
- * NO CREDENTIALS ARE EVER HARDCODED.
+ * Carrega a configuração do WhatsApp garantindo que nenhuma credencial esteja hardcoded.
+ * Prioridade: Banco (`whatsapp_meta_config`) -> Variáveis de Ambiente (`WHATSAPP_*` / `META_*`)
  */
 export async function loadWhatsAppConfig(): Promise<WhatsAppConfig> {
   const envAccessToken = process.env.WHATSAPP_ACCESS_TOKEN || process.env.META_ACCESS_TOKEN || "";
@@ -59,7 +64,7 @@ export async function loadWhatsAppConfig(): Promise<WhatsAppConfig> {
       };
     }
   } catch (e) {
-    console.warn("[whatsapp:cloudApi] Erro ao carregar whatsapp_meta_config do banco, usando env vars:", e);
+    console.warn("[whatsapp:cloudApi] Aviso ao ler whatsapp_meta_config do banco, usando env vars:", (e as Error).message);
   }
 
   return {
@@ -74,125 +79,211 @@ export async function loadWhatsAppConfig(): Promise<WhatsAppConfig> {
 }
 
 /**
- * Sends raw message payload to Meta WhatsApp Cloud API via Graph API.
+ * Envia mensagem via Meta WhatsApp Cloud API com sanitização de telefone, retry com backoff e logging completo.
  */
 export async function sendRawCloudApiMessage(
   recipientTo: string,
   bodyPayload: Record<string, any>,
-  options?: { agendamentoId?: string; templateName?: string }
+  options?: {
+    agendamentoId?: string;
+    pacienteNome?: string;
+    profissionalNome?: string;
+    templateName?: string;
+  }
 ): Promise<CloudApiSendResult> {
   const config = await loadWhatsAppConfig();
   const startTime = Date.now();
 
-  if (!config.access_token || !config.phone_number_id) {
-    const err = "Credenciais do WhatsApp Cloud API não configuradas (Access Token / Phone Number ID ausentes)";
-    console.error(`[whatsapp:cloudApi] ${err}`);
-    return { ok: false, duracaoMs: 0, status: 400, error: err };
+  // 1. Sanitização e Validação do Número de Telefone
+  const phoneValidation = validateAndFormatPhone(recipientTo);
+
+  if (!phoneValidation.valid) {
+    const validationError = `Telefone de destino inválido '${recipientTo}': ${phoneValidation.error}`;
+    console.error(`[whatsapp:cloudApi] ${validationError}`);
+
+    const parsedErr: MetaParsedError = {
+      code: "INVALID_PHONE_NUMBER",
+      type: "ValidationError",
+      userMessage: phoneValidation.error || "Número de telefone em formato inválido.",
+      technicalDiagnostic: validationError,
+      isDevelopmentModeError: false,
+      isAllowedListError: false,
+      isTokenExpired: false,
+      retryable: false,
+    };
+
+    await logWhatsAppExecution({
+      agendamentoId: options?.agendamentoId,
+      pacienteNome: options?.pacienteNome,
+      profissionalNome: options?.profissionalNome,
+      destinatarioTelefone: recipientTo,
+      mensagem: bodyPayload.text?.body || JSON.stringify(bodyPayload),
+      templateName: options?.templateName,
+      statusEnvio: "ERRO",
+      duracaoMs: Date.now() - startTime,
+      ultimoErro: validationError,
+      stackTrace: new Error(validationError).stack,
+    });
+
+    return {
+      ok: false,
+      duracaoMs: Date.now() - startTime,
+      status: 400,
+      error: validationError,
+      parsedError: parsedErr,
+    };
   }
 
-  const cleanPhone = digits(recipientTo);
+  const cleanPhone = phoneValidation.formattedPhone;
+
+  // 2. Validação de Credenciais
+  if (!config.access_token || !config.phone_number_id) {
+    const credError = "Credenciais do Meta WhatsApp Cloud API não configuradas (Access Token / Phone Number ID ausentes)";
+    console.error(`[whatsapp:cloudApi] ${credError}`);
+
+    const parsedErr = parseMetaApiError({ error: { message: credError } }, 401);
+
+    await logWhatsAppExecution({
+      agendamentoId: options?.agendamentoId,
+      pacienteNome: options?.pacienteNome,
+      profissionalNome: options?.profissionalNome,
+      destinatarioTelefone: cleanPhone,
+      mensagem: bodyPayload.text?.body || JSON.stringify(bodyPayload),
+      templateName: options?.templateName,
+      statusEnvio: "ERRO",
+      duracaoMs: Date.now() - startTime,
+      ultimoErro: credError,
+      actionRequired: "Informe as credenciais WHATSAPP_ACCESS_TOKEN e WHATSAPP_PHONE_NUMBER_ID.",
+    });
+
+    return {
+      ok: false,
+      duracaoMs: Date.now() - startTime,
+      status: 401,
+      error: credError,
+      parsedError: parsedErr,
+      formattedPhone: cleanPhone,
+    };
+  }
+
   const version = config.graph_version || "v20.0";
   const url = `https://graph.facebook.com/${version}/${config.phone_number_id}/messages`;
 
-  const payload = {
+  const finalPayload = {
     messaging_product: "whatsapp",
     recipient_type: "individual",
     to: cleanPhone,
     ...bodyPayload,
   };
 
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${config.access_token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+  // 3. Execução com Retry Exponencial
+  const retryResult = await executeWithRetry(async (attempt) => {
+    const attemptStart = Date.now();
 
-    const duracaoMs = Date.now() - startTime;
-    const raw = await response.json().catch(() => null);
-
-    if (!response.ok) {
-      const errorMsg = raw?.error?.message || `Erro HTTP ${response.status}: ${response.statusText}`;
-      console.error(`[whatsapp:cloudApi] Falha no envio para ${cleanPhone}:`, errorMsg);
-      await logMessageToDb({
-        agendamentoId: options?.agendamentoId,
-        destinatarioTelefone: cleanPhone,
-        mensagem: bodyPayload.text?.body || JSON.stringify(bodyPayload),
-        templateName: options?.templateName,
-        statusEnvio: "ERRO",
-        duracaoMs,
-        ultimoErro: errorMsg,
-        payload,
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${config.access_token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(finalPayload),
       });
-      return { ok: false, duracaoMs, status: response.status, error: errorMsg, raw };
+
+      const attemptDur = Date.now() - attemptStart;
+      const raw = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        const errorMsg = raw?.error?.message || `Erro HTTP ${response.status}: ${response.statusText}`;
+        return {
+          ok: false,
+          status: response.status,
+          raw,
+          error: errorMsg,
+          duracaoMs: attemptDur,
+        };
+      }
+
+      return {
+        ok: true,
+        status: response.status,
+        raw,
+        duracaoMs: attemptDur,
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        status: 500,
+        error: (e as Error).message,
+        duracaoMs: Date.now() - attemptStart,
+      };
     }
+  }, { maxRetries: 3, initialDelayMs: 500 });
 
-    const wamid = raw?.messages?.[0]?.id ?? undefined;
-    console.log(`[whatsapp:cloudApi] Sucesso no envio para ${cleanPhone} (wamid: ${wamid}) em ${duracaoMs}ms`);
+  const totalDuration = Date.now() - startTime;
+  const lastRaw = retryResult.data || retryResult.parsedError?.rawError;
+  const wamid = lastRaw?.messages?.[0]?.id ?? undefined;
 
-    await logMessageToDb({
+  if (retryResult.success) {
+    console.log(`[whatsapp:cloudApi] Sucesso no envio para ${cleanPhone} (wamid: ${wamid}) em ${totalDuration}ms após ${retryResult.totalAttempts} tentativa(s).`);
+
+    await logWhatsAppExecution({
       agendamentoId: options?.agendamentoId,
+      pacienteNome: options?.pacienteNome,
+      profissionalNome: options?.profissionalNome,
       destinatarioTelefone: cleanPhone,
       mensagem: bodyPayload.text?.body || JSON.stringify(bodyPayload),
       templateName: options?.templateName,
+      payloadEnviado: finalPayload,
+      respostaMeta: lastRaw,
+      httpStatus: 200,
+      duracaoMs: totalDuration,
       statusEnvio: "ENVIADA",
-      wamid,
-      duracaoMs,
-      payload,
+      retryCount: retryResult.totalAttempts - 1,
     });
 
-    return { ok: true, wamid, duracaoMs, status: response.status, raw };
-  } catch (e) {
-    const duracaoMs = Date.now() - startTime;
-    const errorMsg = (e as Error).message;
-    console.error(`[whatsapp:cloudApi] Exceção ao enviar mensagem para ${cleanPhone}:`, errorMsg);
+    return {
+      ok: true,
+      wamid,
+      duracaoMs: totalDuration,
+      status: 200,
+      raw: lastRaw,
+      formattedPhone: cleanPhone,
+    };
+  } else {
+    const parsedErr = retryResult.parsedError || parseMetaApiError(lastRaw, 500);
 
-    await logMessageToDb({
+    console.error(
+      `[whatsapp:cloudApi] Falha no envio para ${cleanPhone} após ${retryResult.totalAttempts} tentativa(s):`,
+      parsedErr.technicalDiagnostic
+    );
+
+    await logWhatsAppExecution({
       agendamentoId: options?.agendamentoId,
+      pacienteNome: options?.pacienteNome,
+      profissionalNome: options?.profissionalNome,
       destinatarioTelefone: cleanPhone,
       mensagem: bodyPayload.text?.body || JSON.stringify(bodyPayload),
       templateName: options?.templateName,
+      payloadEnviado: finalPayload,
+      respostaMeta: lastRaw,
+      httpStatus: Number(parsedErr.code) || 500,
+      duracaoMs: totalDuration,
       statusEnvio: "ERRO",
-      duracaoMs,
-      ultimoErro: errorMsg,
-      payload,
+      ultimoErro: parsedErr.technicalDiagnostic,
+      retryCount: retryResult.totalAttempts - 1,
+      actionRequired: parsedErr.actionRequired,
     });
 
-    return { ok: false, duracaoMs, status: 500, error: errorMsg };
-  }
-}
-
-/**
- * Internal helper to record WhatsApp message execution log into DB.
- */
-async function logMessageToDb(data: {
-  agendamentoId?: string;
-  destinatarioTelefone: string;
-  mensagem: string;
-  templateName?: string;
-  statusEnvio: string;
-  wamid?: string;
-  duracaoMs: number;
-  ultimoErro?: string;
-  payload?: any;
-}) {
-  try {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await (supabaseAdmin as any).from("whatsapp_message_logs").insert({
-      agendamento_id: data.agendamentoId || null,
-      destinatario_telefone: data.destinatarioTelefone,
-      mensagem: data.mensagem,
-      template_name: data.templateName || "text",
-      status_envio: data.statusEnvio,
-      wamid: data.wamid || null,
-      duracao_ms: data.duracaoMs,
-      ultimo_erro: data.ultimoErro || null,
-      payload: data.payload || null,
-    });
-  } catch (err) {
-    console.warn("[whatsapp:cloudApi] Erro ao registrar log no banco:", err);
+    return {
+      ok: false,
+      duracaoMs: totalDuration,
+      status: Number(parsedErr.code) || 500,
+      error: parsedErr.userMessage,
+      parsedError: parsedErr,
+      raw: lastRaw,
+      formattedPhone: cleanPhone,
+      isDevelopmentMode: parsedErr.isDevelopmentModeError,
+    };
   }
 }
