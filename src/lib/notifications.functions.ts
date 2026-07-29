@@ -94,7 +94,7 @@ export const obterConfigNotificacoes = createServerFn({ method: "POST" })
   });
 
 const configSchema = z.object({
-  destinatario_solicitacao: z.enum(["PROFISSIONAL", "RECEPCIONISTA", "AMBOS"]),
+  destinatario_solicitacao: z.enum(["PROFISSIONAL", "RECEPCIONISTA", "AMBOS", "ADMINISTRADOR", "TODOS"]),
   lembrete_24h_ativo: z.boolean(),
   lembrete_2h_ativo: z.boolean(),
   provider: z.enum(["console", "evolution", "meta", "twilio"]),
