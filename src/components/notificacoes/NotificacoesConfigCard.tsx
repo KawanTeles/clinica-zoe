@@ -25,7 +25,13 @@ import { Loader2, MessageSquare, Save, PlugZap } from "lucide-react";
 
 
 type Cfg = {
-  destinatario_solicitacao: "PROFISSIONAL" | "RECEPCIONISTA" | "AMBOS";
+  destinatario_solicitacao:
+    | "PROFISSIONAL"
+    | "RECEPCIONISTA"
+    | "AMBOS"
+    | "ADMINISTRADOR"
+    | "TODOS";
+
   lembrete_24h_ativo: boolean;
   lembrete_2h_ativo: boolean;
   provider: "console" | "evolution" | "meta" | "twilio";
