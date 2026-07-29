@@ -23,6 +23,11 @@ const CANAL_ICON: Record<string, React.ComponentType<{ className?: string }>> = 
 const STATUS_TONE: Record<string, string> = {
   ENVIADA:
     "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30",
+  ENTREGUE:
+    "bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-500/15 dark:text-sky-300 dark:border-sky-500/30",
+  LIDO: "bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-500/15 dark:text-indigo-300 dark:border-indigo-500/30",
+  RESPONDIDO:
+    "bg-teal-100 text-teal-800 border-teal-200 dark:bg-teal-500/15 dark:text-teal-300 dark:border-teal-500/30",
   PENDENTE:
     "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30",
   ENVIANDO:
@@ -31,13 +36,28 @@ const STATUS_TONE: Record<string, string> = {
   CANCELADA: "bg-muted text-muted-foreground border-border",
 };
 
+const STATUS_LABEL: Record<string, string> = {
+  PENDENTE: "Na fila",
+  ENVIANDO: "Enviando",
+  ENVIADA: "Enviada",
+  ENTREGUE: "Entregue",
+  LIDO: "Lida",
+  RESPONDIDO: "Respondida",
+  ERRO: "Erro",
+  CANCELADA: "Cancelada",
+};
+
 type Props = {
   /** Notificações endereçadas a este usuário. */
   usuarioId?: string;
   /** Notificações ligadas às consultas deste paciente (por user_id do paciente). */
   pacienteUserId?: string;
+  /** Notificações ligadas às consultas deste paciente (por id do cadastro). */
+  pacienteId?: string;
   /** Notificações ligadas às consultas deste profissional. */
   profissionalUserId?: string;
+  /** Notificações ligadas às consultas deste profissional (por id do cadastro). */
+  profissionalId?: string;
   limit?: number;
 };
 
@@ -45,13 +65,39 @@ type Props = {
 export function NotificacoesTimeline({
   usuarioId,
   pacienteUserId,
+  pacienteId,
   profissionalUserId,
+  profissionalId,
   limit = 60,
 }: Props) {
   const { data, isLoading } = useQuery({
-    queryKey: ["notif-timeline", usuarioId, pacienteUserId, profissionalUserId, limit],
+    queryKey: [
+      "notif-timeline",
+      usuarioId,
+      pacienteUserId,
+      pacienteId,
+      profissionalUserId,
+      profissionalId,
+      limit,
+    ],
     queryFn: async () => {
       const ids = new Set<string>();
+
+      if (pacienteId) {
+        const { data: ags } = await supabase
+          .from("agendamentos")
+          .select("id")
+          .eq("paciente_id", pacienteId);
+        (ags ?? []).forEach((a) => ids.add(a.id));
+      }
+
+      if (profissionalId) {
+        const { data: ags } = await supabase
+          .from("agendamentos")
+          .select("id")
+          .eq("profissional_id", profissionalId);
+        (ags ?? []).forEach((a) => ids.add(a.id));
+      }
 
       if (pacienteUserId) {
         const [{ data: byUser }, { data: pac }] = await Promise.all([
