@@ -25,7 +25,13 @@ import { Loader2, MessageSquare, Save, PlugZap } from "lucide-react";
 
 
 type Cfg = {
-  destinatario_solicitacao: "PROFISSIONAL" | "RECEPCIONISTA" | "AMBOS";
+  destinatario_solicitacao:
+    | "PROFISSIONAL"
+    | "RECEPCIONISTA"
+    | "AMBOS"
+    | "ADMINISTRADOR"
+    | "TODOS";
+
   lembrete_24h_ativo: boolean;
   lembrete_2h_ativo: boolean;
   provider: "console" | "evolution" | "meta" | "twilio";
@@ -64,12 +70,18 @@ const PROVIDER_HINT: Record<Cfg["provider"], { url: string; remetente: string; t
     remetente: "Phone Number ID da Meta",
     token: "Access token permanente (System User Token)",
   },
+  evolution: {
+    url: "https://sua-evolution-api.com",
+    remetente: "Número remetente (E.164)",
+    token: "API Key da instância",
+  },
   twilio: {
     url: "—",
     remetente: "Número remetente (E.164)",
     token: "ACCOUNT_SID:AUTH_TOKEN",
   },
 };
+
 
 /** Configuração das notificações automáticas e do provider de WhatsApp. */
 export function NotificacoesConfigCard() {
@@ -171,7 +183,10 @@ export function NotificacoesConfigCard() {
               <SelectContent>
                 <SelectItem value="PROFISSIONAL">Profissional</SelectItem>
                 <SelectItem value="RECEPCIONISTA">Recepcionista</SelectItem>
-                <SelectItem value="AMBOS">Ambos</SelectItem>
+                <SelectItem value="ADMINISTRADOR">Administrador</SelectItem>
+                <SelectItem value="AMBOS">Profissional e recepcionista</SelectItem>
+                <SelectItem value="TODOS">Todos (profissional, recepção e admin)</SelectItem>
+
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
@@ -237,6 +252,15 @@ export function NotificacoesConfigCard() {
                 onChange={(e) => set("remetente", e.target.value)}
               />
             </div>
+            <div className="space-y-1.5">
+              <Label>Instância / conta</Label>
+              <Input
+                value={form.provider_instancia}
+                placeholder="Nome da instância (Evolution) ou conta do provider"
+                onChange={(e) => set("provider_instancia", e.target.value)}
+              />
+            </div>
+
             <div className="space-y-1.5">
               <Label>Access Token (Permanent System User Token)</Label>
               <Input

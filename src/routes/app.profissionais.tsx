@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
 import { adminCreateUser } from "@/lib/admin.functions";
 import { WhatsAppLinha } from "@/components/contato/WhatsAppAviso";
+import { HistoricoNotificacoesDialog } from "@/components/notificacoes/HistoricoNotificacoesDialog";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -122,6 +123,8 @@ function ProfissionaisPage() {
                 </div>
                 <EditarContatoProfissionalDialog id={p.id} nome={p.nome} telefone={p.telefone} whatsapp={p.whatsapp} />
                 <FotoProfissionalDialog id={p.id} nome={p.nome} fotoUrl={p.foto_url} />
+                <HistoricoNotificacoesDialog nome={p.nome} profissionalId={p.id} />
+
 
               </CardContent>
             </Card>

@@ -23,6 +23,11 @@ const CANAL_ICON: Record<string, React.ComponentType<{ className?: string }>> = 
 const STATUS_TONE: Record<string, string> = {
   ENVIADA:
     "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30",
+  ENTREGUE:
+    "bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-500/15 dark:text-sky-300 dark:border-sky-500/30",
+  LIDO: "bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-500/15 dark:text-indigo-300 dark:border-indigo-500/30",
+  RESPONDIDO:
+    "bg-teal-100 text-teal-800 border-teal-200 dark:bg-teal-500/15 dark:text-teal-300 dark:border-teal-500/30",
   PENDENTE:
     "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30",
   ENVIANDO:
@@ -31,13 +36,28 @@ const STATUS_TONE: Record<string, string> = {
   CANCELADA: "bg-muted text-muted-foreground border-border",
 };
 
+const STATUS_LABEL: Record<string, string> = {
+  PENDENTE: "Na fila",
+  ENVIANDO: "Enviando",
+  ENVIADA: "Enviada",
+  ENTREGUE: "Entregue",
+  LIDO: "Lida",
+  RESPONDIDO: "Respondida",
+  ERRO: "Erro",
+  CANCELADA: "Cancelada",
+};
+
 type Props = {
   /** Notificações endereçadas a este usuário. */
   usuarioId?: string;
   /** Notificações ligadas às consultas deste paciente (por user_id do paciente). */
   pacienteUserId?: string;
+  /** Notificações ligadas às consultas deste paciente (por id do cadastro). */
+  pacienteId?: string;
   /** Notificações ligadas às consultas deste profissional. */
   profissionalUserId?: string;
+  /** Notificações ligadas às consultas deste profissional (por id do cadastro). */
+  profissionalId?: string;
   limit?: number;
 };
 
@@ -45,13 +65,39 @@ type Props = {
 export function NotificacoesTimeline({
   usuarioId,
   pacienteUserId,
+  pacienteId,
   profissionalUserId,
+  profissionalId,
   limit = 60,
 }: Props) {
   const { data, isLoading } = useQuery({
-    queryKey: ["notif-timeline", usuarioId, pacienteUserId, profissionalUserId, limit],
+    queryKey: [
+      "notif-timeline",
+      usuarioId,
+      pacienteUserId,
+      pacienteId,
+      profissionalUserId,
+      profissionalId,
+      limit,
+    ],
     queryFn: async () => {
       const ids = new Set<string>();
+
+      if (pacienteId) {
+        const { data: ags } = await supabase
+          .from("agendamentos")
+          .select("id")
+          .eq("paciente_id", pacienteId);
+        (ags ?? []).forEach((a) => ids.add(a.id));
+      }
+
+      if (profissionalId) {
+        const { data: ags } = await supabase
+          .from("agendamentos")
+          .select("id")
+          .eq("profissional_id", profissionalId);
+        (ags ?? []).forEach((a) => ids.add(a.id));
+      }
 
       if (pacienteUserId) {
         const [{ data: byUser }, { data: pac }] = await Promise.all([
@@ -88,8 +134,9 @@ export function NotificacoesTimeline({
       let query = supabase
         .from("notificacoes")
         .select(
-          "id, titulo, mensagem, evento, canal, status_envio, created_at, enviado_em, ultimo_erro, provider, duracao_ms, agendamento_id",
+          "id, titulo, mensagem, evento, canal, status_envio, created_at, enviado_em, entregue_em, lido_em, respondido_em, mensagem_recebida, ultimo_erro, provider, duracao_ms, agendamento_id",
         )
+
         .order("created_at", { ascending: false })
         .limit(limit);
 
@@ -140,22 +187,35 @@ export function NotificacoesTimeline({
                   {EVENTO_LABEL[n.evento ?? ""] ?? n.titulo}
                 </span>
                 <Badge variant="outline" className={STATUS_TONE[n.status_envio] ?? ""}>
-                  {n.status_envio}
+                  {STATUS_LABEL[n.status_envio] ?? n.status_envio}
                 </Badge>
                 <Badge variant="secondary" className="text-xs">
                   {n.canal}
                 </Badge>
               </div>
               <p className="mt-1 whitespace-pre-line text-sm text-muted-foreground">{n.mensagem}</p>
+              {n.mensagem_recebida && (
+                <p className="mt-2 rounded-lg bg-surface-muted p-2 text-sm">
+                  <span className="font-medium">Resposta recebida:</span> {n.mensagem_recebida}
+                </p>
+              )}
               <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                 <span>{new Date(n.created_at).toLocaleString("pt-BR")}</span>
                 {n.enviado_em && (
                   <span>Enviada: {new Date(n.enviado_em).toLocaleString("pt-BR")}</span>
                 )}
+                {n.entregue_em && (
+                  <span>Entregue: {new Date(n.entregue_em).toLocaleString("pt-BR")}</span>
+                )}
+                {n.lido_em && <span>Lida: {new Date(n.lido_em).toLocaleString("pt-BR")}</span>}
+                {n.respondido_em && (
+                  <span>Respondida: {new Date(n.respondido_em).toLocaleString("pt-BR")}</span>
+                )}
                 {n.provider && <span>Provider: {n.provider}</span>}
                 {n.duracao_ms != null && <span>{n.duracao_ms} ms</span>}
               </div>
               {n.ultimo_erro && <p className="mt-1 text-xs text-red-600">Erro: {n.ultimo_erro}</p>}
+
             </div>
           </li>
         );
