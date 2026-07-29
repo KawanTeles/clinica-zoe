@@ -187,22 +187,35 @@ export function NotificacoesTimeline({
                   {EVENTO_LABEL[n.evento ?? ""] ?? n.titulo}
                 </span>
                 <Badge variant="outline" className={STATUS_TONE[n.status_envio] ?? ""}>
-                  {n.status_envio}
+                  {STATUS_LABEL[n.status_envio] ?? n.status_envio}
                 </Badge>
                 <Badge variant="secondary" className="text-xs">
                   {n.canal}
                 </Badge>
               </div>
               <p className="mt-1 whitespace-pre-line text-sm text-muted-foreground">{n.mensagem}</p>
+              {n.mensagem_recebida && (
+                <p className="mt-2 rounded-lg bg-surface-muted p-2 text-sm">
+                  <span className="font-medium">Resposta recebida:</span> {n.mensagem_recebida}
+                </p>
+              )}
               <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                 <span>{new Date(n.created_at).toLocaleString("pt-BR")}</span>
                 {n.enviado_em && (
                   <span>Enviada: {new Date(n.enviado_em).toLocaleString("pt-BR")}</span>
                 )}
+                {n.entregue_em && (
+                  <span>Entregue: {new Date(n.entregue_em).toLocaleString("pt-BR")}</span>
+                )}
+                {n.lido_em && <span>Lida: {new Date(n.lido_em).toLocaleString("pt-BR")}</span>}
+                {n.respondido_em && (
+                  <span>Respondida: {new Date(n.respondido_em).toLocaleString("pt-BR")}</span>
+                )}
                 {n.provider && <span>Provider: {n.provider}</span>}
                 {n.duracao_ms != null && <span>{n.duracao_ms} ms</span>}
               </div>
               {n.ultimo_erro && <p className="mt-1 text-xs text-red-600">Erro: {n.ultimo_erro}</p>}
+
             </div>
           </li>
         );
