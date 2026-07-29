@@ -64,12 +64,18 @@ const PROVIDER_HINT: Record<Cfg["provider"], { url: string; remetente: string; t
     remetente: "Phone Number ID da Meta",
     token: "Access token permanente (System User Token)",
   },
+  evolution: {
+    url: "https://sua-evolution-api.com",
+    remetente: "Número remetente (E.164)",
+    token: "API Key da instância",
+  },
   twilio: {
     url: "—",
     remetente: "Número remetente (E.164)",
     token: "ACCOUNT_SID:AUTH_TOKEN",
   },
 };
+
 
 /** Configuração das notificações automáticas e do provider de WhatsApp. */
 export function NotificacoesConfigCard() {
