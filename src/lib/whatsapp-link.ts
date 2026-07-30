@@ -1,3 +1,5 @@
+export const CLINIC_WHATSAPP_NUMBER = "5582998343617";
+
 /** Sanitiza telefone para o formato numérico do WhatsApp Brasil (ex: 5511999999999) */
 export function sanitizePhone(phone?: string | null): string {
   if (!phone) return "";
@@ -53,6 +55,12 @@ ${info.horario}
 
 Acesse o painel para confirmar ou cancelar.
 ━━━━━━━━━━━━━━━━━━`;
+}
+
+/** Gera URL do WhatsApp com a notificação pronta para o número oficial da clínica (82 998343617) */
+export function getClinicWhatsAppNotificationUrl(info: SolicitacaoWhatsAppInfo): string {
+  const msg = formatClinicNotificationMsg(info);
+  return getWhatsAppUrl(CLINIC_WHATSAPP_NUMBER, msg);
 }
 
 /** Formata mensagem de confirmação de consulta para o paciente */

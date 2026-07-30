@@ -19,15 +19,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Sparkles,
-  Loader2,
-  CheckCircle2,
   CalendarDays,
   Clock,
   CreditCard,
-  ArrowLeft,
+  Sparkles,
   ArrowRight,
+  ArrowLeft,
+  CheckCircle2,
+  Loader2,
+  Stethoscope,
+  MessageSquare,
 } from "lucide-react";
+import { getClinicWhatsAppNotificationUrl } from "@/lib/whatsapp-link";
 import { cn } from "@/lib/utils";
 import { addMinutes, fmtHora, todayISO } from "@/lib/agenda-utils";
 
@@ -215,8 +218,20 @@ function AgendamentoPage() {
       setCriado(id);
       setStep(5);
       toast.success("Solicitação enviada!");
-      // Dispara imediatamente os avisos desta solicitação.
       dispararFn({ data: { agendamentoId: id } }).catch(() => {});
+
+      // Tenta abrir automaticamente o WhatsApp da clínica (82 998343617) com os dados
+      try {
+        const url = getClinicWhatsAppNotificationUrl({
+          pacienteNome: nome || user?.email || "Paciente",
+          pacienteTelefone: telefone,
+          profissionalNome: profissional?.nome ?? "Profissional",
+          especialidadeNome: (profissional?.especialidade as any)?.nome ?? "Consulta",
+          data,
+          horario: hora,
+        });
+        window.open(url, "_blank");
+      } catch (e) {}
     },
     onError: (e: any) => toast.error(e.message ?? "Não foi possível agendar."),
   });
@@ -475,20 +490,42 @@ function AgendamentoPage() {
             )}
 
             {step === 5 && (
-              <div className="py-6 text-center">
-                <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-primary/10 text-primary">
+              <div className="py-6 text-center space-y-4">
+                <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-emerald-500/10 text-emerald-600">
                   <CheckCircle2 className="h-7 w-7" />
                 </div>
-                <h2 className="mt-4 text-xl font-semibold">Solicitação enviada!</h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Você receberá a confirmação assim que o profissional aprovar.
-                </p>
-                <div className="mt-6 flex flex-wrap justify-center gap-2">
+                <div>
+                  <h2 className="text-xl font-semibold">Solicitação enviada!</h2>
+                  <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
+                    Sua solicitação foi salva com o status <b>PENDENTE</b>. Notifique a recepção da clínica no WhatsApp para agilizar sua confirmação.
+                  </p>
+                </div>
+
+                <div className="pt-2 flex flex-col items-center gap-3">
+                  <a
+                    href={getClinicWhatsAppNotificationUrl({
+                      pacienteNome: nome || user?.email || "Paciente",
+                      pacienteTelefone: telefone,
+                      profissionalNome: profissional?.nome ?? "Profissional",
+                      especialidadeNome: (profissional?.especialidade as any)?.nome ?? "Consulta",
+                      data,
+                      horario: hora,
+                    })}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <Button className="rounded-full bg-emerald-600 hover:bg-emerald-700 text-white gap-2 px-6 shadow-md">
+                      <MessageSquare className="h-4 w-4" /> Enviar aviso ao WhatsApp da Clínica (82 998343617)
+                    </Button>
+                  </a>
+                </div>
+
+                <div className="pt-4 flex flex-wrap justify-center gap-2 border-t border-border">
                   <Link to="/cliente">
-                    <Button className="rounded-full">Ver minhas consultas</Button>
+                    <Button variant="outline" className="rounded-full">Ver minhas consultas</Button>
                   </Link>
                   <Link to="/">
-                    <Button variant="outline" className="rounded-full">Voltar ao início</Button>
+                    <Button variant="ghost" className="rounded-full">Voltar ao início</Button>
                   </Link>
                 </div>
               </div>
