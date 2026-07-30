@@ -1,4 +1,4 @@
-Vou construir o painel administrativo da Clínica em etapas, validando cada uma antes de avançar. Nesta primeira entrega o foco é a **fundação**: banco de dados, autenticação, permissões e layout administrativo com as 3 áreas (Admin, Recepcionista, Profissional). Os módulos de negócio (agenda, financeiro, WhatsApp) vêm nas etapas seguintes, sobre essa base já testada.
+Vou construir o painel administrativo da Clínica em etapas, validando cada uma antes de avançar. Nesta primeira entrega o foco é a **fundação**: banco de dados, autenticação, permissões e layout administrativo com as 3 áreas (Admin, Recepcionista, Profissional). Os módulos de negócio (agenda, financeiro, notificações) vêm nas etapas seguintes, sobre essa base já testada.
 
 ## Escopo desta entrega (Etapa 1 + 2)
 
@@ -18,7 +18,6 @@ Tabelas conforme especificação, com enums e RLS desde o início:
 - `agendamentos` (enum status: PENDENTE, APROVADO, RECUSADO, CANCELADO, REMARCADO, FINALIZADO)
 - `financeiro` (enum status: ABERTO, PAGO, CANCELADO)
 - `notificacoes`
-- `whatsapp_queue` (estrutura pronta, envio real fica para etapa 7)
 - Função `has_role(user_id, role)` SECURITY DEFINER
 - Trigger que cria `profiles` + role `CLIENTE` automaticamente no signup
 
@@ -55,7 +54,8 @@ Tabelas conforme especificação, com enums e RLS desde o início:
 - **Etapa 4**: Agenda/calendário com bloqueio de conflitos, visão por profissional
 - **Etapa 5**: Fluxo de solicitação de consulta (cliente → PENDENTE → profissional aceita/recusa → APROVADO gera lançamento financeiro ABERTO)
 - **Etapa 6**: Painel financeiro (abertos, pagos, transições de status)
-- **Etapa 7**: Notificações + integração WhatsApp (fila já existe; falta o worker de envio)
+- **Etapa 7**: Notificações
+- **Etapa 8**: Testes de ponta a ponta + polimento
 - **Etapa 8**: Testes de ponta a ponta + polimento
 
 ## Detalhes técnicos

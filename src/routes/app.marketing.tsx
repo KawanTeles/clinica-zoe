@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Sparkles, Megaphone, Send, Target, Users } from "lucide-react";
+import { Sparkles, Megaphone, Target, Users } from "lucide-react";
 
 export const Route = createFileRoute("/app/marketing")({
   head: () => ({
     meta: [
       { title: "Marketing — Clínica" },
-      { name: "description", content: "Campanhas e mensagens em massa da clínica." },
+      { name: "description", content: "Campanhas e comunicação da clínica." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -19,7 +19,7 @@ function MarketingPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Marketing & Campanhas</h1>
         <p className="text-sm text-muted-foreground">
-          Gestão de disparo de mensagens, comunicação em massa e remarketing via WhatsApp.
+          Gestão de disparo de mensagens, comunicação em massa e remarketing de pacientes.
         </p>
       </div>
 
@@ -42,7 +42,7 @@ function MarketingPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground mt-1">Pacientes engajados via WhatsApp</p>
+            <p className="text-xs text-muted-foreground mt-1">Pacientes engajados</p>
           </CardContent>
         </Card>
 
@@ -64,12 +64,12 @@ function MarketingPage() {
             <Sparkles className="h-5 w-5 text-primary" /> Módulo de Campanhas em Desenvolvimento
           </CardTitle>
           <CardDescription>
-            Integração nativa com a Evolution API configurada para disparos agendados e segmented por pacientes.
+            Configuração de mensagens personalizadas e segmentadas para pacientes.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">
-            Com a Evolution API conectada no módulo <strong>WhatsApp</strong>, este painel permitirá criar mensagens personalizadas para retorno de pacientes, lembretes de exames e avisos gerais.
+            Este painel permitirá criar mensagens personalizadas para retorno de pacientes, lembretes de exames e avisos gerais.
           </p>
         </CardContent>
       </Card>

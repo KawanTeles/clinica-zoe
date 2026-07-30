@@ -389,7 +389,7 @@ function PerfilSection({ userId }: { userId: string }) {
         supabase.from("profiles").select("nome, email, telefone, foto_url").eq("id", userId).maybeSingle(),
         supabase
           .from("pacientes")
-          .select("id, telefone, whatsapp, data_nascimento, foto_url")
+          .select("id, telefone, data_nascimento, foto_url")
           .eq("user_id", userId)
           .maybeSingle(),
       ]);
@@ -409,14 +409,12 @@ function PerfilSection({ userId }: { userId: string }) {
 
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
-  const [whatsapp, setWhatsapp] = useState("");
   const [dob, setDob] = useState("");
 
   useEffect(() => {
     if (data?.prof) {
       setNome(data.prof.nome ?? "");
       setTelefone(data.prof.telefone ?? data.pac?.telefone ?? "");
-      setWhatsapp(data.pac?.whatsapp ?? "");
       setDob(data.pac?.data_nascimento ?? "");
     }
   }, [data]);
@@ -432,7 +430,7 @@ function PerfilSection({ userId }: { userId: string }) {
       if (data?.pac?.id) {
         const { error: e2 } = await supabase
           .from("pacientes")
-          .update({ telefone, whatsapp: whatsapp || null, data_nascimento: dob || null })
+          .update({ telefone, data_nascimento: dob || null })
           .eq("id", data.pac.id);
         if (e2) throw e2;
       }
@@ -476,15 +474,6 @@ function PerfilSection({ userId }: { userId: string }) {
         <Label>Telefone</Label>
         <Input value={telefone} onChange={(e) => setTelefone(e.target.value)} />
       </div>
-      {data?.pac && (
-        <div className="space-y-2">
-          <Label>WhatsApp</Label>
-          <Input value={whatsapp} placeholder="(00) 00000-0000" onChange={(e) => setWhatsapp(e.target.value)} />
-          <p className="text-xs text-muted-foreground">
-            Usado para enviar confirmações e lembretes das suas consultas.
-          </p>
-        </div>
-      )}
       {data?.pac && (
         <div className="space-y-2">
           <Label>Data de nascimento</Label>

@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { SiteShell, Reveal } from "@/components/site/SiteShell";
 import { ProfilePhoto, useAvatarUrl } from "@/lib/avatar";
 import { Button } from "@/components/ui/button";
-import { useClinicSettings, directionsHref, mapsEmbedUrl, whatsappHref } from "@/lib/clinic-settings";
+import { useClinicSettings, directionsHref, mapsEmbedUrl } from "@/lib/clinic-settings";
 import { ProfissionalCard, useProfissionaisPublicos } from "@/lib/profissionais-public";
 import {
   Sparkles,
@@ -314,7 +314,7 @@ function Depoimentos() {
     {
       nome: "Camila R.",
       texto:
-        "Atendimento impecável. Consegui agendar em minutos e recebi confirmação no WhatsApp. Recomendo!",
+        "Atendimento impecável. Consegui agendar em minutos e recebi confirmação por e-mail. Recomendo!",
     },
     {
       nome: "Roberto S.",
@@ -451,9 +451,6 @@ function Localizacao() {
                     <Navigation className="mr-2 h-4 w-4" /> Como chegar
                   </Button>
                 </a>
-                <a href={whatsappHref(settings)} target="_blank" rel="noreferrer">
-                  <Button variant="outline" className="rounded-full">WhatsApp</Button>
-                </a>
               </div>
             </div>
           </Reveal>
@@ -521,15 +518,6 @@ function CTAFinal() {
                 Agendar consulta <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <a href={whatsappHref(settings)} target="_blank" rel="noreferrer">
-              <Button
-                size="lg"
-                variant="outline"
-                className="rounded-full border-primary/40 px-6 text-foreground transition-transform hover:-translate-y-0.5 hover:bg-secondary"
-              >
-                Falar no WhatsApp
-              </Button>
-            </a>
           </div>
         </Reveal>
       </div>

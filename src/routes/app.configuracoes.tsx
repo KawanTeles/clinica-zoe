@@ -86,7 +86,6 @@ function ClinicaCard() {
         texto_institucional: form.texto_institucional,
         endereco: form.endereco,
         telefone: form.telefone,
-        whatsapp: form.whatsapp,
         email: form.email,
         horarios: form.horarios,
         redes_sociais: form.redes_sociais,
@@ -186,7 +185,6 @@ function ClinicaCard() {
             <Field label="Endereço" value={form.endereco} onChange={(v) => set("endereco", v)} />
             <Field label="E-mail" value={form.email} onChange={(v) => set("email", v)} />
             <Field label="Telefone" value={form.telefone} onChange={(v) => set("telefone", v)} />
-            <Field label="WhatsApp" value={form.whatsapp} onChange={(v) => set("whatsapp", v)} />
             <Field
               label="Latitude (mapa)"
               value={String(form.latitude ?? "")}
@@ -249,7 +247,7 @@ function ClinicaCard() {
             <Share2 className="h-4 w-4 text-primary" /> Redes sociais
           </h3>
           <div className="grid gap-4 sm:grid-cols-2">
-            {(["instagram", "facebook", "youtube", "tiktok", "linkedin"] as const).map((rede) => (
+            {(["instagram", "youtube", "tiktok", "linkedin"] as const).map((rede) => (
               <Field
                 key={rede}
                 label={rede.charAt(0).toUpperCase() + rede.slice(1)}

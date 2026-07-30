@@ -59,7 +59,7 @@ type Notif = {
   mensagem: string;
   mensagem_recebida?: string | null;
   tipo: string;
-  canal: "WHATSAPP" | "EMAIL" | "INTERNO";
+  canal: "EMAIL" | "INTERNO";
   status_envio: "PENDENTE" | "ENVIANDO" | "ENVIADA" | "ENTREGUE" | "LIDO" | "RESPONDIDO" | "ERRO" | "CANCELADA";
   tentativas: number;
   ultimo_erro: string | null;
@@ -98,7 +98,6 @@ const STATUS_LABEL: Record<Notif["status_envio"], string> = {
 };
 
 const CANAL_ICON: Record<Notif["canal"], React.ComponentType<{ className?: string }>> = {
-  WHATSAPP: MessageSquare,
   EMAIL: Mail,
   INTERNO: Bell,
 };
@@ -152,7 +151,7 @@ function NotificacoesPage() {
     onSuccess: (r: any) => {
       if (r?.ok)
         toast.success(
-          r?.providerId ? `Mensagem aceita pela Meta (ID ${String(r.providerId).slice(0, 24)}…)` : "Mensagem aceita pela Meta",
+          r?.providerId ? `Mensagem enviada (ID ${String(r.providerId).slice(0, 24)}…)` : "Mensagem enviada",
         );
       else toast.error(r?.error ?? "Falha ao reenviar", { duration: 12000 });
       qc.invalidateQueries({ queryKey: ["notificacoes"] });
@@ -170,7 +169,7 @@ function NotificacoesPage() {
         toast.error(`${enviadas}/${total} enviada(s). ${falhas} falha(s): ${primeiroErro ?? "erro desconhecido"}`, {
           duration: 12000,
         });
-      else toast.success(`${enviadas}/${total} mensagem(ns) aceita(s) pela Meta`);
+      else toast.success(`${enviadas}/${total} mensagem(ns) enviada(s)`);
       qc.invalidateQueries({ queryKey: ["notificacoes"] });
     },
     onError: (e: Error) => toast.error(e.message, { duration: 12000 }),
@@ -282,7 +281,7 @@ function NotificacoesPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Notificações</h1>
           <p className="text-sm text-muted-foreground">
-            Central de eventos, envios internos e mensagens externas (WhatsApp / e-mail).
+            Central de eventos, envios internos e e-mails.
           </p>
         </div>
         {isAdmin && (
@@ -379,7 +378,6 @@ function NotificacoesPage() {
               <SelectContent>
                 <SelectItem value="TODOS">Todos os canais</SelectItem>
                 <SelectItem value="INTERNO">Interno</SelectItem>
-                <SelectItem value="WHATSAPP">WhatsApp</SelectItem>
                 <SelectItem value="EMAIL">E-mail</SelectItem>
               </SelectContent>
             </Select>

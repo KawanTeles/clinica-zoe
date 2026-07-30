@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
-export type AvatarBucket = "profissionais" | "clientes";
+export type AvatarBucket = "profissionais" | "clientes" | "pacientes";
 
 export const AVATAR_MAX_BYTES = 5 * 1024 * 1024;
 export const AVATAR_ACCEPT = ["image/jpeg", "image/jpg", "image/png", "image/webp"];

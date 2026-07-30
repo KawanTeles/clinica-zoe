@@ -4,7 +4,6 @@ import { supabase } from "@/lib/supabase";
 export type ClinicHorario = { dias: string; horario: string };
 export type ClinicRedes = {
   instagram?: string;
-  facebook?: string;
   youtube?: string;
   tiktok?: string;
   linkedin?: string;
@@ -22,7 +21,6 @@ export type ClinicSettings = {
   texto_institucional: string;
   endereco: string;
   telefone: string;
-  whatsapp: string;
   email: string;
   horarios: ClinicHorario[];
   redes_sociais: ClinicRedes;
@@ -43,7 +41,6 @@ export const CLINIC_DEFAULTS: ClinicSettings = {
   texto_institucional: "",
   endereco: "",
   telefone: "",
-  whatsapp: "",
   email: "",
   horarios: [],
   redes_sociais: {},
@@ -65,7 +62,6 @@ function normalize(row: any): ClinicSettings {
     texto_institucional: row.texto_institucional ?? "",
     endereco: row.endereco ?? "",
     telefone: row.telefone ?? "",
-    whatsapp: row.whatsapp ?? "",
     email: row.email ?? "",
     horarios: Array.isArray(row.horarios) ? (row.horarios as ClinicHorario[]) : [],
     redes_sociais: (row.redes_sociais ?? {}) as ClinicRedes,
@@ -92,15 +88,6 @@ export function useClinicSettings() {
     staleTime: 5 * 60 * 1000,
   });
   return { settings: data ?? CLINIC_DEFAULTS, isLoading };
-}
-
-export function whatsappHref(
-  settings: Pick<ClinicSettings, "whatsapp">,
-  mensagem = "Olá! Gostaria de mais informações.",
-) {
-  const num = (settings.whatsapp ?? "").replace(/\D/g, "");
-  if (!num) return "#";
-  return `https://wa.me/${num}?text=${encodeURIComponent(mensagem)}`;
 }
 
 export function mapsEmbedUrl(settings: Pick<ClinicSettings, "latitude" | "longitude">) {

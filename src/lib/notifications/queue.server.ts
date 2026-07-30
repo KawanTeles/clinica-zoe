@@ -63,7 +63,7 @@ export async function processOne(id: string, opts?: { ignorarJanela?: boolean })
     return { ok: true };
   }
 
-  const to = n.canal === "WHATSAPP" ? n.destinatario_telefone : n.destinatario_email;
+  const to = n.canal === "EMAIL" ? n.destinatario_email : n.destinatario_telefone;
   if (!to) {
     await (supabaseAdmin as any)
       .from("notificacoes")
@@ -108,35 +108,19 @@ export async function processOne(id: string, opts?: { ignorarJanela?: boolean })
     body = renderTemplate(tpl, vars);
   }
 
-  const provider = pickProvider(n.canal as "WHATSAPP" | "EMAIL", cfg);
+  const provider = pickProvider(n.canal as "EMAIL", cfg);
   const t0 = Date.now();
 
-  let result: { ok: boolean; providerId?: string; error?: string };
-
-  if (n.canal === "WHATSAPP" && n.evento) {
-    // Motor inteligente: texto livre dentro da janela de 24h, template aprovado fora dela.
-    const { sendEventMessage } = await import("@/lib/whatsapp/templates.server");
-    const r = await sendEventMessage({
-      evento: n.evento as string,
+  const result = await provider.send(
+    {
+      channel: n.canal as "EMAIL",
       to,
-      texto: body,
-      variaveis: Object.fromEntries(
-        Object.entries(vars ?? {}).map(([k, v]) => [k, v == null ? "" : String(v)]),
-      ),
-    });
-    result = { ok: r.ok, providerId: r.wamid ?? undefined, error: r.error ?? (r as any).motivo ?? undefined };
-  } else {
-    result = await provider.send(
-      {
-        channel: n.canal as "WHATSAPP" | "EMAIL",
-        to,
-        title: n.titulo,
-        body,
-        metadata: { notificacao_id: n.id, agendamento_id: n.agendamento_id },
-      },
-      cfg,
-    );
-  }
+      title: n.titulo,
+      body,
+      metadata: { notificacao_id: n.id, agendamento_id: n.agendamento_id },
+    },
+    cfg,
+  );
 
   const duracao = Date.now() - t0;
 
@@ -194,7 +178,7 @@ export async function processQueue(limit = 20, opts?: { ignorarJanela?: boolean 
       .from("notificacoes")
       .select("id")
       .eq("status_envio", "PENDENTE")
-      .in("canal", ["WHATSAPP", "EMAIL"])
+      .in("canal", ["EMAIL"])
       .order("created_at", { ascending: true })
       .limit(limit),
     // Reenvio automático: erros cujo intervalo de espera já venceu.
@@ -205,7 +189,7 @@ export async function processQueue(limit = 20, opts?: { ignorarJanela?: boolean 
       .eq("definitivo", false)
       .not("proxima_tentativa_em", "is", null)
       .lte("proxima_tentativa_em", agora)
-      .in("canal", ["WHATSAPP", "EMAIL"])
+      .in("canal", ["EMAIL"])
       .order("proxima_tentativa_em", { ascending: true })
       .limit(limit),
   ]);
@@ -233,7 +217,7 @@ export async function reprocessarErros(limit = 100) {
     .from("notificacoes")
     .select("id")
     .eq("status_envio", "ERRO")
-    .in("canal", ["WHATSAPP", "EMAIL"])
+    .in("canal", ["EMAIL"])
     .order("created_at", { ascending: true })
     .limit(limit);
   if (error) throw new Error(error.message);

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Bell, MessageSquare, Mail } from "lucide-react";
+import { Loader2, Bell, Mail } from "lucide-react";
 
 export const EVENTO_LABEL: Record<string, string> = {
   SOLICITACAO_NOVA: "Solicitação enviada",
@@ -15,7 +15,6 @@ export const EVENTO_LABEL: Record<string, string> = {
 };
 
 const CANAL_ICON: Record<string, React.ComponentType<{ className?: string }>> = {
-  WHATSAPP: MessageSquare,
   EMAIL: Mail,
   INTERNO: Bell,
 };

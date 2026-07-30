@@ -12,7 +12,6 @@ import {
   UserCircle2,
   ShieldCheck,
   Sparkles,
-  MessageSquare,
   Megaphone,
 } from "lucide-react";
 import {
@@ -49,7 +48,6 @@ const items: Item[] = [
   { title: "Profissionais", url: "/app/profissionais", icon: Stethoscope, roles: ["ADMIN"] },
   { title: "Marketing", url: "/app/marketing", icon: Megaphone, roles: ["ADMIN", "RECEPCIONISTA"] },
   { title: "Notificações", url: "/app/notificacoes", icon: Bell, roles: ["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"], badge: "notificacoes", badgeTone: "danger" },
-  { title: "WhatsApp", url: "/app/whatsapp", icon: MessageSquare, roles: ["ADMIN", "RECEPCIONISTA"] },
   { title: "Usuários", url: "/app/usuarios", icon: UserCog, roles: ["ADMIN"] },
   { title: "Minha Agenda", url: "/app/minha-agenda", icon: CalendarDays, roles: ["PROFISSIONAL"], badge: "agenda", badgeTone: "primary" },
   { title: "Meus Pacientes", url: "/app/meus-pacientes", icon: Users, roles: ["PROFISSIONAL"] },

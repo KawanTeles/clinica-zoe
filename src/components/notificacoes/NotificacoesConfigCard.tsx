@@ -21,7 +21,7 @@ import {
   testarConexaoNotificacoes,
 } from "@/lib/notifications.functions";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, MessageSquare, Save, PlugZap } from "lucide-react";
+import { Loader2, Bell, Save, PlugZap } from "lucide-react";
 
 
 type Cfg = {
@@ -34,7 +34,7 @@ type Cfg = {
 
   lembrete_24h_ativo: boolean;
   lembrete_2h_ativo: boolean;
-  provider: "console" | "evolution" | "meta" | "twilio";
+  provider: "console" | "email";
   provider_url: string;
   remetente: string;
   provider_instancia: string;
@@ -63,27 +63,7 @@ const EVENTOS: Array<{ key: string; label: string }> = [
 
 export const NOTIF_CONFIG_KEY = ["notificacoes-config"] as const;
 
-const PROVIDER_HINT: Record<Cfg["provider"], { url: string; remetente: string; token: string }> = {
-  console: { url: "—", remetente: "—", token: "Não é necessário (modo de teste)" },
-  meta: {
-    url: "https://graph.facebook.com/v20.0",
-    remetente: "Phone Number ID da Meta",
-    token: "Access token permanente (System User Token)",
-  },
-  evolution: {
-    url: "https://sua-evolution-api.com",
-    remetente: "Número remetente (E.164)",
-    token: "API Key da instância",
-  },
-  twilio: {
-    url: "—",
-    remetente: "Número remetente (E.164)",
-    token: "ACCOUNT_SID:AUTH_TOKEN",
-  },
-};
-
-
-/** Configuração das notificações automáticas e do provider de WhatsApp. */
+/** Configuração das notificações automáticas de e-mail e alertas internos. */
 export function NotificacoesConfigCard() {
   const qc = useQueryClient();
   const obter = useServerFn(obterConfigNotificacoes);
@@ -96,7 +76,6 @@ export function NotificacoesConfigCard() {
   });
 
   const [form, setForm] = useState<Cfg | null>(null);
-  const [token, setToken] = useState("");
 
   useEffect(() => {
     if (data) setForm(data);
@@ -120,14 +99,11 @@ export function NotificacoesConfigCard() {
           janela_inicio: form.janela_inicio,
           janela_fim: form.janela_fim,
           templates: form.templates ?? {},
-
-          ...(token ? { provider_token: token } : {}),
         },
       });
     },
     onSuccess: () => {
       toast.success("Configurações de notificações salvas");
-      setToken("");
       qc.invalidateQueries({ queryKey: NOTIF_CONFIG_KEY });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -153,7 +129,6 @@ export function NotificacoesConfigCard() {
     );
   }
 
-  const hint = PROVIDER_HINT[form.provider];
   const statusTone =
     form.conexao_status === "CONECTADO"
       ? "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30"
@@ -165,7 +140,7 @@ export function NotificacoesConfigCard() {
     <Card className="border-border shadow-soft">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
-          <MessageSquare className="h-4 w-4 text-primary" /> Notificações e WhatsApp
+          <Bell className="h-4 w-4 text-primary" /> Notificações
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-8">
@@ -186,7 +161,6 @@ export function NotificacoesConfigCard() {
                 <SelectItem value="ADMINISTRADOR">Administrador</SelectItem>
                 <SelectItem value="AMBOS">Profissional e recepcionista</SelectItem>
                 <SelectItem value="TODOS">Todos (profissional, recepção e admin)</SelectItem>
-
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
@@ -230,60 +204,18 @@ export function NotificacoesConfigCard() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="meta">Meta WhatsApp Cloud API (Oficial)</SelectItem>
                   <SelectItem value="console">Simulado (log interno)</SelectItem>
-                  <SelectItem value="twilio">Twilio</SelectItem>
+                  <SelectItem value="email">E-mail</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>URL Graph API</Label>
-              <Input
-                value={form.provider_url}
-                placeholder={hint.url}
-                onChange={(e) => set("provider_url", e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Phone Number ID</Label>
+              <Label>E-mail Remetente</Label>
               <Input
                 value={form.remetente}
-                placeholder={hint.remetente}
+                placeholder="contato@clinica.com"
                 onChange={(e) => set("remetente", e.target.value)}
               />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Instância / conta</Label>
-              <Input
-                value={form.provider_instancia}
-                placeholder="Nome da instância (Evolution) ou conta do provider"
-                onChange={(e) => set("provider_instancia", e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label>Access Token (Permanent System User Token)</Label>
-              <Input
-                type="password"
-                autoComplete="new-password"
-                value={token}
-                placeholder={form.token_definido ? "•••••••• (salvo)" : hint.token}
-                onChange={(e) => setToken(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                O token de acesso permanente fica armazenado com segurança no servidor.
-              </p>
-            </div>
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label>Webhook Verify Token</Label>
-              <Input
-                value={form.webhook_secret}
-                placeholder="clinica_zoe_verify_token_2026"
-                onChange={(e) => set("webhook_secret", e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                URL do Webhook: <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">{typeof window !== "undefined" ? window.location.origin : ""}/api/public/hooks/meta</code>
-              </p>
             </div>
           </div>
           {form.conexao_erro && (
@@ -347,7 +279,6 @@ export function NotificacoesConfigCard() {
         </section>
 
         <div className="flex flex-wrap justify-end gap-2">
-
           <Button variant="outline" onClick={() => mTestar.mutate()} disabled={mTestar.isPending}>
             {mTestar.isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

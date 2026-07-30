@@ -46,13 +46,11 @@ function MeuPerfil() {
     },
   });
 
-  const [form, setForm] = useState({ telefone: "", whatsapp: "", descricao: "", registro_profissional: "", formacao: "", anos_experiencia: "" });
+  const [form, setForm] = useState({ telefone: "", descricao: "", registro_profissional: "", formacao: "", anos_experiencia: "" });
   useEffect(() => {
     if (data) {
       setForm({
         telefone: data.telefone ?? "",
-        whatsapp: data.whatsapp ?? "",
-
         descricao: data.descricao ?? "",
         registro_profissional: data.registro_profissional ?? "",
         formacao: data.formacao ?? "",
@@ -68,8 +66,6 @@ function MeuPerfil() {
         .from("profissionais")
         .update({
           telefone: form.telefone || null,
-          whatsapp: form.whatsapp || null,
-
           descricao: form.descricao || null,
           registro_profissional: form.registro_profissional || null,
           formacao: form.formacao || null,
@@ -128,17 +124,7 @@ function MeuPerfil() {
             <Label>Telefone</Label>
             <Input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} />
           </div>
-          <div className="space-y-1.5">
-            <Label>WhatsApp</Label>
-            <Input
-              value={form.whatsapp}
-              placeholder="(00) 00000-0000"
-              onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
-            />
-            <p className="text-[11px] text-muted-foreground">
-              Sem WhatsApp você não receberá notificações automáticas.
-            </p>
-          </div>
+
 
           <div className="space-y-1.5">
             <Label>Registro profissional</Label>

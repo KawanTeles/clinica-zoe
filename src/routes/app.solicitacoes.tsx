@@ -19,7 +19,6 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarDays, CheckCircle2, XCircle, Loader2, Clock, User, Stethoscope, CreditCard, Send } from "lucide-react";
 import { STATUS_COLOR, STATUS_LABEL, fmtHora } from "@/lib/agenda-utils";
-import { WhatsAppAviso, semWhatsapp } from "@/components/contato/WhatsAppAviso";
 import { PersonAvatar } from "@/lib/avatar";
 
 export const Route = createFileRoute("/app/solicitacoes")({
@@ -79,7 +78,7 @@ function SolicitacoesPage() {
       let q = supabase
         .from("agendamentos")
         .select(
-          "id, data, hora_inicio, hora_fim, status, valor, forma_pagamento, observacoes, profissional_id, paciente:pacientes(id,nome,telefone,whatsapp,foto_url), profissional:profissionais(id,nome,foto_url,whatsapp,especialidade:especialidades(nome))",
+          "id, data, hora_inicio, hora_fim, status, valor, forma_pagamento, observacoes, profissional_id, paciente:pacientes(id,nome,telefone,foto_url), profissional:profissionais(id,nome,foto_url,especialidade:especialidades(nome))",
         )
         .order("data", { ascending: true })
         .order("hora_inicio", { ascending: true });
@@ -197,7 +196,6 @@ function SolicitacoesPage() {
                         <PersonAvatar size="xs" nome={a.paciente?.nome} fotoUrl={a.paciente?.foto_url} />
                         {a.paciente?.nome ?? "Sem paciente"}
                       </span>
-                      {a.paciente && semWhatsapp(a.paciente.whatsapp) && <WhatsAppAviso />}
                       <Badge variant="outline" className={STATUS_COLOR[a.status]}>
                         {STATUS_LABEL[a.status]}
                       </Badge>
@@ -207,9 +205,6 @@ function SolicitacoesPage() {
                         <PersonAvatar size="xs" nome={a.profissional?.nome} fotoUrl={a.profissional?.foto_url} className="h-5 w-5 text-[8px]" />
                         {a.profissional?.nome} • {a.profissional?.especialidade?.nome ?? "—"}
                       </span>
-                      {a.profissional && semWhatsapp(a.profissional.whatsapp) && (
-                        <WhatsAppAviso label="Profissional sem WhatsApp" />
-                      )}
                       {a.valor != null && (
                         <span className="flex items-center gap-1">
                           <CreditCard className="h-3 w-3" />

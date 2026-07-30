@@ -10,4 +10,4 @@ A Clínica oferece consultas com profissionais qualificados em diversas especial
 - [Sobre](/sobre): História, missão e valores da Clínica.
 - [Especialidades](/especialidades): Especialidades clínicas disponíveis para agendamento.
 - [Profissionais](/profissionais): Time de especialistas, formação, experiência e valores de consulta.
-- [Contato](/contato): Endereço, telefone, WhatsApp, e-mail e horário de funcionamento.
+- [Contato](/contato): Endereço, telefone, e-mail e horário de funcionamento.

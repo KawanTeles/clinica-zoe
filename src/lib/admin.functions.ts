@@ -8,7 +8,6 @@ const createUserSchema = z.object({
   email: z.string().trim().email().max(255),
   senha: z.string().min(6).max(100),
   telefone: z.string().trim().max(30).optional().nullable(),
-  whatsapp: z.string().trim().max(30).optional().nullable(),
 
   role: z.enum(["ADMIN", "RECEPCIONISTA", "PROFISSIONAL", "CLIENTE"]),
   profissional: z
@@ -89,7 +88,6 @@ export const adminCreateUser = createServerFn({ method: "POST" })
           nome: data.nome,
           email: data.email,
           telefone: data.telefone ?? null,
-          whatsapp: data.whatsapp ?? null,
 
           especialidade_id: p.especialidade_id ?? null,
           registro_profissional: p.registro_profissional ?? null,

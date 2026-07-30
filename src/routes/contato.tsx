@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteShell, Reveal } from "@/components/site/SiteShell";
 import { Button } from "@/components/ui/button";
-import { useClinicSettings, directionsHref, mapsEmbedUrl, whatsappHref } from "@/lib/clinic-settings";
-import { MapPin, Phone, Mail, Clock, Navigation, MessageCircle } from "lucide-react";
+import { useClinicSettings, directionsHref, mapsEmbedUrl } from "@/lib/clinic-settings";
+import { MapPin, Phone, Mail, Clock, Navigation } from "lucide-react";
 
 export const Route = createFileRoute("/contato")({
   head: () => ({
@@ -10,10 +10,10 @@ export const Route = createFileRoute("/contato")({
       { title: "Contato — Clínica" },
       {
         name: "description",
-        content: "Fale com a Clínica: endereço, telefone, WhatsApp, e-mail e horário de funcionamento.",
+        content: "Fale com a Clínica: endereço, telefone, e-mail e horário de funcionamento.",
       },
       { property: "og:title", content: "Contato — Clínica" },
-      { property: "og:description", content: "Endereço, telefone, WhatsApp e horário de funcionamento." },
+      { property: "og:description", content: "Endereço, telefone e horário de funcionamento." },
       { property: "og:type", content: "website" },
     ],
     links: [{ rel: "canonical", href: "/contato" }],
@@ -47,12 +47,6 @@ function ContatoPage() {
             <div className="space-y-5 rounded-2xl border border-border bg-surface p-6 shadow-soft">
               <Row icon={MapPin} label="Endereço" value={settings.endereco} />
               <Row icon={Phone} label="Telefone" value={settings.telefone} />
-              <Row
-                icon={MessageCircle}
-                label="WhatsApp"
-                value={settings.whatsapp}
-                href={whatsappHref(settings)}
-              />
               <Row
                 icon={Mail}
                 label="Email"

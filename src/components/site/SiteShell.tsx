@@ -3,7 +3,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Menu, X, Sparkles, MapPin, Phone, Mail, Stethoscope, UserRound } from "lucide-react";
 
 import { useAuth } from "@/lib/auth-context";
-import { useClinicSettings, whatsappHref } from "@/lib/clinic-settings";
+import { useClinicSettings } from "@/lib/clinic-settings";
 import { useAvatarUrl } from "@/lib/avatar";
 import { useStaffSession } from "@/lib/staff-session";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,6 @@ const NAV = [
 
 const REDES: { key: string; label: string }[] = [
   { key: "instagram", label: "Instagram" },
-  { key: "facebook", label: "Facebook" },
   { key: "youtube", label: "YouTube" },
   { key: "tiktok", label: "TikTok" },
   { key: "linkedin", label: "LinkedIn" },
@@ -252,9 +251,6 @@ export function SiteShell({ children }: { children: ReactNode }) {
               )}
               {settings.email && (
                 <li className="flex gap-2"><Mail className="h-4 w-4 shrink-0 text-primary" /><span>{settings.email}</span></li>
-              )}
-              {settings.whatsapp && (
-                <li><a href={whatsappHref(settings)} target="_blank" rel="noreferrer" className="text-primary hover:underline">WhatsApp</a></li>
               )}
             </ul>
           </div>

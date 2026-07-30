@@ -7,7 +7,6 @@ import { z } from "zod";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
 import { adminCreateUser } from "@/lib/admin.functions";
-import { WhatsAppLinha } from "@/components/contato/WhatsAppAviso";
 import { HistoricoNotificacoesDialog } from "@/components/notificacoes/HistoricoNotificacoesDialog";
 
 import { Button } from "@/components/ui/button";
@@ -61,7 +60,7 @@ function ProfissionaisPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profissionais")
-        .select("id, user_id, foto_url, nome, email, telefone, whatsapp, status, valor_consulta_avista, valor_consulta_cartao, duracao_consulta_min, especialidade:especialidades(nome)")
+        .select("id, user_id, foto_url, nome, email, telefone, status, valor_consulta_avista, valor_consulta_cartao, duracao_consulta_min, especialidade:especialidades(nome)")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -115,17 +114,14 @@ function ProfissionaisPage() {
               <CardContent className="space-y-2 text-sm">
                 <p className="truncate text-muted-foreground">{p.email}</p>
                 {p.telefone && <p className="text-muted-foreground">Tel.: {p.telefone}</p>}
-                <p><WhatsAppLinha valor={p.whatsapp} /></p>
                 <div className="flex flex-wrap gap-x-4 gap-y-1 pt-2 text-xs text-muted-foreground">
                   <span>À vista: R$ {Number(p.valor_consulta_avista ?? 0).toFixed(2)}</span>
                   <span>Cartão: R$ {Number(p.valor_consulta_cartao ?? 0).toFixed(2)}</span>
                   <span>{p.duracao_consulta_min} min</span>
                 </div>
-                <EditarContatoProfissionalDialog id={p.id} nome={p.nome} telefone={p.telefone} whatsapp={p.whatsapp} />
+                <EditarContatoProfissionalDialog id={p.id} nome={p.nome} telefone={p.telefone} />
                 <FotoProfissionalDialog id={p.id} nome={p.nome} fotoUrl={p.foto_url} />
                 <HistoricoNotificacoesDialog nome={p.nome} profissionalId={p.id} />
-
-
               </CardContent>
             </Card>
           ))}
@@ -140,8 +136,6 @@ const formSchema = z.object({
   email: z.string().trim().email("Email inválido"),
   senha: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
   telefone: z.string().trim().optional(),
-  whatsapp: z.string().trim().optional(),
-
   especialidade_id: z.string().uuid().optional().nullable(),
   registro_profissional: z.string().optional(),
   descricao: z.string().optional(),
@@ -171,8 +165,6 @@ function NovoProfissionalDialog() {
     email: "",
     senha: "",
     telefone: "",
-    whatsapp: "",
-
     especialidade_id: "",
     registro_profissional: "",
     descricao: "",
@@ -196,8 +188,6 @@ function NovoProfissionalDialog() {
           email: parsed.email,
           senha: parsed.senha,
           telefone: parsed.telefone || null,
-          whatsapp: parsed.whatsapp || null,
-
           role: "PROFISSIONAL",
           profissional: {
             especialidade_id: parsed.especialidade_id ?? null,
@@ -223,8 +213,6 @@ function NovoProfissionalDialog() {
         email: "",
         senha: "",
         telefone: "",
-        whatsapp: "",
-
         especialidade_id: "",
         registro_profissional: "",
         descricao: "",
@@ -275,15 +263,8 @@ function NovoProfissionalDialog() {
           <Field label="Senha inicial">
             <Input type="text" value={form.senha} onChange={(e) => setForm({ ...form, senha: e.target.value })} />
           </Field>
-          <Field label="Telefone">
+          <Field label="Telefone" span={2}>
             <Input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} />
-          </Field>
-          <Field label="WhatsApp">
-            <Input
-              value={form.whatsapp}
-              placeholder="(00) 00000-0000"
-              onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
-            />
           </Field>
 
           <Field label="Registro profissional">
@@ -369,28 +350,25 @@ function EditarContatoProfissionalDialog({
   id,
   nome,
   telefone,
-  whatsapp,
 }: {
   id: string;
   nome: string;
   telefone: string | null;
-  whatsapp: string | null;
 }) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [tel, setTel] = useState(telefone ?? "");
-  const [wpp, setWpp] = useState(whatsapp ?? "");
 
   const mut = useMutation({
     mutationFn: async () => {
       const { error } = await supabase
         .from("profissionais")
-        .update({ telefone: tel.trim() || null, whatsapp: wpp.trim() || null })
+        .update({ telefone: tel.trim() || null })
         .eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Contatos atualizados");
+      toast.success("Contato atualizado");
       qc.invalidateQueries({ queryKey: ["profissionais"] });
       setOpen(false);
     },
@@ -404,30 +382,22 @@ function EditarContatoProfissionalDialog({
         setOpen(v);
         if (v) {
           setTel(telefone ?? "");
-          setWpp(whatsapp ?? "");
         }
       }}
     >
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="mt-3 w-full">
-          Editar contatos
+          Editar contato
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Contatos de {nome}</DialogTitle>
+          <DialogTitle>Contato de {nome}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="space-y-1.5">
             <Label>Telefone</Label>
             <Input value={tel} onChange={(e) => setTel(e.target.value)} />
-          </div>
-          <div className="space-y-1.5">
-            <Label>WhatsApp</Label>
-            <Input value={wpp} placeholder="(00) 00000-0000" onChange={(e) => setWpp(e.target.value)} />
-            <p className="text-[11px] text-muted-foreground">
-              Sem WhatsApp o profissional não receberá notificações automáticas.
-            </p>
           </div>
         </div>
         <DialogFooter>
@@ -442,8 +412,6 @@ function EditarContatoProfissionalDialog({
     </Dialog>
   );
 }
-
-
 
 function FotoProfissionalDialog({
   id,

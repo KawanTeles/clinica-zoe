@@ -97,7 +97,7 @@ const configSchema = z.object({
   destinatario_solicitacao: z.enum(["PROFISSIONAL", "RECEPCIONISTA", "AMBOS", "ADMINISTRADOR", "TODOS"]),
   lembrete_24h_ativo: z.boolean(),
   lembrete_2h_ativo: z.boolean(),
-  provider: z.enum(["console", "evolution", "meta", "twilio"]),
+  provider: z.enum(["console", "email"]),
   provider_url: z.string().max(500).optional().default(""),
   remetente: z.string().max(120).optional().default(""),
   provider_instancia: z.string().max(200).optional().default(""),
@@ -164,7 +164,7 @@ export const testarConexaoNotificacoes = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const cfg = await loadConfig();
-    const provider = pickProvider("WHATSAPP", cfg);
+    const provider = pickProvider("EMAIL", cfg);
     const r = await provider.test(cfg);
 
     const { data: existing } = await (supabaseAdmin as any)
@@ -207,7 +207,7 @@ export const dispararNotificacoesAgendamento = createServerFn({ method: "POST" }
       .eq("agendamento_id", data.agendamentoId)
       .in("status_envio", ["PENDENTE", "ERRO"])
 
-      .in("canal", ["WHATSAPP", "EMAIL"])
+      .in("canal", ["EMAIL"])
       .limit(20);
     if (error) throw new Error(error.message);
 

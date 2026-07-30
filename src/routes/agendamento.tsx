@@ -164,7 +164,7 @@ function AgendamentoPage() {
             user_id: user.id,
             nome: nome ?? user.email ?? "Cliente",
             email: user.email ?? null,
-            whatsapp: telefone || null,
+            telefone: telefone || null,
           })
           .select("id")
           .single();
@@ -173,11 +173,9 @@ function AgendamentoPage() {
       } else if (telefone) {
         await supabase
           .from("pacientes")
-          .update({ whatsapp: telefone })
+          .update({ telefone })
           .eq("id", paciente_id);
-
       }
-
 
       const { data: ag, error } = await supabase
         .from("agendamentos")
@@ -191,18 +189,19 @@ function AgendamentoPage() {
           status: "PENDENTE",
           forma_pagamento: forma,
           observacoes: obs || null,
+          valor: valor,
         })
         .select("id")
         .single();
 
-      if (error) throw error;
+      if (error || !ag) throw new Error(error?.message ?? "Falha ao criar solicitação");
       return ag.id as string;
     },
     onSuccess: (id) => {
       setCriado(id);
       setStep(5);
       toast.success("Solicitação enviada!");
-      // Dispara imediatamente os avisos externos (WhatsApp/e-mail) desta solicitação.
+      // Dispara imediatamente os avisos desta solicitação.
       dispararFn({ data: { agendamentoId: id } }).catch(() => {});
     },
     onError: (e: any) => toast.error(e.message ?? "Não foi possível agendar."),
@@ -399,7 +398,7 @@ function AgendamentoPage() {
               <div className="space-y-4">
                 <h2 className="text-lg font-semibold">Forma de pagamento e detalhes</h2>
                 <div className="space-y-2">
-                  <Label>WhatsApp para contato</Label>
+                  <Label>Telefone para contato</Label>
                   <Input
                     value={telefone}
                     onChange={(e) => setTelefone(e.target.value)}

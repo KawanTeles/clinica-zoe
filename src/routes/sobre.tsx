@@ -87,7 +87,7 @@ function SobrePage() {
             <div className="grid grid-cols-2 gap-3">
               {[
                 "Agenda 100% online",
-                "Confirmação por WhatsApp",
+                "Confirmação por E-mail",
                 "Profissionais qualificados",
                 "Ambiente sofisticado",
                 "Pagamento simplificado",

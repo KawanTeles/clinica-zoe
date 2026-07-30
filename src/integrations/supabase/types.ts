@@ -108,7 +108,6 @@ export type Database = {
           telefone: string | null
           texto_institucional: string | null
           updated_at: string
-          whatsapp: string | null
         }
         Insert: {
           created_at?: string
@@ -129,7 +128,6 @@ export type Database = {
           telefone?: string | null
           texto_institucional?: string | null
           updated_at?: string
-          whatsapp?: string | null
         }
         Update: {
           created_at?: string
@@ -150,7 +148,6 @@ export type Database = {
           telefone?: string | null
           texto_institucional?: string | null
           updated_at?: string
-          whatsapp?: string | null
         }
         Relationships: []
       }
@@ -423,7 +420,6 @@ export type Database = {
           telefone: string | null
           updated_at: string
           user_id: string | null
-          whatsapp: string | null
         }
         Insert: {
           created_at?: string
@@ -436,7 +432,6 @@ export type Database = {
           telefone?: string | null
           updated_at?: string
           user_id?: string | null
-          whatsapp?: string | null
         }
         Update: {
           created_at?: string
@@ -449,7 +444,6 @@ export type Database = {
           telefone?: string | null
           updated_at?: string
           user_id?: string | null
-          whatsapp?: string | null
         }
         Relationships: []
       }
@@ -468,7 +462,6 @@ export type Database = {
           removido_por: string | null
           telefone: string | null
           updated_at: string
-          whatsapp: string | null
         }
         Insert: {
           ativo?: boolean
@@ -484,7 +477,6 @@ export type Database = {
           removido_por?: string | null
           telefone?: string | null
           updated_at?: string
-          whatsapp?: string | null
         }
         Update: {
           ativo?: boolean
@@ -500,7 +492,6 @@ export type Database = {
           removido_por?: string | null
           telefone?: string | null
           updated_at?: string
-          whatsapp?: string | null
         }
         Relationships: []
       }
@@ -523,7 +514,6 @@ export type Database = {
           user_id: string | null
           valor_consulta_avista: number | null
           valor_consulta_cartao: number | null
-          whatsapp: string | null
         }
         Insert: {
           anos_experiencia?: number | null
@@ -543,7 +533,6 @@ export type Database = {
           user_id?: string | null
           valor_consulta_avista?: number | null
           valor_consulta_cartao?: number | null
-          whatsapp?: string | null
         }
         Update: {
           anos_experiencia?: number | null
@@ -563,7 +552,6 @@ export type Database = {
           user_id?: string | null
           valor_consulta_avista?: number | null
           valor_consulta_cartao?: number | null
-          whatsapp?: string | null
         }
         Relationships: [
           {
@@ -716,282 +704,6 @@ export type Database = {
         }
         Relationships: []
       }
-      whatsapp_evento_templates: {
-        Row: {
-          ativo: boolean
-          created_at: string
-          evento: string
-          id: string
-          language: string
-          template_name: string | null
-          updated_at: string
-          variaveis: Json
-        }
-        Insert: {
-          ativo?: boolean
-          created_at?: string
-          evento: string
-          id?: string
-          language?: string
-          template_name?: string | null
-          updated_at?: string
-          variaveis?: Json
-        }
-        Update: {
-          ativo?: boolean
-          created_at?: string
-          evento?: string
-          id?: string
-          language?: string
-          template_name?: string | null
-          updated_at?: string
-          variaveis?: Json
-        }
-        Relationships: []
-      }
-      whatsapp_message_logs: {
-        Row: {
-          accepted_at: string | null
-          agendamento_id: string | null
-          conversation_category: string | null
-          conversation_id: string | null
-          created_at: string
-          delivered_at: string | null
-          destinatario_telefone: string
-          duracao_ms: number | null
-          erro_codigo: string | null
-          erro_detalhe: string | null
-          evento: string | null
-          failed_at: string | null
-          id: string
-          mensagem: string | null
-          mensagem_recebida: string | null
-          message_status: string | null
-          paciente_nome: string | null
-          payload: Json | null
-          profissional_nome: string | null
-          read_at: string | null
-          sent_at: string | null
-          status_envio: string
-          template_name: string | null
-          ultimo_erro: string | null
-          wamid: string | null
-          webhook_payload: Json | null
-        }
-        Insert: {
-          accepted_at?: string | null
-          agendamento_id?: string | null
-          conversation_category?: string | null
-          conversation_id?: string | null
-          created_at?: string
-          delivered_at?: string | null
-          destinatario_telefone: string
-          duracao_ms?: number | null
-          erro_codigo?: string | null
-          erro_detalhe?: string | null
-          evento?: string | null
-          failed_at?: string | null
-          id?: string
-          mensagem?: string | null
-          mensagem_recebida?: string | null
-          message_status?: string | null
-          paciente_nome?: string | null
-          payload?: Json | null
-          profissional_nome?: string | null
-          read_at?: string | null
-          sent_at?: string | null
-          status_envio?: string
-          template_name?: string | null
-          ultimo_erro?: string | null
-          wamid?: string | null
-          webhook_payload?: Json | null
-        }
-        Update: {
-          accepted_at?: string | null
-          agendamento_id?: string | null
-          conversation_category?: string | null
-          conversation_id?: string | null
-          created_at?: string
-          delivered_at?: string | null
-          destinatario_telefone?: string
-          duracao_ms?: number | null
-          erro_codigo?: string | null
-          erro_detalhe?: string | null
-          evento?: string | null
-          failed_at?: string | null
-          id?: string
-          mensagem?: string | null
-          mensagem_recebida?: string | null
-          message_status?: string | null
-          paciente_nome?: string | null
-          payload?: Json | null
-          profissional_nome?: string | null
-          read_at?: string | null
-          sent_at?: string | null
-          status_envio?: string
-          template_name?: string | null
-          ultimo_erro?: string | null
-          wamid?: string | null
-          webhook_payload?: Json | null
-        }
-        Relationships: []
-      }
-      whatsapp_meta_config: {
-        Row: {
-          access_token: string | null
-          app_id: string | null
-          app_secret: string | null
-          business_account_id: string | null
-          created_at: string
-          graph_version: string
-          id: string
-          phone_number_id: string | null
-          updated_at: string
-          verify_token: string | null
-        }
-        Insert: {
-          access_token?: string | null
-          app_id?: string | null
-          app_secret?: string | null
-          business_account_id?: string | null
-          created_at?: string
-          graph_version?: string
-          id?: string
-          phone_number_id?: string | null
-          updated_at?: string
-          verify_token?: string | null
-        }
-        Update: {
-          access_token?: string | null
-          app_id?: string | null
-          app_secret?: string | null
-          business_account_id?: string | null
-          created_at?: string
-          graph_version?: string
-          id?: string
-          phone_number_id?: string | null
-          updated_at?: string
-          verify_token?: string | null
-        }
-        Relationships: []
-      }
-      whatsapp_queue: {
-        Row: {
-          created_at: string
-          destinatario: string
-          enviado_em: string | null
-          erro: string | null
-          id: string
-          mensagem: string
-          status: Database["public"]["Enums"]["wa_status"]
-          tentativas: number
-        }
-        Insert: {
-          created_at?: string
-          destinatario: string
-          enviado_em?: string | null
-          erro?: string | null
-          id?: string
-          mensagem: string
-          status?: Database["public"]["Enums"]["wa_status"]
-          tentativas?: number
-        }
-        Update: {
-          created_at?: string
-          destinatario?: string
-          enviado_em?: string | null
-          erro?: string | null
-          id?: string
-          mensagem?: string
-          status?: Database["public"]["Enums"]["wa_status"]
-          tentativas?: number
-        }
-        Relationships: []
-      }
-      whatsapp_sessions: {
-        Row: {
-          last_inbound_at: string
-          telefone: string
-          updated_at: string
-        }
-        Insert: {
-          last_inbound_at?: string
-          telefone: string
-          updated_at?: string
-        }
-        Update: {
-          last_inbound_at?: string
-          telefone?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      whatsapp_templates: {
-        Row: {
-          body_text: string
-          buttons: Json
-          category: string
-          created_at: string
-          footer_text: string | null
-          header_text: string | null
-          id: string
-          language: string
-          meta_created_at: string | null
-          meta_id: string | null
-          meta_updated_at: string | null
-          name: string
-          quality_rating: string | null
-          rejected_reason: string | null
-          status: string
-          synced_at: string | null
-          titulo_interno: string | null
-          updated_at: string
-          variaveis: Json
-        }
-        Insert: {
-          body_text?: string
-          buttons?: Json
-          category?: string
-          created_at?: string
-          footer_text?: string | null
-          header_text?: string | null
-          id?: string
-          language?: string
-          meta_created_at?: string | null
-          meta_id?: string | null
-          meta_updated_at?: string | null
-          name: string
-          quality_rating?: string | null
-          rejected_reason?: string | null
-          status?: string
-          synced_at?: string | null
-          titulo_interno?: string | null
-          updated_at?: string
-          variaveis?: Json
-        }
-        Update: {
-          body_text?: string
-          buttons?: Json
-          category?: string
-          created_at?: string
-          footer_text?: string | null
-          header_text?: string | null
-          id?: string
-          language?: string
-          meta_created_at?: string | null
-          meta_id?: string | null
-          meta_updated_at?: string | null
-          name?: string
-          quality_rating?: string | null
-          rejected_reason?: string | null
-          status?: string
-          synced_at?: string | null
-          titulo_interno?: string | null
-          updated_at?: string
-          variaveis?: Json
-        }
-        Relationships: []
-      }
     }
     Views: {
       profissionais_public: {
@@ -1084,7 +796,6 @@ export type Database = {
           hora_inicio: string
         }[]
       }
-      normalizar_whatsapp: { Args: { _valor: string }; Returns: string }
       notif_config: {
         Args: never
         Returns: {
@@ -1137,7 +848,7 @@ export type Database = {
         | "CARTAO_DEBITO"
         | "CARTAO_CREDITO"
         | "OUTRO"
-      notif_canal: "WHATSAPP" | "EMAIL" | "INTERNO"
+      notif_canal: "EMAIL" | "INTERNO"
       notif_evento:
         | "SOLICITACAO_NOVA"
         | "CONSULTA_APROVADA"
@@ -1157,7 +868,6 @@ export type Database = {
         | "LIDO"
         | "RESPONDIDO"
       profissional_status: "ATIVO" | "INATIVO"
-      wa_status: "PENDENTE" | "ENVIADO" | "FALHOU"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1302,7 +1012,7 @@ export const Constants = {
         "CARTAO_CREDITO",
         "OUTRO",
       ],
-      notif_canal: ["WHATSAPP", "EMAIL", "INTERNO"],
+      notif_canal: ["EMAIL", "INTERNO"],
       notif_evento: [
         "SOLICITACAO_NOVA",
         "CONSULTA_APROVADA",
@@ -1324,7 +1034,6 @@ export const Constants = {
         "RESPONDIDO",
       ],
       profissional_status: ["ATIVO", "INATIVO"],
-      wa_status: ["PENDENTE", "ENVIADO", "FALHOU"],
     },
   },
 } as const
