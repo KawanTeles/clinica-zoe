@@ -22,7 +22,7 @@ import {
 import { toast } from "sonner";
 import { dispararNotificacoesAgendamento } from "@/lib/notifications.functions";
 import { useServerFn } from "@tanstack/react-start";
-import { getWhatsAppUrl, formatPatientConfirmationMsg } from "@/lib/whatsapp-link";
+import { getWhatsAppUrl, formatPatientConfirmationMsg, openWhatsAppLink } from "@/lib/whatsapp-link";
 
 function valorLancamento(row: any) {
   const valorCongelado = row?.agendamento?.valor;
@@ -222,7 +222,7 @@ function Dashboard() {
                           variant="ghost"
                           size="sm"
                           className="h-8 text-xs text-emerald-600 hover:bg-emerald-500/10"
-                          onClick={() => window.open(getWhatsAppUrl(item.paciente.telefone), "_blank")}
+                          onClick={() => openWhatsAppLink(getWhatsAppUrl(item.paciente.telefone))}
                         >
                           <MessageSquare className="h-3.5 w-3.5" /> WhatsApp
                         </Button>

@@ -30,7 +30,7 @@ import {
   Stethoscope,
   MessageSquare,
 } from "lucide-react";
-import { getClinicWhatsAppNotificationUrl } from "@/lib/whatsapp-link";
+import { getClinicWhatsAppNotificationUrl, openWhatsAppLink } from "@/lib/whatsapp-link";
 import { cn } from "@/lib/utils";
 import { addMinutes, fmtHora, todayISO } from "@/lib/agenda-utils";
 
@@ -230,7 +230,7 @@ function AgendamentoPage() {
           data,
           horario: hora,
         });
-        window.open(url, "_blank");
+        openWhatsAppLink(url);
       } catch (e) {}
     },
     onError: (e: any) => toast.error(e.message ?? "Não foi possível agendar."),

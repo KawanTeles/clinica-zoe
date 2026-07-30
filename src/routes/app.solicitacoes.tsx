@@ -42,6 +42,7 @@ import { PersonAvatar } from "@/lib/avatar";
 import {
   formatPatientConfirmationMsg,
   getWhatsAppUrl,
+  openWhatsAppLink,
 } from "@/lib/whatsapp-link";
 
 export const Route = createFileRoute("/app/solicitacoes")({
@@ -265,7 +266,7 @@ function SolicitacoesPage() {
     return { pend, aprov, canc };
   }, [rows]);
 
-  const abrirWhatsAppPaciente = (a: any) => {
+  const enviarConfirmacaoWhatsApp = (a: any) => {
     const msg = formatPatientConfirmationMsg({
       pacienteNome: a.paciente?.nome ?? "Paciente",
       pacienteTelefone: a.paciente?.telefone ?? "",
@@ -275,12 +276,12 @@ function SolicitacoesPage() {
       horario: `${fmtHora(a.hora_inicio)} - ${fmtHora(a.hora_fim)}`,
     });
     const url = getWhatsAppUrl(a.paciente?.telefone, msg);
-    window.open(url, "_blank");
+    openWhatsAppLink(url);
   };
 
   const abrirWhatsAppContato = (telefone?: string | null) => {
     const url = getWhatsAppUrl(telefone);
-    window.open(url, "_blank");
+    openWhatsAppLink(url);
   };
 
   return (
@@ -455,7 +456,7 @@ function SolicitacoesPage() {
                           variant="default"
                           size="sm"
                           className="gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
-                          onClick={() => abrirWhatsAppPaciente(a)}
+                          onClick={() => enviarConfirmacaoWhatsApp(a)}
                         >
                           💬 Enviar confirmação
                         </Button>
@@ -572,7 +573,7 @@ function SolicitacoesPage() {
                 Fechar
               </Button>
               {detalhesItem.status === "APROVADO" && detalhesItem.paciente?.telefone && (
-                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => abrirWhatsAppPaciente(detalhesItem)}>
+                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => enviarConfirmacaoWhatsApp(detalhesItem)}>
                   💬 Enviar confirmação
                 </Button>
               )}

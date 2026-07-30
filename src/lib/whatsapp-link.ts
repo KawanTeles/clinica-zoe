@@ -10,14 +10,25 @@ export function sanitizePhone(phone?: string | null): string {
   return digits;
 }
 
-/** Gera a URL do WhatsApp Web / Api no formato universal wa.me */
+/**
+ * Gera a URL direta do WhatsApp Web (evita redirecionamento COOP api.whatsapp.com que gera ERR_BLOCKED_BY_RESPONSE).
+ */
 export function getWhatsAppUrl(phone?: string | null, message?: string): string {
   const cleanPhone = sanitizePhone(phone);
   const encodedMsg = message ? encodeURIComponent(message) : "";
   if (!cleanPhone) {
-    return `https://wa.me/?text=${encodedMsg}`;
+    return `https://web.whatsapp.com/send?text=${encodedMsg}`;
   }
-  return `https://wa.me/${cleanPhone}?text=${encodedMsg}`;
+  return `https://web.whatsapp.com/send?phone=${cleanPhone}&text=${encodedMsg}`;
+}
+
+/**
+ * Abre o link do WhatsApp com noopener,noreferrer para prevenir bloqueio de Cross-Origin-Opener-Policy (ERR_BLOCKED_BY_RESPONSE)
+ */
+export function openWhatsAppLink(url: string) {
+  if (typeof window !== "undefined") {
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
 }
 
 export type SolicitacaoWhatsAppInfo = {
