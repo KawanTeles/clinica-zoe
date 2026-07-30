@@ -457,7 +457,59 @@ function MetaWhatsAppAdminPage() {
               )}
             </CardContent>
           </Card>
+
+          {/* Homologação: usa imediatamente o token salvo, sem recompilar */}
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Diagnóstico e Homologação</CardTitle>
+              <CardDescription>
+                Consulta a Meta em tempo real com o token atualmente salvo. Ideal para validar um token temporário antes de migrar para o permanente.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button variant="outline" onClick={runDiagnostico} disabled={diagLoading} className="gap-2">
+                {diagLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Activity className="h-4 w-4" />}
+                Executar diagnóstico agora
+              </Button>
+
+              {diag && (
+                <div className="space-y-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant={diag.ok ? "default" : "destructive"}>
+                      {diag.ok ? "Token válido" : "Token inválido"}
+                    </Badge>
+                    <Badge variant="outline">HTTP {diag.httpStatus ?? "—"}</Badge>
+                    <Badge variant="outline">{diag.graphVersion ?? "—"}</Badge>
+                    <Badge variant="outline">{diag.duracaoMs} ms</Badge>
+                  </div>
+
+                  {diag.numero && (
+                    <p className="text-sm text-muted-foreground">
+                      Número: <strong>{diag.numero.display_phone_number}</strong> — {diag.numero.verified_name} (qualidade{" "}
+                      {diag.numero.quality_rating})
+                    </p>
+                  )}
+                  {diag.erro && <p className="text-sm text-destructive">{diag.erro}</p>}
+
+                  {diag.templates?.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {diag.templates.map((t: any) => (
+                        <Badge key={`${t.name}-${t.language}`} variant="secondary" className="font-normal">
+                          {t.name} · {t.language} · {t.status}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+
+                  <pre className="max-h-72 overflow-auto rounded-lg bg-muted p-3 text-[11px] leading-relaxed">
+                    {JSON.stringify(diag, null, 2)}
+                  </pre>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
+
 
         {/* TAB 2: CARD 4 - Envio de Teste de Texto */}
         <TabsContent value="mensagens">
