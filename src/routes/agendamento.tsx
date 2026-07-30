@@ -187,6 +187,7 @@ function AgendamentoPage() {
           hora_inicio: hora,
           hora_fim,
           status: "PENDENTE",
+          origem: "Site",
           forma_pagamento: forma,
           observacoes: obs || null,
           valor: valor,

@@ -16,6 +16,10 @@ export type Database = {
     Tables: {
       agendamentos: {
         Row: {
+          aprovado_em: string | null
+          aprovado_por: string | null
+          cancelado_em: string | null
+          cancelado_por: string | null
           cliente_user_id: string | null
           created_at: string
           data: string
@@ -23,7 +27,9 @@ export type Database = {
           hora_fim: string
           hora_inicio: string
           id: string
+          motivo_cancelamento: string | null
           observacoes: string | null
+          origem: string | null
           paciente_id: string | null
           profissional_id: string
           status: Database["public"]["Enums"]["agendamento_status"]
@@ -31,6 +37,10 @@ export type Database = {
           valor: number | null
         }
         Insert: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
+          cancelado_em?: string | null
+          cancelado_por?: string | null
           cliente_user_id?: string | null
           created_at?: string
           data: string
@@ -40,7 +50,9 @@ export type Database = {
           hora_fim: string
           hora_inicio: string
           id?: string
+          motivo_cancelamento?: string | null
           observacoes?: string | null
+          origem?: string | null
           paciente_id?: string | null
           profissional_id: string
           status?: Database["public"]["Enums"]["agendamento_status"]
@@ -48,6 +60,10 @@ export type Database = {
           valor?: number | null
         }
         Update: {
+          aprovado_em?: string | null
+          aprovado_por?: string | null
+          cancelado_em?: string | null
+          cancelado_por?: string | null
           cliente_user_id?: string | null
           created_at?: string
           data?: string
@@ -57,7 +73,9 @@ export type Database = {
           hora_fim?: string
           hora_inicio?: string
           id?: string
+          motivo_cancelamento?: string | null
           observacoes?: string | null
+          origem?: string | null
           paciente_id?: string | null
           profissional_id?: string
           status?: Database["public"]["Enums"]["agendamento_status"]
