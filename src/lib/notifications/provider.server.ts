@@ -78,7 +78,7 @@ class MetaCloudProvider implements MessageProvider {
       return { ok: false, error: "Informe token e Phone Number ID da Meta Cloud API." };
     }
     try {
-      const version = waConfig.graph_version || "v20.0";
+      const version = waConfig.graph_version || GRAPH_VERSION_DEFAULT;
       const resp = await fetch(`https://graph.facebook.com/${version}/${waConfig.phone_number_id}`, {
         headers: { Authorization: `Bearer ${waConfig.access_token}` },
       });
@@ -97,7 +97,7 @@ export const PROVIDER_IDS = providers.map((p) => p.id);
 
 export const DEFAULT_CONFIG: ProviderConfig = {
   provider: "meta",
-  provider_url: "https://graph.facebook.com/v20.0",
+  provider_url: "https://graph.facebook.com/v23.0",
   provider_token: null,
   remetente: null,
   provider_instancia: null,

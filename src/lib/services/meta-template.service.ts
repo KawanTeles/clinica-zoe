@@ -4,7 +4,7 @@ import type { MetaCloudConfig, MetaTemplate } from "@/lib/types/meta";
  * Service de Gerenciamento de Templates da Meta Cloud API
  */
 export async function fetchMetaTemplates(config: MetaCloudConfig): Promise<MetaTemplate[]> {
-  const version = config.graph_version || "v20.0";
+  const version = config.graph_version || "v23.0";
   const baseUrl = `https://graph.facebook.com/${version}`;
   const wabaId = config.business_account_id;
 
