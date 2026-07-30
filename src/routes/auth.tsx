@@ -71,7 +71,7 @@ function AuthPage() {
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
           É paciente?{" "}
-          <Link to="/cliente/login" className="font-medium text-primary hover:underline">
+          <Link to="/cliente/login" search={{ redirect: undefined }} className="font-medium text-primary hover:underline">
             Acessar Área do Paciente
           </Link>
         </p>
