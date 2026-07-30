@@ -153,6 +153,12 @@ export async function handleWebhookPost(request: Request): Promise<Response> {
       if (ev.type === "message" && ev.fromPhone && ev.text) {
         console.log(`[whatsapp:webhook] Mensagem recebida de ${ev.fromPhone}: "${ev.text}" (wamid: ${ev.wamid})`);
 
+        // Abre/renova a janela de atendimento de 24h da Meta para este número.
+        const { registerInbound } = await import("./cloudApi");
+        await registerInbound(ev.fromPhone);
+
+
+
         // Chama RPC para interpretar resposta do profissional (CONFIRMAR, RECUSAR, REMARCAR)
         const { data: rpcRes, error: rpcErr } = await (supabaseAdmin as any).rpc(
           "processar_resposta_meta_profissional",
