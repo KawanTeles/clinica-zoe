@@ -32,7 +32,7 @@ export const Route = createFileRoute("/api/public/test-whatsapp")({
         };
 
         if (!cfg.access_token || !cfg.phone_number_id) {
-          return Response.json({ ok: false, error: "Credenciais ausentes neste ambiente.", diag }, { status: 500 });
+          return Response.json({ ok: false, error: "Credenciais ausentes neste ambiente.", diag });
         }
 
         const t0 = Date.now();
@@ -103,7 +103,7 @@ export const Route = createFileRoute("/api/public/test-whatsapp")({
             erro: result.error ?? null,
             erroDetalhado: result.parsedError ?? null,
           },
-          { status: result.ok ? 200 : 502 },
+          { status: 200 },
         );
       },
     },
