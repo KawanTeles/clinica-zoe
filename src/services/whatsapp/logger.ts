@@ -13,7 +13,9 @@ export interface WhatsAppLogPayload {
   templateName?: string;
   payloadEnviado?: any;
   respostaMeta?: any;
+  responseHeaders?: Record<string, string>;
   httpStatus?: number;
+
   duracaoMs: number;
   statusEnvio: "PENDENTE" | "ENVIANDO" | "ENVIADA" | "ENTREGUE" | "LIDO" | "RECEBIDO" | "ERRO" | "CANCELADA";
   ultimoErro?: string;
