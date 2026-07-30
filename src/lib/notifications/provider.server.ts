@@ -61,17 +61,7 @@ class MetaCloudProvider implements MessageProvider {
     const textContent = msg.title && !msg.body.startsWith(msg.title) ? `${msg.title}\n\n${msg.body}` : msg.body;
     const agendamentoId = (msg.metadata?.agendamento_id as string) || undefined;
 
-    const result = await sendRawCloudApiMessage(
-      msg.to,
-      {
-        type: "text",
-        text: {
-          preview_url: true,
-          body: textContent,
-        },
-      },
-      { agendamentoId }
-    );
+    const result = await sendSessionAwareText(msg.to, textContent, { agendamentoId });
 
     return {
       ok: result.ok,
@@ -80,6 +70,7 @@ class MetaCloudProvider implements MessageProvider {
       raw: result.raw,
     };
   }
+
 
   async test(_cfg: ProviderConfig): Promise<DeliveryResult> {
     const waConfig = await loadWhatsAppConfig();
