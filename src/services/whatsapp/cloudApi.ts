@@ -144,6 +144,7 @@ export async function sendRawCloudApiMessage(
     pacienteNome?: string;
     profissionalNome?: string;
     templateName?: string;
+    evento?: string;
   }
 ): Promise<CloudApiSendResult> {
   const config = await loadWhatsAppConfig();
@@ -168,6 +169,7 @@ export async function sendRawCloudApiMessage(
     };
 
     await logWhatsAppExecution({
+      evento: options?.evento,
       agendamentoId: options?.agendamentoId,
       pacienteNome: options?.pacienteNome,
       profissionalNome: options?.profissionalNome,
@@ -200,6 +202,7 @@ export async function sendRawCloudApiMessage(
     const parsedErr = parseMetaApiError({ error: { message: credError, code: 401 } }, 401);
 
     await logWhatsAppExecution({
+      evento: options?.evento,
       agendamentoId: options?.agendamentoId,
       pacienteNome: options?.pacienteNome,
       profissionalNome: options?.profissionalNome,
@@ -305,6 +308,7 @@ export async function sendRawCloudApiMessage(
     );
 
     await logWhatsAppExecution({
+      evento: options?.evento,
       agendamentoId: options?.agendamentoId,
       pacienteNome: options?.pacienteNome,
       profissionalNome: options?.profissionalNome,
@@ -317,6 +321,11 @@ export async function sendRawCloudApiMessage(
       httpStatus: 200,
       duracaoMs: totalDuration,
       statusEnvio: "ENVIADA",
+      messageStatus: messageStatus ?? "accepted",
+      conversationId: lastRaw?.messages?.[0]?.conversation?.id ?? lastRaw?.conversation?.id ?? null,
+      conversationCategory:
+        lastRaw?.messages?.[0]?.conversation?.origin?.type ?? lastRaw?.conversation?.origin?.type ?? null,
+      acceptedAt: new Date().toISOString(),
       retryCount: retryResult.totalAttempts - 1,
     });
 
@@ -341,6 +350,7 @@ export async function sendRawCloudApiMessage(
   );
 
   await logWhatsAppExecution({
+    evento: options?.evento,
     agendamentoId: options?.agendamentoId,
     pacienteNome: options?.pacienteNome,
     profissionalNome: options?.profissionalNome,
@@ -353,6 +363,10 @@ export async function sendRawCloudApiMessage(
     httpStatus: Number(parsedErr.code) || 500,
     duracaoMs: totalDuration,
     statusEnvio: "ERRO",
+    messageStatus: "failed",
+    erroCodigo: String(parsedErr.code ?? ""),
+    erroDetalhe: parsedErr.technicalDiagnostic,
+    failedAt: new Date().toISOString(),
     ultimoErro: parsedErr.technicalDiagnostic,
     retryCount: retryResult.totalAttempts - 1,
     actionRequired: parsedErr.actionRequired,
@@ -404,6 +418,7 @@ export async function sendSessionAwareText(
       "Janela de 24h fechada para este número e nenhum template aprovado configurado (WHATSAPP_FALLBACK_TEMPLATE). A Meta não entrega mensagens de texto livre fora da janela de atendimento.";
     console.error(`[whatsapp:cloudApi] ${err} | Número: ${phone}`);
     await logWhatsAppExecution({
+      evento: options?.evento,
       agendamentoId: options?.agendamentoId,
       pacienteNome: options?.pacienteNome,
       profissionalNome: options?.profissionalNome,
