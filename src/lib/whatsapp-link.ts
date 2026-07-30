@@ -40,11 +40,14 @@ export type SolicitacaoWhatsAppInfo = {
   especialidadeNome: string;
   data: string;
   horario: string;
+  formaPagamento?: string;
 };
 
-/** Formata mensagem da nova solicitação para o WhatsApp da Clínica */
+/** Formata mensagem da nova solicitação enviada pelo paciente para o WhatsApp da Clínica */
 export function formatClinicNotificationMsg(info: SolicitacaoWhatsAppInfo): string {
   const dataFmt = formatDateBR(info.data);
+  const formaStr = info.formaPagamento ? `\n\n*Forma de Pagamento:*\n${info.formaPagamento}` : "";
+
   return `*NOVA SOLICITAÇÃO DE AGENDAMENTO*
 
 *Paciente:*
@@ -63,9 +66,7 @@ ${info.especialidadeNome}
 ${dataFmt}
 
 *Horário:*
-${info.horario}
-
-Acesse o painel para confirmar ou cancelar.`;
+${info.horario}${formaStr}`;
 }
 
 /** Gera URL do WhatsApp com a notificação pronta para o número oficial da clínica (5582998343617) */
@@ -77,13 +78,15 @@ export function getClinicWhatsAppNotificationUrl(info: SolicitacaoWhatsAppInfo):
 /** Formata mensagem de confirmação de consulta para o paciente */
 export function formatPatientConfirmationMsg(info: SolicitacaoWhatsAppInfo): string {
   const dataFmt = formatDateBR(info.data);
+  const formaStr = info.formaPagamento ? `\n*Forma de Pagamento:* ${info.formaPagamento}` : "";
+
   return `Olá, ${info.pacienteNome}!
 
 Sua consulta foi confirmada.
 
 *Data:* ${dataFmt}
 *Horário:* ${info.horario}
-*Profissional:* ${info.profissionalNome}
+*Profissional:* ${info.profissionalNome}${formaStr}
 
 Em caso de dúvidas estamos à disposição.
 

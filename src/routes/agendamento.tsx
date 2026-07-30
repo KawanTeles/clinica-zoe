@@ -229,6 +229,7 @@ function AgendamentoPage() {
           especialidadeNome: (profissional?.especialidade as any)?.nome ?? "Consulta",
           data,
           horario: hora,
+          formaPagamento: FORMAS.find((f) => f.value === forma)?.label ?? forma,
         });
         openWhatsAppLink(url);
       } catch (e) {}
@@ -510,6 +511,7 @@ function AgendamentoPage() {
                       especialidadeNome: (profissional?.especialidade as any)?.nome ?? "Consulta",
                       data,
                       horario: hora,
+                      formaPagamento: FORMAS.find((f) => f.value === forma)?.label ?? forma,
                     })}
                     target="_blank"
                     rel="noopener noreferrer"
