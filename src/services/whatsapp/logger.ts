@@ -6,6 +6,7 @@
 
 export interface WhatsAppLogPayload {
   agendamentoId?: string;
+  evento?: string;
   pacienteNome?: string;
   profissionalNome?: string;
   destinatarioTelefone: string;
@@ -18,6 +19,13 @@ export interface WhatsAppLogPayload {
 
   duracaoMs: number;
   statusEnvio: "PENDENTE" | "ENVIANDO" | "ENVIADA" | "ENTREGUE" | "LIDO" | "RECEBIDO" | "ERRO" | "CANCELADA";
+  messageStatus?: string;
+  conversationId?: string | null;
+  conversationCategory?: string | null;
+  erroCodigo?: string;
+  erroDetalhe?: string;
+  acceptedAt?: string;
+  failedAt?: string;
   ultimoErro?: string;
   stackTrace?: string;
   retryCount?: number;
@@ -31,7 +39,7 @@ export async function logWhatsAppExecution(logData: WhatsAppLogPayload): Promise
   const timestamp = new Date().toISOString();
   const logPrefix = `[whatsapp:logger][${timestamp}]`;
 
-  console.log(`${logPrefix} Target: ${logData.destinatarioTelefone} | Status: ${logData.statusEnvio} | HTTP ${logData.httpStatus ?? 0} | Latency: ${logData.duracaoMs}ms | Retry: ${logData.retryCount ?? 0}`);
+  console.log(`${logPrefix} Target: ${logData.destinatarioTelefone} | Evento: ${logData.evento ?? "-"} | Status: ${logData.statusEnvio}/${logData.messageStatus ?? "-"} | HTTP ${logData.httpStatus ?? 0} | Latency: ${logData.duracaoMs}ms | Retry: ${logData.retryCount ?? 0}`);
   if (logData.pacienteNome) console.log(`${logPrefix} Paciente: ${logData.pacienteNome}`);
   if (logData.profissionalNome) console.log(`${logPrefix} Profissional: ${logData.profissionalNome}`);
   if (logData.ultimoErro) console.error(`${logPrefix} ERRO: ${logData.ultimoErro}`);
@@ -46,12 +54,20 @@ export async function logWhatsAppExecution(logData: WhatsAppLogPayload): Promise
 
     const logRecord = {
       agendamento_id: logData.agendamentoId || null,
+      evento: logData.evento || null,
       destinatario_telefone: logData.destinatarioTelefone,
       paciente_nome: logData.pacienteNome || null,
       profissional_nome: logData.profissionalNome || null,
       mensagem: logData.mensagem,
       template_name: logData.templateName || "text",
       status_envio: logData.statusEnvio,
+      message_status: logData.messageStatus || null,
+      conversation_id: logData.conversationId || null,
+      conversation_category: logData.conversationCategory || null,
+      erro_codigo: logData.erroCodigo || null,
+      erro_detalhe: logData.erroDetalhe || null,
+      accepted_at: logData.acceptedAt || null,
+      failed_at: logData.failedAt || null,
       wamid,
       duracao_ms: logData.duracaoMs,
       ultimo_erro: logData.ultimoErro || null,
