@@ -136,6 +136,21 @@ function Dashboard() {
       qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
       qc.invalidateQueries({ queryKey: ["solicitacoes"] });
       qc.invalidateQueries({ queryKey: ["agenda"] });
+
+      if (item.paciente?.telefone) {
+        try {
+          const msg = formatPatientConfirmationMsg({
+            pacienteNome: item.paciente?.nome ?? "Paciente",
+            pacienteTelefone: item.paciente?.telefone ?? "",
+            profissionalNome: item.profissional?.nome ?? "Profissional",
+            especialidadeNome: item.profissional?.especialidade?.nome ?? "Consulta",
+            data: item.data,
+            horario: `${String(item.hora_inicio).slice(0, 5)} - ${String(item.hora_fim).slice(0, 5)}`,
+          });
+          const url = getWhatsAppUrl(item.paciente.telefone, msg);
+          openWhatsAppLink(url);
+        } catch (e) {}
+      }
     },
     onError: (e: any) => toast.error(e?.message ?? "Falha ao aprovar"),
   });

@@ -198,6 +198,13 @@ function SolicitacoesPage() {
       qc.invalidateQueries({ queryKey: ["solicitacoes"] });
       qc.invalidateQueries({ queryKey: ["agenda"] });
       qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
+
+      // Abre automaticamente o WhatsApp com a mensagem de confirmação para o paciente
+      if (agendamento.paciente?.telefone) {
+        try {
+          enviarConfirmacaoWhatsApp(agendamento);
+        } catch (e) {}
+      }
     },
     onError: (e: any) => toast.error(e?.message ?? "Falha ao confirmar consulta"),
   });
