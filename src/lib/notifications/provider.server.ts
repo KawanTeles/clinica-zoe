@@ -4,7 +4,7 @@
  * Exclusively uses Meta WhatsApp Cloud API for WhatsApp messaging.
  */
 
-import { sendRawCloudApiMessage, loadWhatsAppConfig } from "@/services/whatsapp/cloudApi";
+import { sendSessionAwareText, loadWhatsAppConfig, GRAPH_VERSION_DEFAULT } from "@/services/whatsapp/cloudApi";
 
 export type OutboundChannel = "WHATSAPP" | "EMAIL";
 
