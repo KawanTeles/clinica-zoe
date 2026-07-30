@@ -1,6 +1,6 @@
 export const CLINIC_WHATSAPP_NUMBER = "5582998343617";
 
-/** Sanitiza telefone para o formato numérico do WhatsApp Brasil (ex: 5511999999999) */
+/** Sanitiza telefone para o formato numérico do WhatsApp Brasil (ex: 5582998343617) */
 export function sanitizePhone(phone?: string | null): string {
   if (!phone) return "";
   const digits = phone.replace(/\D/g, "");
@@ -10,12 +10,12 @@ export function sanitizePhone(phone?: string | null): string {
   return digits;
 }
 
-/** Gera a URL do WhatsApp Web / Api */
+/** Gera a URL do WhatsApp Web / Api no formato universal wa.me */
 export function getWhatsAppUrl(phone?: string | null, message?: string): string {
   const cleanPhone = sanitizePhone(phone);
   const encodedMsg = message ? encodeURIComponent(message) : "";
   if (!cleanPhone) {
-    return `https://api.whatsapp.com/send?text=${encodedMsg}`;
+    return `https://wa.me/?text=${encodedMsg}`;
   }
   return `https://wa.me/${cleanPhone}?text=${encodedMsg}`;
 }
@@ -32,29 +32,27 @@ export type SolicitacaoWhatsAppInfo = {
 /** Formata mensagem da nova solicitação para o WhatsApp da Clínica */
 export function formatClinicNotificationMsg(info: SolicitacaoWhatsAppInfo): string {
   const dataFmt = formatDateBR(info.data);
-  return `━━━━━━━━━━━━━━━━━━
-🔔 NOVA SOLICITAÇÃO DE AGENDAMENTO
+  return `*NOVA SOLICITAÇÃO DE AGENDAMENTO*
 
-👤 Paciente:
+*Paciente:*
 ${info.pacienteNome}
 
-📱 Telefone:
+*Telefone:*
 ${info.pacienteTelefone || "Não informado"}
 
-👨‍⚕️ Profissional:
+*Profissional:*
 ${info.profissionalNome}
 
-🩺 Especialidade:
+*Especialidade:*
 ${info.especialidadeNome}
 
-📅 Data:
+*Data:*
 ${dataFmt}
 
-🕒 Horário:
+*Horário:*
 ${info.horario}
 
-Acesse o painel para confirmar ou cancelar.
-━━━━━━━━━━━━━━━━━━`;
+Acesse o painel para confirmar ou cancelar.`;
 }
 
 /** Gera URL do WhatsApp com a notificação pronta para o número oficial da clínica (82 998343617) */
@@ -70,14 +68,9 @@ export function formatPatientConfirmationMsg(info: SolicitacaoWhatsAppInfo): str
 
 Sua consulta foi confirmada.
 
-📅 Data:
-${dataFmt}
-
-🕒 Horário:
-${info.horario}
-
-👨‍⚕️ Profissional:
-${info.profissionalNome}
+*Data:* ${dataFmt}
+*Horário:* ${info.horario}
+*Profissional:* ${info.profissionalNome}
 
 Em caso de dúvidas estamos à disposição.
 
