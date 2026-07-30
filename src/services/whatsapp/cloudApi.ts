@@ -396,7 +396,7 @@ export async function sendRawCloudApiMessage(
 export async function sendSessionAwareText(
   to: string,
   text: string,
-  options?: { agendamentoId?: string; pacienteNome?: string; profissionalNome?: string }
+  options?: { agendamentoId?: string; pacienteNome?: string; profissionalNome?: string; evento?: string }
 ): Promise<CloudApiSendResult> {
   const validation = validateAndFormatPhone(to);
   const phone = validation.valid ? validation.formattedPhone : to;
