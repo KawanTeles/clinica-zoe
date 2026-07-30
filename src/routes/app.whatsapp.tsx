@@ -9,6 +9,11 @@ import { useMetaMessages } from "@/hooks/useMetaMessages";
 import { useMetaTemplates } from "@/hooks/useMetaTemplates";
 import { saveMetaConfig, diagnosticarMeta } from "@/lib/meta.functions";
 import { useServerFn } from "@tanstack/react-start";
+import { TemplatesTab } from "@/components/whatsapp/TemplatesTab";
+import { EventosTab } from "@/components/whatsapp/EventosTab";
+import { DiagnosticoPanel } from "@/components/whatsapp/DiagnosticoPanel";
+import { EntregaLogsTab } from "@/components/whatsapp/EntregaLogsTab";
+
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
