@@ -20,7 +20,7 @@ export const Route = createFileRoute("/cliente/login")({
   head: () => ({
     meta: [
       { title: "Área do Paciente — Clínica" },
-      { name: "description", content: "Acesse sua área do paciente na Clínica: consultas, notificações e mais." },
+      { name: "description", content: "Acesse sua área do paciente na Clínica: consultas e mais." },
       { property: "og:title", content: "Área do Paciente — Clínica" },
       { property: "og:description", content: "Entre na sua área de paciente da Clínica." },
       { name: "robots", content: "noindex" },

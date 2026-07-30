@@ -1,8 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { dispararNotificacoesAgendamento } from "@/lib/notifications.functions";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
@@ -148,8 +146,6 @@ function SolicitacoesPage() {
     enabled: !isProfissional || !!profId || filtroStatus === "TODOS",
   });
 
-  const dispararFn = useServerFn(dispararNotificacoesAgendamento);
-
   // Confirmar solicitação (verificando duplo agendamento)
   const aprovarMut = useMutation({
     mutationFn: async (agendamento: any) => {
@@ -194,7 +190,6 @@ function SolicitacoesPage() {
     },
     onSuccess: (_, agendamento) => {
       toast.success("Consulta confirmada e adicionada à agenda!");
-      dispararFn({ data: { agendamentoId: agendamento.id } }).catch(() => {});
       qc.invalidateQueries({ queryKey: ["solicitacoes"] });
       qc.invalidateQueries({ queryKey: ["agenda"] });
       qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
@@ -238,7 +233,6 @@ function SolicitacoesPage() {
     },
     onSuccess: (_, vars) => {
       toast.success("Solicitação cancelada com sucesso.");
-      dispararFn({ data: { agendamentoId: vars.id } }).catch(() => {});
       setCancelarItem(null);
       setMotivoCancelamento("");
       qc.invalidateQueries({ queryKey: ["solicitacoes"] });

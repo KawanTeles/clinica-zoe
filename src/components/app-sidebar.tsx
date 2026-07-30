@@ -7,12 +7,10 @@ import {
   DollarSign,
   UserCog,
   Settings,
-  Bell,
   ClipboardList,
   UserCircle2,
   ShieldCheck,
   Sparkles,
-  Megaphone,
 } from "lucide-react";
 import {
   Sidebar,
@@ -46,8 +44,6 @@ const items: Item[] = [
   { title: "Pacientes", url: "/app/pacientes", icon: Users, roles: ["ADMIN", "RECEPCIONISTA"] },
   { title: "Financeiro", url: "/app/financeiro", icon: DollarSign, roles: ["ADMIN", "PROFISSIONAL"], badge: "financeiro", badgeTone: "warning" },
   { title: "Profissionais", url: "/app/profissionais", icon: Stethoscope, roles: ["ADMIN"] },
-  { title: "Marketing", url: "/app/marketing", icon: Megaphone, roles: ["ADMIN", "RECEPCIONISTA"] },
-  { title: "Notificações", url: "/app/notificacoes", icon: Bell, roles: ["ADMIN", "RECEPCIONISTA", "PROFISSIONAL"], badge: "notificacoes", badgeTone: "danger" },
   { title: "Usuários", url: "/app/usuarios", icon: UserCog, roles: ["ADMIN"] },
   { title: "Minha Agenda", url: "/app/minha-agenda", icon: CalendarDays, roles: ["PROFISSIONAL"], badge: "agenda", badgeTone: "primary" },
   { title: "Meus Pacientes", url: "/app/meus-pacientes", icon: Users, roles: ["PROFISSIONAL"] },

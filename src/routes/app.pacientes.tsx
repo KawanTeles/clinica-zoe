@@ -20,7 +20,6 @@ import {
 import { Plus, Loader2, Users } from "lucide-react";
 import { AvatarUploader } from "@/components/media/AvatarUploader";
 import { PersonAvatar } from "@/lib/avatar";
-import { HistoricoNotificacoesDialog } from "@/components/notificacoes/HistoricoNotificacoesDialog";
 
 
 export const Route = createFileRoute("/app/pacientes")({
@@ -96,7 +95,6 @@ function PacientesPage() {
                 {p.telefone && <p>Tel.: {p.telefone}</p>}
                 {p.data_nascimento && <p>Nasc.: {new Date(p.data_nascimento).toLocaleDateString("pt-BR")}</p>}
                 <EditarContatoPacienteDialog id={p.id} nome={p.nome} telefone={p.telefone} />
-                <HistoricoNotificacoesDialog nome={p.nome} pacienteId={p.id} />
                 <FotoPacienteDialog id={p.id} nome={p.nome} fotoUrl={p.foto_url} />
               </CardContent>
             </Card>

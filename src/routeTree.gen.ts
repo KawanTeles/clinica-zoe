@@ -25,18 +25,15 @@ import { Route as AppAgendaRouteImport } from './routes/app.agenda'
 import { Route as AppConfiguracoesRouteImport } from './routes/app.configuracoes'
 import { Route as AppContaRouteImport } from './routes/app.conta'
 import { Route as AppFinanceiroRouteImport } from './routes/app.financeiro'
-import { Route as AppMarketingRouteImport } from './routes/app.marketing'
 import { Route as AppMeuPerfilRouteImport } from './routes/app.meu-perfil'
 import { Route as AppMeusPacientesRouteImport } from './routes/app.meus-pacientes'
 import { Route as AppMinhaAgendaRouteImport } from './routes/app.minha-agenda'
-import { Route as AppNotificacoesRouteImport } from './routes/app.notificacoes'
 import { Route as AppPacientesRouteImport } from './routes/app.pacientes'
 import { Route as AppProfissionaisRouteImport } from './routes/app.profissionais'
 import { Route as AppSolicitacoesRouteImport } from './routes/app.solicitacoes'
 import { Route as AppUsuariosRouteImport } from './routes/app.usuarios'
 import { Route as ClienteIndexRouteImport } from './routes/cliente.index'
 import { Route as ClienteLoginRouteImport } from './routes/cliente.login'
-import { Route as ApiPublicHooksNotificacoesRouteImport } from './routes/api/public/hooks/notificacoes'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -118,11 +115,6 @@ const AppFinanceiroRoute = AppFinanceiroRouteImport.update({
   path: '/financeiro',
   getParentRoute: () => AppRoute,
 } as any)
-const AppMarketingRoute = AppMarketingRouteImport.update({
-  id: '/marketing',
-  path: '/marketing',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppMeuPerfilRoute = AppMeuPerfilRouteImport.update({
   id: '/meu-perfil',
   path: '/meu-perfil',
@@ -136,11 +128,6 @@ const AppMeusPacientesRoute = AppMeusPacientesRouteImport.update({
 const AppMinhaAgendaRoute = AppMinhaAgendaRouteImport.update({
   id: '/minha-agenda',
   path: '/minha-agenda',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppNotificacoesRoute = AppNotificacoesRouteImport.update({
-  id: '/notificacoes',
-  path: '/notificacoes',
   getParentRoute: () => AppRoute,
 } as any)
 const AppPacientesRoute = AppPacientesRouteImport.update({
@@ -173,12 +160,6 @@ const ClienteLoginRoute = ClienteLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => ClienteRoute,
 } as any)
-const ApiPublicHooksNotificacoesRoute =
-  ApiPublicHooksNotificacoesRouteImport.update({
-    id: '/api/public/hooks/notificacoes',
-    path: '/api/public/hooks/notificacoes',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -196,11 +177,9 @@ export interface FileRoutesByFullPath {
   '/app/configuracoes': typeof AppConfiguracoesRoute
   '/app/conta': typeof AppContaRoute
   '/app/financeiro': typeof AppFinanceiroRoute
-  '/app/marketing': typeof AppMarketingRoute
   '/app/meu-perfil': typeof AppMeuPerfilRoute
   '/app/meus-pacientes': typeof AppMeusPacientesRoute
   '/app/minha-agenda': typeof AppMinhaAgendaRoute
-  '/app/notificacoes': typeof AppNotificacoesRoute
   '/app/pacientes': typeof AppPacientesRoute
   '/app/profissionais': typeof AppProfissionaisRoute
   '/app/solicitacoes': typeof AppSolicitacoesRoute
@@ -208,7 +187,6 @@ export interface FileRoutesByFullPath {
   '/cliente/login': typeof ClienteLoginRoute
   '/app/': typeof AppIndexRoute
   '/cliente/': typeof ClienteIndexRoute
-  '/api/public/hooks/notificacoes': typeof ApiPublicHooksNotificacoesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -224,11 +202,9 @@ export interface FileRoutesByTo {
   '/app/configuracoes': typeof AppConfiguracoesRoute
   '/app/conta': typeof AppContaRoute
   '/app/financeiro': typeof AppFinanceiroRoute
-  '/app/marketing': typeof AppMarketingRoute
   '/app/meu-perfil': typeof AppMeuPerfilRoute
   '/app/meus-pacientes': typeof AppMeusPacientesRoute
   '/app/minha-agenda': typeof AppMinhaAgendaRoute
-  '/app/notificacoes': typeof AppNotificacoesRoute
   '/app/pacientes': typeof AppPacientesRoute
   '/app/profissionais': typeof AppProfissionaisRoute
   '/app/solicitacoes': typeof AppSolicitacoesRoute
@@ -236,7 +212,6 @@ export interface FileRoutesByTo {
   '/cliente/login': typeof ClienteLoginRoute
   '/app': typeof AppIndexRoute
   '/cliente': typeof ClienteIndexRoute
-  '/api/public/hooks/notificacoes': typeof ApiPublicHooksNotificacoesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -255,11 +230,9 @@ export interface FileRoutesById {
   '/app/configuracoes': typeof AppConfiguracoesRoute
   '/app/conta': typeof AppContaRoute
   '/app/financeiro': typeof AppFinanceiroRoute
-  '/app/marketing': typeof AppMarketingRoute
   '/app/meu-perfil': typeof AppMeuPerfilRoute
   '/app/meus-pacientes': typeof AppMeusPacientesRoute
   '/app/minha-agenda': typeof AppMinhaAgendaRoute
-  '/app/notificacoes': typeof AppNotificacoesRoute
   '/app/pacientes': typeof AppPacientesRoute
   '/app/profissionais': typeof AppProfissionaisRoute
   '/app/solicitacoes': typeof AppSolicitacoesRoute
@@ -267,7 +240,6 @@ export interface FileRoutesById {
   '/cliente/login': typeof ClienteLoginRoute
   '/app/': typeof AppIndexRoute
   '/cliente/': typeof ClienteIndexRoute
-  '/api/public/hooks/notificacoes': typeof ApiPublicHooksNotificacoesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -287,11 +259,9 @@ export interface FileRouteTypes {
     | '/app/configuracoes'
     | '/app/conta'
     | '/app/financeiro'
-    | '/app/marketing'
     | '/app/meu-perfil'
     | '/app/meus-pacientes'
     | '/app/minha-agenda'
-    | '/app/notificacoes'
     | '/app/pacientes'
     | '/app/profissionais'
     | '/app/solicitacoes'
@@ -299,7 +269,6 @@ export interface FileRouteTypes {
     | '/cliente/login'
     | '/app/'
     | '/cliente/'
-    | '/api/public/hooks/notificacoes'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -315,11 +284,9 @@ export interface FileRouteTypes {
     | '/app/configuracoes'
     | '/app/conta'
     | '/app/financeiro'
-    | '/app/marketing'
     | '/app/meu-perfil'
     | '/app/meus-pacientes'
     | '/app/minha-agenda'
-    | '/app/notificacoes'
     | '/app/pacientes'
     | '/app/profissionais'
     | '/app/solicitacoes'
@@ -327,7 +294,6 @@ export interface FileRouteTypes {
     | '/cliente/login'
     | '/app'
     | '/cliente'
-    | '/api/public/hooks/notificacoes'
   id:
     | '__root__'
     | '/'
@@ -345,11 +311,9 @@ export interface FileRouteTypes {
     | '/app/configuracoes'
     | '/app/conta'
     | '/app/financeiro'
-    | '/app/marketing'
     | '/app/meu-perfil'
     | '/app/meus-pacientes'
     | '/app/minha-agenda'
-    | '/app/notificacoes'
     | '/app/pacientes'
     | '/app/profissionais'
     | '/app/solicitacoes'
@@ -357,7 +321,6 @@ export interface FileRouteTypes {
     | '/cliente/login'
     | '/app/'
     | '/cliente/'
-    | '/api/public/hooks/notificacoes'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -372,7 +335,6 @@ export interface RootRouteChildren {
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SobreRoute: typeof SobreRoute
-  ApiPublicHooksNotificacoesRoute: typeof ApiPublicHooksNotificacoesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -489,13 +451,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFinanceiroRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/marketing': {
-      id: '/app/marketing'
-      path: '/marketing'
-      fullPath: '/app/marketing'
-      preLoaderRoute: typeof AppMarketingRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/meu-perfil': {
       id: '/app/meu-perfil'
       path: '/meu-perfil'
@@ -515,13 +470,6 @@ declare module '@tanstack/react-router' {
       path: '/minha-agenda'
       fullPath: '/app/minha-agenda'
       preLoaderRoute: typeof AppMinhaAgendaRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/notificacoes': {
-      id: '/app/notificacoes'
-      path: '/notificacoes'
-      fullPath: '/app/notificacoes'
-      preLoaderRoute: typeof AppNotificacoesRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/pacientes': {
@@ -566,13 +514,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClienteLoginRouteImport
       parentRoute: typeof ClienteRoute
     }
-    '/api/public/hooks/notificacoes': {
-      id: '/api/public/hooks/notificacoes'
-      path: '/api/public/hooks/notificacoes'
-      fullPath: '/api/public/hooks/notificacoes'
-      preLoaderRoute: typeof ApiPublicHooksNotificacoesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -581,11 +522,9 @@ interface AppRouteChildren {
   AppConfiguracoesRoute: typeof AppConfiguracoesRoute
   AppContaRoute: typeof AppContaRoute
   AppFinanceiroRoute: typeof AppFinanceiroRoute
-  AppMarketingRoute: typeof AppMarketingRoute
   AppMeuPerfilRoute: typeof AppMeuPerfilRoute
   AppMeusPacientesRoute: typeof AppMeusPacientesRoute
   AppMinhaAgendaRoute: typeof AppMinhaAgendaRoute
-  AppNotificacoesRoute: typeof AppNotificacoesRoute
   AppPacientesRoute: typeof AppPacientesRoute
   AppProfissionaisRoute: typeof AppProfissionaisRoute
   AppSolicitacoesRoute: typeof AppSolicitacoesRoute
@@ -598,11 +537,9 @@ const AppRouteChildren: AppRouteChildren = {
   AppConfiguracoesRoute: AppConfiguracoesRoute,
   AppContaRoute: AppContaRoute,
   AppFinanceiroRoute: AppFinanceiroRoute,
-  AppMarketingRoute: AppMarketingRoute,
   AppMeuPerfilRoute: AppMeuPerfilRoute,
   AppMeusPacientesRoute: AppMeusPacientesRoute,
   AppMinhaAgendaRoute: AppMinhaAgendaRoute,
-  AppNotificacoesRoute: AppNotificacoesRoute,
   AppPacientesRoute: AppPacientesRoute,
   AppProfissionaisRoute: AppProfissionaisRoute,
   AppSolicitacoesRoute: AppSolicitacoesRoute,
@@ -637,7 +574,6 @@ const rootRouteChildren: RootRouteChildren = {
   RedefinirSenhaRoute: RedefinirSenhaRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SobreRoute: SobreRoute,
-  ApiPublicHooksNotificacoesRoute: ApiPublicHooksNotificacoesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -7,7 +7,6 @@ import { z } from "zod";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
 import { adminCreateUser } from "@/lib/admin.functions";
-import { HistoricoNotificacoesDialog } from "@/components/notificacoes/HistoricoNotificacoesDialog";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -121,7 +120,6 @@ function ProfissionaisPage() {
                 </div>
                 <EditarContatoProfissionalDialog id={p.id} nome={p.nome} telefone={p.telefone} />
                 <FotoProfissionalDialog id={p.id} nome={p.nome} fotoUrl={p.foto_url} />
-                <HistoricoNotificacoesDialog nome={p.nome} profissionalId={p.id} />
               </CardContent>
             </Card>
           ))}

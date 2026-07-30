@@ -5,12 +5,11 @@ import { todayISO } from "@/lib/agenda-utils";
 
 export interface SidebarBadges {
   solicitacoes: number;
-  notificacoes: number;
   financeiro: number;
   agenda: number;
 }
 
-const EMPTY: SidebarBadges = { solicitacoes: 0, notificacoes: 0, financeiro: 0, agenda: 0 };
+const EMPTY: SidebarBadges = { solicitacoes: 0, financeiro: 0, agenda: 0 };
 
 /**
  * Contadores para os badges da sidebar.
@@ -29,9 +28,8 @@ export function useSidebarBadges(): SidebarBadges {
     staleTime: 10_000,
     queryFn: async (): Promise<SidebarBadges> => {
       const hoje = todayISO();
-      const [pend, naoLidas, aberto, agHoje] = await Promise.all([
+      const [pend, aberto, agHoje] = await Promise.all([
         supabase.from("agendamentos").select("id", { count: "exact", head: true }).eq("status", "PENDENTE"),
-        supabase.from("notificacoes").select("id", { count: "exact", head: true }).eq("lida", false),
         canFinanceiro
           ? supabase.from("financeiro").select("id", { count: "exact", head: true }).eq("status_pagamento", "ABERTO")
           : Promise.resolve({ count: 0 } as { count: number | null }),
@@ -44,7 +42,6 @@ export function useSidebarBadges(): SidebarBadges {
 
       return {
         solicitacoes: pend.count ?? 0,
-        notificacoes: naoLidas.count ?? 0,
         financeiro: aberto.count ?? 0,
         agenda: agHoje.count ?? 0,
       };

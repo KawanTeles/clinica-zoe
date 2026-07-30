@@ -1,8 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { dispararNotificacoesAgendamento } from "@/lib/notifications.functions";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
@@ -141,8 +139,6 @@ function AgendamentoPage() {
       : Number(profissional.valor_consulta_avista ?? profissional.valor_consulta_cartao ?? 0);
   }, [profissional, forma]);
 
-  const dispararFn = useServerFn(dispararNotificacoesAgendamento);
-
   const criar = useMutation({
     mutationFn: async () => {
       if (!session || !user) throw new Error("Faça login para agendar.");
@@ -218,7 +214,6 @@ function AgendamentoPage() {
       setCriado(id);
       setStep(5);
       toast.success("Solicitação enviada!");
-      dispararFn({ data: { agendamentoId: id } }).catch(() => {});
 
       // Tenta abrir automaticamente o WhatsApp da clínica (82 998343617) com os dados
       try {
@@ -485,7 +480,7 @@ function AgendamentoPage() {
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Ao confirmar, sua solicitação será enviada como <b>PENDENTE</b> e o profissional
-                  aprovará em breve. Você recebe atualização por notificação.
+                  aprovará em breve.
                 </p>
               </div>
             )}

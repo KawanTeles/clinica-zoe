@@ -20,8 +20,6 @@ import {
   Check,
 } from "lucide-react";
 import { toast } from "sonner";
-import { dispararNotificacoesAgendamento } from "@/lib/notifications.functions";
-import { useServerFn } from "@tanstack/react-start";
 import { getWhatsAppUrl, formatPatientConfirmationMsg, openWhatsAppLink } from "@/lib/whatsapp-link";
 
 function valorLancamento(row: any) {
@@ -47,7 +45,6 @@ function Dashboard() {
   const qc = useQueryClient();
   const isAdmin = roles.includes("ADMIN");
   const isProfissional = roles.includes("PROFISSIONAL");
-  const dispararFn = useServerFn(dispararNotificacoesAgendamento);
 
   const { data: stats } = useQuery({
     queryKey: ["dashboard-stats"],
@@ -132,7 +129,6 @@ function Dashboard() {
     },
     onSuccess: (_, item) => {
       toast.success("Solicitação confirmada!");
-      dispararFn({ data: { agendamentoId: item.id } }).catch(() => {});
       qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
       qc.invalidateQueries({ queryKey: ["solicitacoes"] });
       qc.invalidateQueries({ queryKey: ["agenda"] });

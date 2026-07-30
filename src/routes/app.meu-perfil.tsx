@@ -12,7 +12,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { AvatarUploader } from "@/components/media/AvatarUploader";
 import { SecurityCard } from "@/components/security/SecurityCard";
-import { NotificacoesTimeline } from "@/components/notificacoes/NotificacoesTimeline";
 
 
 
@@ -151,15 +150,6 @@ function MeuPerfil() {
               {save.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Salvar
             </Button>
           </div>
-        </CardContent>
-      </Card>
-
-      <Card className="border-border shadow-soft">
-        <CardHeader>
-          <CardTitle className="text-base">Histórico de notificações</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {user && <NotificacoesTimeline usuarioId={user.id} profissionalUserId={user.id} limit={40} />}
         </CardContent>
       </Card>
 

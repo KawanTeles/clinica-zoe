@@ -6,7 +6,6 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
 import { AuthSplash } from "@/components/auth-splash";
 import { SiteShell, Reveal } from "@/components/site/SiteShell";
-import { NotificacoesTimeline } from "@/components/notificacoes/NotificacoesTimeline";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,7 +32,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Loader2, CalendarDays, LogOut, Bell, UserCircle2 } from "lucide-react";
+import { Loader2, CalendarDays, LogOut, UserCircle2 } from "lucide-react";
 import { STATUS_COLOR, STATUS_LABEL, addMinutes, fmtHora, todayISO } from "@/lib/agenda-utils";
 import { cn } from "@/lib/utils";
 import { AvatarUploader } from "@/components/media/AvatarUploader";
@@ -44,9 +43,9 @@ export const Route = createFileRoute("/cliente/")({
   head: () => ({
     meta: [
       { title: "Área do Cliente — Clínica" },
-      { name: "description", content: "Acompanhe suas consultas, notificações e dados na Clínica." },
+      { name: "description", content: "Acompanhe suas consultas e dados na Clínica." },
       { property: "og:title", content: "Área do Cliente — Clínica" },
-      { property: "og:description", content: "Suas consultas e notificações." },
+      { property: "og:description", content: "Suas consultas e dados." },
       { name: "robots", content: "noindex" },
     ],
     links: [{ rel: "canonical", href: "/cliente" }],
@@ -103,18 +102,12 @@ function ClientePage() {
               <TabsTrigger value="consultas">
                 <CalendarDays className="mr-2 h-4 w-4" /> Consultas
               </TabsTrigger>
-              <TabsTrigger value="notificacoes">
-                <Bell className="mr-2 h-4 w-4" /> Notificações
-              </TabsTrigger>
               <TabsTrigger value="perfil">
                 <UserCircle2 className="mr-2 h-4 w-4" /> Meus dados
               </TabsTrigger>
             </TabsList>
             <TabsContent value="consultas" className="mt-6">
               <ConsultasSection userId={user.id} />
-            </TabsContent>
-            <TabsContent value="notificacoes" className="mt-6">
-              <NotificacoesSection userId={user.id} />
             </TabsContent>
             <TabsContent value="perfil" className="mt-6 space-y-6">
               <PerfilSection userId={user.id} />
@@ -375,9 +368,7 @@ function RemarcarDialog({
   );
 }
 
-function NotificacoesSection({ userId }: { userId: string }) {
-  return <NotificacoesTimeline usuarioId={userId} pacienteUserId={userId} />;
-}
+
 
 
 function PerfilSection({ userId }: { userId: string }) {
