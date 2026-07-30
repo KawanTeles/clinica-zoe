@@ -11,3 +11,6 @@ ALTER TABLE IF EXISTS public.agendamentos
 -- Performance indexes for appointment workflow
 CREATE INDEX IF NOT EXISTS idx_agendamentos_status_data ON public.agendamentos(status, data);
 CREATE INDEX IF NOT EXISTS idx_agendamentos_prof_data ON public.agendamentos(profissional_id, data);
+
+-- Reload PostgREST schema cache
+NOTIFY pgrst, 'reload schema';

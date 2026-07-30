@@ -101,16 +101,18 @@ function SolicitacoesPage() {
   const { data: rows, isLoading } = useQuery({
     queryKey: ["solicitacoes", filtroStatus, profId ?? "ALL", isProfissional],
     queryFn: async () => {
-      let q = supabase
-        .from("agendamentos")
-        .select(
-          `id, data, hora_inicio, hora_fim, status, valor, forma_pagamento, observacoes, origem,
+      const selectFull = `id, data, hora_inicio, hora_fim, status, valor, forma_pagamento, observacoes, origem,
            aprovado_por, aprovado_em, cancelado_por, cancelado_em, motivo_cancelamento, created_at,
            profissional_id, paciente_id,
            paciente:pacientes(id,nome,telefone,email,foto_url),
-           profissional:profissionais(id,nome,foto_url,especialidade:especialidades(nome))`
-        )
-        .order("created_at", { ascending: false });
+           profissional:profissionais(id,nome,foto_url,especialidade:especialidades(nome))`;
+
+      const selectBase = `id, data, hora_inicio, hora_fim, status, valor, forma_pagamento, observacoes, created_at,
+           profissional_id, paciente_id,
+           paciente:pacientes(id,nome,telefone,email,foto_url),
+           profissional:profissionais(id,nome,foto_url,especialidade:especialidades(nome))`;
+
+      let q = supabase.from("agendamentos").select(selectFull).order("created_at", { ascending: false });
 
       if (filtroStatus !== "TODOS") {
         if (filtroStatus === "CANCELADO") {
@@ -121,7 +123,24 @@ function SolicitacoesPage() {
       }
       if (isProfissional && profId) q = q.eq("profissional_id", profId);
 
-      const { data, error } = await q;
+      let { data, error } = await q;
+
+      if (error && (error.message?.includes("schema cache") || error.message?.includes("origem") || (error as any).code === "PGRST204")) {
+        let qFallback = supabase.from("agendamentos").select(selectBase).order("created_at", { ascending: false });
+        if (filtroStatus !== "TODOS") {
+          if (filtroStatus === "CANCELADO") {
+            qFallback = qFallback.in("status", ["RECUSADO", "CANCELADO"]);
+          } else {
+            qFallback = qFallback.eq("status", filtroStatus as any);
+          }
+        }
+        if (isProfissional && profId) qFallback = qFallback.eq("profissional_id", profId);
+
+        const fallbackRes = await qFallback;
+        data = fallbackRes.data as any;
+        error = fallbackRes.error;
+      }
+
       if (error) throw error;
       return data ?? [];
     },
@@ -149,16 +168,28 @@ function SolicitacoesPage() {
         throw new Error("O profissional já possui uma consulta confirmada neste mesmo horário!");
       }
 
+      const payload: any = {
+        status: "APROVADO",
+        aprovado_por: user?.id ?? null,
+        aprovado_em: new Date().toISOString(),
+      };
+
       const { error } = await supabase
         .from("agendamentos")
-        .update({
-          status: "APROVADO",
-          aprovado_por: user?.id ?? null,
-          aprovado_em: new Date().toISOString(),
-        })
+        .update(payload)
         .eq("id", agendamento.id);
 
-      if (error) throw error;
+      if (error) {
+        if (error.message?.includes("schema cache") || error.message?.includes("aprovado") || (error as any).code === "PGRST204") {
+          const { error: fallbackErr } = await supabase
+            .from("agendamentos")
+            .update({ status: "APROVADO" })
+            .eq("id", agendamento.id);
+          if (fallbackErr) throw fallbackErr;
+        } else {
+          throw error;
+        }
+      }
     },
     onSuccess: (_, agendamento) => {
       toast.success("Consulta confirmada e adicionada à agenda!");
@@ -173,16 +204,29 @@ function SolicitacoesPage() {
   // Cancelar solicitação
   const cancelarMut = useMutation({
     mutationFn: async ({ id, motivo }: { id: string; motivo?: string }) => {
+      const payload: any = {
+        status: "RECUSADO",
+        cancelado_por: user?.id ?? null,
+        cancelado_em: new Date().toISOString(),
+        motivo_cancelamento: motivo || null,
+      };
+
       const { error } = await supabase
         .from("agendamentos")
-        .update({
-          status: "RECUSADO",
-          cancelado_por: user?.id ?? null,
-          cancelado_em: new Date().toISOString(),
-          motivo_cancelamento: motivo || null,
-        })
+        .update(payload)
         .eq("id", id);
-      if (error) throw error;
+
+      if (error) {
+        if (error.message?.includes("schema cache") || error.message?.includes("cancelado") || (error as any).code === "PGRST204") {
+          const { error: fallbackErr } = await supabase
+            .from("agendamentos")
+            .update({ status: "RECUSADO" })
+            .eq("id", id);
+          if (fallbackErr) throw fallbackErr;
+        } else {
+          throw error;
+        }
+      }
     },
     onSuccess: (_, vars) => {
       toast.success("Solicitação cancelada com sucesso.");

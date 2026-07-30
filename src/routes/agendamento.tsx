@@ -177,23 +177,36 @@ function AgendamentoPage() {
           .eq("id", paciente_id);
       }
 
-      const { data: ag, error } = await supabase
+      const payload: any = {
+        profissional_id: profissional.id,
+        paciente_id,
+        cliente_user_id: user.id,
+        data,
+        hora_inicio: hora,
+        hora_fim,
+        status: "PENDENTE",
+        origem: "Site",
+        forma_pagamento: forma,
+        observacoes: obs || null,
+        valor: valor,
+      };
+
+      let { data: ag, error } = await supabase
         .from("agendamentos")
-        .insert({
-          profissional_id: profissional.id,
-          paciente_id,
-          cliente_user_id: user.id,
-          data,
-          hora_inicio: hora,
-          hora_fim,
-          status: "PENDENTE",
-          origem: "Site",
-          forma_pagamento: forma,
-          observacoes: obs || null,
-          valor: valor,
-        })
+        .insert(payload)
         .select("id")
         .single();
+
+      if (error && (error.message?.includes("schema cache") || error.message?.includes("origem") || (error as any).code === "PGRST204")) {
+        delete payload.origem;
+        const res = await supabase
+          .from("agendamentos")
+          .insert(payload)
+          .select("id")
+          .single();
+        ag = res.data;
+        error = res.error;
+      }
 
       if (error || !ag) throw new Error(error?.message ?? "Falha ao criar solicitação");
       return ag.id as string;
