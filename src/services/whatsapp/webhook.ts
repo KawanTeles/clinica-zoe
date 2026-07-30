@@ -197,6 +197,13 @@ export async function handleWebhookPost(request: Request): Promise<Response> {
         else if (statusUpper === "FAILED") targetStatus = "ERRO";
         else if (statusUpper === "SENT") targetStatus = "ENVIADA";
 
+        // Motivo real de falha reportado pela Meta (ex.: 131047 fora da janela de 24h).
+        const falha = ev.raw?.errors?.[0];
+        const falhaMsg = falha
+          ? `Meta status=failed code=${falha.code} title=${falha.title ?? ""} details=${falha.error_data?.details ?? falha.message ?? ""}`
+          : null;
+        if (falhaMsg) console.error(`[whatsapp:webhook] Falha de entrega wamid=${ev.wamid}: ${falhaMsg}`);
+
         if (targetStatus) {
           console.log(`[whatsapp:webhook] Atualizando status wamid=${ev.wamid} -> ${targetStatus}`);
 
@@ -206,6 +213,9 @@ export async function handleWebhookPost(request: Request): Promise<Response> {
               status_envio: targetStatus,
               ...(targetStatus === "ENTREGUE" ? { entregue_em: new Date().toISOString() } : {}),
               ...(targetStatus === "LIDO" ? { lido_em: new Date().toISOString() } : {}),
+              ...(targetStatus === "ERRO"
+                ? { ultimo_erro: falhaMsg ?? "Falha de entrega reportada pela Meta", definitivo: true }
+                : {}),
             })
             .eq("provider_message_id", ev.wamid);
 
@@ -213,9 +223,11 @@ export async function handleWebhookPost(request: Request): Promise<Response> {
             .from("whatsapp_message_logs")
             .update({
               status_envio: targetStatus,
+              ...(falhaMsg ? { ultimo_erro: falhaMsg } : {}),
             })
             .eq("wamid", ev.wamid);
         }
+
       }
     }
 
