@@ -58,6 +58,8 @@ export async function logWhatsAppExecution(logData: WhatsAppLogPayload): Promise
       payload: {
         payload_enviado: logData.payloadEnviado,
         resposta_meta: logData.respostaMeta,
+        response_headers: logData.responseHeaders ?? null,
+
         http_status: logData.httpStatus,
         retry_count: logData.retryCount ?? 0,
         stack_trace: logData.stackTrace || null,
