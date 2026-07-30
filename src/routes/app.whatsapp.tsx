@@ -105,6 +105,26 @@ function MetaWhatsAppAdminPage() {
   });
   const [isSaving, setIsSaving] = useState(false);
 
+  // 5. Diagnóstico de homologação (usa o token salvo, em tempo real)
+  const diagnosticarFn = useServerFn(diagnosticarMeta);
+  const [diag, setDiag] = useState<any>(null);
+  const [diagLoading, setDiagLoading] = useState(false);
+
+  const runDiagnostico = async () => {
+    try {
+      setDiagLoading(true);
+      const r = await diagnosticarFn({ data: {} });
+      setDiag(r);
+      if (r.ok) toast.success("Token válido — conexão com a Meta confirmada.");
+      else toast.error(r.erro ?? "Falha na validação do token.", { duration: 12000 });
+    } catch (e: any) {
+      toast.error(e.message ?? "Erro ao executar diagnóstico.");
+    } finally {
+      setDiagLoading(false);
+    }
+  };
+
+
   useEffect(() => {
     if (config) {
       setCfgForm({
