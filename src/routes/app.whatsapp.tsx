@@ -113,7 +113,7 @@ function MetaWhatsAppAdminPage() {
   const runDiagnostico = async () => {
     try {
       setDiagLoading(true);
-      const r = await diagnosticarFn({ data: {} });
+      const r = await diagnosticarFn(undefined as never);
       setDiag(r);
       if (r.ok) toast.success("Token válido — conexão com a Meta confirmada.");
       else toast.error(r.erro ?? "Falha na validação do token.", { duration: 12000 });
