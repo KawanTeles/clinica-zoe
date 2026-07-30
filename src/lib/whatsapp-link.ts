@@ -1,6 +1,6 @@
 export const CLINIC_WHATSAPP_NUMBER = "5582998343617";
 
-/** Sanitiza telefone para o formato numérico do WhatsApp Brasil (ex: 5582998343617) */
+/** Sanitiza telefone para o formato numérico do WhatsApp no padrão internacional E.164 (ex: 5582998343617) */
 export function sanitizePhone(phone?: string | null): string {
   if (!phone) return "";
   const digits = phone.replace(/\D/g, "");
@@ -11,19 +11,21 @@ export function sanitizePhone(phone?: string | null): string {
 }
 
 /**
- * Gera a URL direta do WhatsApp Web (evita redirecionamento COOP api.whatsapp.com que gera ERR_BLOCKED_BY_RESPONSE).
+ * Gera a URL oficial no formato https://wa.me/<telefone>?text=<mensagem_codificada>
+ * Suporta redirecionamento automático para app nativo no Celular (Android/iOS)
+ * e para WhatsApp Web/Desktop no Computador.
  */
 export function getWhatsAppUrl(phone?: string | null, message?: string): string {
   const cleanPhone = sanitizePhone(phone);
   const encodedMsg = message ? encodeURIComponent(message) : "";
   if (!cleanPhone) {
-    return `https://web.whatsapp.com/send?text=${encodedMsg}`;
+    return `https://wa.me/?text=${encodedMsg}`;
   }
-  return `https://web.whatsapp.com/send?phone=${cleanPhone}&text=${encodedMsg}`;
+  return `https://wa.me/${cleanPhone}?text=${encodedMsg}`;
 }
 
 /**
- * Abre o link do WhatsApp com noopener,noreferrer para prevenir bloqueio de Cross-Origin-Opener-Policy (ERR_BLOCKED_BY_RESPONSE)
+ * Abre o link do WhatsApp utilizando window.open(url, "_blank", "noopener,noreferrer")
  */
 export function openWhatsAppLink(url: string) {
   if (typeof window !== "undefined") {
@@ -66,7 +68,7 @@ ${info.horario}
 Acesse o painel para confirmar ou cancelar.`;
 }
 
-/** Gera URL do WhatsApp com a notificação pronta para o número oficial da clínica (82 998343617) */
+/** Gera URL do WhatsApp com a notificação pronta para o número oficial da clínica (5582998343617) */
 export function getClinicWhatsAppNotificationUrl(info: SolicitacaoWhatsAppInfo): string {
   const msg = formatClinicNotificationMsg(info);
   return getWhatsAppUrl(CLINIC_WHATSAPP_NUMBER, msg);

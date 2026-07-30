@@ -512,7 +512,7 @@ function AgendamentoPage() {
                       horario: hora,
                     })}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                   >
                     <Button className="rounded-full bg-emerald-600 hover:bg-emerald-700 text-white gap-2 px-6 shadow-md">
                       <MessageSquare className="h-4 w-4" /> Enviar aviso ao WhatsApp da Clínica (82 998343617)
