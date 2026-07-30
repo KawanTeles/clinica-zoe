@@ -3,14 +3,14 @@ import { createFileRoute } from "@tanstack/react-router";
 /**
  * Endpoint de diagnóstico da integração Meta WhatsApp Cloud API.
  *
- * GET  /api/test-whatsapp?secret=...            -> diagnóstico (token, phone number id, templates)
- * POST /api/test-whatsapp?secret=...            -> envia mensagem de teste
+ * GET  /api/public/test-whatsapp?secret=...            -> diagnóstico (token, phone number id, templates)
+ * POST /api/public/test-whatsapp?secret=...            -> envia mensagem de teste
  *      body: { "to": "5582998343617", "text": "...", "template": "hello_world", "language": "en_US" }
  *
  * Protegido pelo segredo WHATSAPP_TEST_SECRET (ou WHATSAPP_VERIFY_TOKEN).
  * Retorna integralmente: payload enviado, status HTTP, headers, JSON da Meta, wamid, erro e duração.
  */
-export const Route = createFileRoute("/api/test-whatsapp")({
+export const Route = createFileRoute("/api/public/test-whatsapp")({
   server: {
     handlers: {
       GET: async ({ request }) => {

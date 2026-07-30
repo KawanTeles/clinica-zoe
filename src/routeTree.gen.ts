@@ -38,6 +38,7 @@ import { Route as AppContaRouteImport } from './routes/app.conta'
 import { Route as AppConfiguracoesRouteImport } from './routes/app.configuracoes'
 import { Route as AppAgendaRouteImport } from './routes/app.agenda'
 import { Route as ApiWhatsappWebhookRouteImport } from './routes/api/whatsapp/webhook'
+import { Route as ApiPublicTestWhatsappRouteImport } from './routes/api/public/test-whatsapp'
 import { Route as ApiPublicHooksNotificacoesRouteImport } from './routes/api/public/hooks/notificacoes'
 import { Route as ApiPublicHooksMetaRouteImport } from './routes/api/public/hooks/meta'
 
@@ -186,6 +187,11 @@ const ApiWhatsappWebhookRoute = ApiWhatsappWebhookRouteImport.update({
   path: '/api/whatsapp/webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicTestWhatsappRoute = ApiPublicTestWhatsappRouteImport.update({
+  id: '/api/public/test-whatsapp',
+  path: '/api/public/test-whatsapp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksNotificacoesRoute =
   ApiPublicHooksNotificacoesRouteImport.update({
     id: '/api/public/hooks/notificacoes',
@@ -227,6 +233,7 @@ export interface FileRoutesByFullPath {
   '/cliente/login': typeof ClienteLoginRoute
   '/app/': typeof AppIndexRoute
   '/cliente/': typeof ClienteIndexRoute
+  '/api/public/test-whatsapp': typeof ApiPublicTestWhatsappRoute
   '/api/whatsapp/webhook': typeof ApiWhatsappWebhookRoute
   '/api/public/hooks/meta': typeof ApiPublicHooksMetaRoute
   '/api/public/hooks/notificacoes': typeof ApiPublicHooksNotificacoesRoute
@@ -258,6 +265,7 @@ export interface FileRoutesByTo {
   '/cliente/login': typeof ClienteLoginRoute
   '/app': typeof AppIndexRoute
   '/cliente': typeof ClienteIndexRoute
+  '/api/public/test-whatsapp': typeof ApiPublicTestWhatsappRoute
   '/api/whatsapp/webhook': typeof ApiWhatsappWebhookRoute
   '/api/public/hooks/meta': typeof ApiPublicHooksMetaRoute
   '/api/public/hooks/notificacoes': typeof ApiPublicHooksNotificacoesRoute
@@ -292,6 +300,7 @@ export interface FileRoutesById {
   '/cliente/login': typeof ClienteLoginRoute
   '/app/': typeof AppIndexRoute
   '/cliente/': typeof ClienteIndexRoute
+  '/api/public/test-whatsapp': typeof ApiPublicTestWhatsappRoute
   '/api/whatsapp/webhook': typeof ApiWhatsappWebhookRoute
   '/api/public/hooks/meta': typeof ApiPublicHooksMetaRoute
   '/api/public/hooks/notificacoes': typeof ApiPublicHooksNotificacoesRoute
@@ -327,6 +336,7 @@ export interface FileRouteTypes {
     | '/cliente/login'
     | '/app/'
     | '/cliente/'
+    | '/api/public/test-whatsapp'
     | '/api/whatsapp/webhook'
     | '/api/public/hooks/meta'
     | '/api/public/hooks/notificacoes'
@@ -358,6 +368,7 @@ export interface FileRouteTypes {
     | '/cliente/login'
     | '/app'
     | '/cliente'
+    | '/api/public/test-whatsapp'
     | '/api/whatsapp/webhook'
     | '/api/public/hooks/meta'
     | '/api/public/hooks/notificacoes'
@@ -391,6 +402,7 @@ export interface FileRouteTypes {
     | '/cliente/login'
     | '/app/'
     | '/cliente/'
+    | '/api/public/test-whatsapp'
     | '/api/whatsapp/webhook'
     | '/api/public/hooks/meta'
     | '/api/public/hooks/notificacoes'
@@ -408,6 +420,7 @@ export interface RootRouteChildren {
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SobreRoute: typeof SobreRoute
+  ApiPublicTestWhatsappRoute: typeof ApiPublicTestWhatsappRoute
   ApiWhatsappWebhookRoute: typeof ApiWhatsappWebhookRoute
   ApiPublicHooksMetaRoute: typeof ApiPublicHooksMetaRoute
   ApiPublicHooksNotificacoesRoute: typeof ApiPublicHooksNotificacoesRoute
@@ -618,6 +631,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWhatsappWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/test-whatsapp': {
+      id: '/api/public/test-whatsapp'
+      path: '/api/public/test-whatsapp'
+      fullPath: '/api/public/test-whatsapp'
+      preLoaderRoute: typeof ApiPublicTestWhatsappRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/notificacoes': {
       id: '/api/public/hooks/notificacoes'
       path: '/api/public/hooks/notificacoes'
@@ -698,6 +718,7 @@ const rootRouteChildren: RootRouteChildren = {
   RedefinirSenhaRoute: RedefinirSenhaRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SobreRoute: SobreRoute,
+  ApiPublicTestWhatsappRoute: ApiPublicTestWhatsappRoute,
   ApiWhatsappWebhookRoute: ApiWhatsappWebhookRoute,
   ApiPublicHooksMetaRoute: ApiPublicHooksMetaRoute,
   ApiPublicHooksNotificacoesRoute: ApiPublicHooksNotificacoesRoute,
