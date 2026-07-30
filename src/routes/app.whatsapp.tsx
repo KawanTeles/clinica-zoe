@@ -580,7 +580,7 @@ function MetaWhatsAppAdminPage() {
                     </p>
                   )}
                   <pre className="max-h-60 overflow-auto rounded bg-black/90 p-3 text-xs text-emerald-400 font-mono">
-                    {JSON.stringify(sendResult.raw ?? sendResult, null, 2)}
+                    {JSON.stringify(sendResult, null, 2)}
                   </pre>
                 </div>
               )}
