@@ -7,7 +7,7 @@ import { useMetaStatus } from "@/hooks/useMetaStatus";
 import { useMetaWebhook } from "@/hooks/useMetaWebhook";
 import { useMetaMessages } from "@/hooks/useMetaMessages";
 import { useMetaTemplates } from "@/hooks/useMetaTemplates";
-import { saveMetaConfig } from "@/lib/meta.functions";
+import { saveMetaConfig, diagnosticarMeta } from "@/lib/meta.functions";
 import { useServerFn } from "@tanstack/react-start";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
