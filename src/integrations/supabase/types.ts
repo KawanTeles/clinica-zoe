@@ -716,54 +716,123 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_evento_templates: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          evento: string
+          id: string
+          language: string
+          template_name: string | null
+          updated_at: string
+          variaveis: Json
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          evento: string
+          id?: string
+          language?: string
+          template_name?: string | null
+          updated_at?: string
+          variaveis?: Json
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          evento?: string
+          id?: string
+          language?: string
+          template_name?: string | null
+          updated_at?: string
+          variaveis?: Json
+        }
+        Relationships: []
+      }
       whatsapp_message_logs: {
         Row: {
+          accepted_at: string | null
           agendamento_id: string | null
+          conversation_category: string | null
+          conversation_id: string | null
           created_at: string
+          delivered_at: string | null
           destinatario_telefone: string
           duracao_ms: number | null
+          erro_codigo: string | null
+          erro_detalhe: string | null
+          evento: string | null
+          failed_at: string | null
           id: string
           mensagem: string | null
           mensagem_recebida: string | null
+          message_status: string | null
           paciente_nome: string | null
           payload: Json | null
           profissional_nome: string | null
+          read_at: string | null
+          sent_at: string | null
           status_envio: string
           template_name: string | null
           ultimo_erro: string | null
           wamid: string | null
+          webhook_payload: Json | null
         }
         Insert: {
+          accepted_at?: string | null
           agendamento_id?: string | null
+          conversation_category?: string | null
+          conversation_id?: string | null
           created_at?: string
+          delivered_at?: string | null
           destinatario_telefone: string
           duracao_ms?: number | null
+          erro_codigo?: string | null
+          erro_detalhe?: string | null
+          evento?: string | null
+          failed_at?: string | null
           id?: string
           mensagem?: string | null
           mensagem_recebida?: string | null
+          message_status?: string | null
           paciente_nome?: string | null
           payload?: Json | null
           profissional_nome?: string | null
+          read_at?: string | null
+          sent_at?: string | null
           status_envio?: string
           template_name?: string | null
           ultimo_erro?: string | null
           wamid?: string | null
+          webhook_payload?: Json | null
         }
         Update: {
+          accepted_at?: string | null
           agendamento_id?: string | null
+          conversation_category?: string | null
+          conversation_id?: string | null
           created_at?: string
+          delivered_at?: string | null
           destinatario_telefone?: string
           duracao_ms?: number | null
+          erro_codigo?: string | null
+          erro_detalhe?: string | null
+          evento?: string | null
+          failed_at?: string | null
           id?: string
           mensagem?: string | null
           mensagem_recebida?: string | null
+          message_status?: string | null
           paciente_nome?: string | null
           payload?: Json | null
           profissional_nome?: string | null
+          read_at?: string | null
+          sent_at?: string | null
           status_envio?: string
           template_name?: string | null
           ultimo_erro?: string | null
           wamid?: string | null
+          webhook_payload?: Json | null
         }
         Relationships: []
       }
@@ -854,6 +923,72 @@ export type Database = {
           last_inbound_at?: string
           telefone?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      whatsapp_templates: {
+        Row: {
+          body_text: string
+          buttons: Json
+          category: string
+          created_at: string
+          footer_text: string | null
+          header_text: string | null
+          id: string
+          language: string
+          meta_created_at: string | null
+          meta_id: string | null
+          meta_updated_at: string | null
+          name: string
+          quality_rating: string | null
+          rejected_reason: string | null
+          status: string
+          synced_at: string | null
+          titulo_interno: string | null
+          updated_at: string
+          variaveis: Json
+        }
+        Insert: {
+          body_text?: string
+          buttons?: Json
+          category?: string
+          created_at?: string
+          footer_text?: string | null
+          header_text?: string | null
+          id?: string
+          language?: string
+          meta_created_at?: string | null
+          meta_id?: string | null
+          meta_updated_at?: string | null
+          name: string
+          quality_rating?: string | null
+          rejected_reason?: string | null
+          status?: string
+          synced_at?: string | null
+          titulo_interno?: string | null
+          updated_at?: string
+          variaveis?: Json
+        }
+        Update: {
+          body_text?: string
+          buttons?: Json
+          category?: string
+          created_at?: string
+          footer_text?: string | null
+          header_text?: string | null
+          id?: string
+          language?: string
+          meta_created_at?: string | null
+          meta_id?: string | null
+          meta_updated_at?: string | null
+          name?: string
+          quality_rating?: string | null
+          rejected_reason?: string | null
+          status?: string
+          synced_at?: string | null
+          titulo_interno?: string | null
+          updated_at?: string
+          variaveis?: Json
         }
         Relationships: []
       }

@@ -102,25 +102,44 @@ export async function processOne(id: string, opts?: { ignorarJanela?: boolean })
 
   // Texto: template personalizado do evento (se houver) ou o texto original.
   let body: string = n.mensagem;
+  const vars = await buildVars(n.agendamento_id);
   const tpl = (cfg.templates ?? {})[n.evento as string] ?? DEFAULT_TEMPLATES[n.evento as keyof typeof DEFAULT_TEMPLATES];
   if (n.evento && tpl && (cfg.templates ?? {})[n.evento as string]) {
-    const vars = await buildVars(n.agendamento_id);
     body = renderTemplate(tpl, vars);
   }
 
   const provider = pickProvider(n.canal as "WHATSAPP" | "EMAIL", cfg);
   const t0 = Date.now();
-  const result = await provider.send(
-    {
-      channel: n.canal as "WHATSAPP" | "EMAIL",
+
+  let result: { ok: boolean; providerId?: string; error?: string };
+
+  if (n.canal === "WHATSAPP" && n.evento) {
+    // Motor inteligente: texto livre dentro da janela de 24h, template aprovado fora dela.
+    const { sendEventMessage } = await import("@/lib/whatsapp/templates.server");
+    const r = await sendEventMessage({
+      evento: n.evento as string,
       to,
-      title: n.titulo,
-      body,
-      metadata: { notificacao_id: n.id, agendamento_id: n.agendamento_id },
-    },
-    cfg,
-  );
+      texto: body,
+      variaveis: Object.fromEntries(
+        Object.entries(vars ?? {}).map(([k, v]) => [k, v == null ? "" : String(v)]),
+      ),
+    });
+    result = { ok: r.ok, providerId: r.wamid ?? undefined, error: r.error ?? (r as any).motivo ?? undefined };
+  } else {
+    result = await provider.send(
+      {
+        channel: n.canal as "WHATSAPP" | "EMAIL",
+        to,
+        title: n.titulo,
+        body,
+        metadata: { notificacao_id: n.id, agendamento_id: n.agendamento_id },
+      },
+      cfg,
+    );
+  }
+
   const duracao = Date.now() - t0;
+
 
   // Reenvio manual reinicia o ciclo automático de tentativas.
   const tentativas = manual ? 1 : (n.tentativas ?? 0) + 1;

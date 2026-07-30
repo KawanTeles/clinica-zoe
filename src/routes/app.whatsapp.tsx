@@ -9,6 +9,11 @@ import { useMetaMessages } from "@/hooks/useMetaMessages";
 import { useMetaTemplates } from "@/hooks/useMetaTemplates";
 import { saveMetaConfig, diagnosticarMeta } from "@/lib/meta.functions";
 import { useServerFn } from "@tanstack/react-start";
+import { TemplatesTab } from "@/components/whatsapp/TemplatesTab";
+import { EventosTab } from "@/components/whatsapp/EventosTab";
+import { DiagnosticoPanel } from "@/components/whatsapp/DiagnosticoPanel";
+import { EntregaLogsTab } from "@/components/whatsapp/EntregaLogsTab";
+
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -373,6 +378,18 @@ function MetaWhatsAppAdminPage() {
           <TabsTrigger value="templates" className="gap-2">
             <FileCode2 className="h-4 w-4" /> Templates Oficiais
           </TabsTrigger>
+          <TabsTrigger value="gestao-templates" className="gap-2">
+            <FileCode2 className="h-4 w-4" /> Gestão de Templates
+          </TabsTrigger>
+          <TabsTrigger value="eventos" className="gap-2">
+            <Settings className="h-4 w-4" /> Eventos
+          </TabsTrigger>
+          <TabsTrigger value="diagnostico" className="gap-2">
+            <ShieldCheck className="h-4 w-4" /> Diagnóstico
+          </TabsTrigger>
+          <TabsTrigger value="entregas" className="gap-2">
+            <Activity className="h-4 w-4" /> Ciclo de Entrega
+          </TabsTrigger>
           <TabsTrigger value="monitoramento" className="gap-2">
             <BarChart3 className="h-4 w-4" /> Monitoramento
           </TabsTrigger>
@@ -380,6 +397,23 @@ function MetaWhatsAppAdminPage() {
             <History className="h-4 w-4" /> Histórico de Logs
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="gestao-templates">
+          <TemplatesTab />
+        </TabsContent>
+
+        <TabsContent value="eventos">
+          <EventosTab />
+        </TabsContent>
+
+        <TabsContent value="diagnostico">
+          <DiagnosticoPanel />
+        </TabsContent>
+
+        <TabsContent value="entregas">
+          <EntregaLogsTab />
+        </TabsContent>
+
 
         {/* TAB 1: CARD 2 - Configuração Meta */}
         <TabsContent value="configuracao">

@@ -204,8 +204,32 @@ export async function handleWebhookPost(request: Request): Promise<Response> {
           : null;
         if (falhaMsg) console.error(`[whatsapp:webhook] Falha de entrega wamid=${ev.wamid}: ${falhaMsg}`);
 
+        const nowIso = new Date().toISOString();
+        const tsIso = ev.timestamp ? new Date(Number(ev.timestamp) * 1000).toISOString() : nowIso;
+
+        // Log completo do ciclo de vida da mensagem (accepted -> sent -> delivered -> read/failed)
+        const lifecycle: Record<string, any> = {
+          message_status: (ev.statusText || "").toLowerCase(),
+          conversation_id: ev.raw?.conversation?.id ?? null,
+          conversation_category: ev.raw?.conversation?.origin?.type ?? ev.raw?.pricing?.category ?? null,
+          webhook_payload: ev.raw,
+        };
+        if (statusUpper === "SENT") lifecycle.sent_at = tsIso;
+        if (statusUpper === "DELIVERED") lifecycle.delivered_at = tsIso;
+        if (statusUpper === "READ") lifecycle.read_at = tsIso;
+        if (statusUpper === "FAILED") {
+          lifecycle.failed_at = tsIso;
+          lifecycle.erro_codigo = falha?.code ? String(falha.code) : null;
+          lifecycle.erro_detalhe = falha?.error_data?.details ?? falha?.message ?? falha?.title ?? null;
+        }
+
+        await (supabaseAdmin as any)
+          .from("whatsapp_message_logs")
+          .update(lifecycle)
+          .eq("wamid", ev.wamid);
+
         if (targetStatus) {
-          console.log(`[whatsapp:webhook] Atualizando status wamid=${ev.wamid} -> ${targetStatus}`);
+          console.log(`[whatsapp:webhook] Atualizando status wamid=${ev.wamid} -> ${targetStatus} (${lifecycle.message_status})`);
 
           await (supabaseAdmin as any)
             .from("notificacoes")
