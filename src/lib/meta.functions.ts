@@ -322,3 +322,69 @@ export const getMetaLogs = createServerFn({ method: "POST" })
       payload: { agendamento_id: r.agendamento_id, canal: r.canal },
     }));
   });
+
+/**
+ * 9. Diagnóstico completo do token atual (homologação).
+ * Consulta a Meta em tempo real com o token salvo no banco — sem recompilar nada.
+ */
+export const diagnosticarMeta = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const cfg = await loadMetaConfigServer();
+    const version = cfg.graph_version || "v23.0";
+    const inicio = Date.now();
+
+    if (!cfg.access_token || !cfg.phone_number_id) {
+      return {
+        ok: false,
+        erro: "Access Token ou Phone Number ID ausentes. Preencha e salve as credenciais acima.",
+        endpoint: null,
+        numero: null,
+        templates: [],
+        duracaoMs: 0,
+      };
+    }
+
+    const endpoint = `POST https://graph.facebook.com/${version}/${cfg.phone_number_id}/messages`;
+
+    const numResp = await fetch(
+      `https://graph.facebook.com/${version}/${cfg.phone_number_id}?fields=id,display_phone_number,verified_name,quality_rating,platform_type`,
+      { headers: { Authorization: `Bearer ${cfg.access_token}` } },
+    );
+    const numJson: any = await numResp.json().catch(() => null);
+
+    let templates: Array<{ name: string; status: string; language: string; category: string }> = [];
+    let templatesErro: string | null = null;
+    if (cfg.business_account_id) {
+      const tplResp = await fetch(
+        `https://graph.facebook.com/${version}/${cfg.business_account_id}/message_templates?fields=name,status,language,category&limit=100`,
+        { headers: { Authorization: `Bearer ${cfg.access_token}` } },
+      );
+      const tplJson: any = await tplResp.json().catch(() => null);
+      if (tplJson?.data) {
+        templates = tplJson.data.map((t: any) => ({
+          name: t.name,
+          status: t.status,
+          language: t.language,
+          category: t.category,
+        }));
+      } else {
+        templatesErro = tplJson?.error?.message ?? "Não foi possível listar os templates.";
+      }
+    }
+
+    return {
+      ok: numResp.ok,
+      erro: numResp.ok ? null : (numJson?.error?.message ?? `HTTP ${numResp.status}`),
+      httpStatus: numResp.status,
+      endpoint,
+      graphVersion: version,
+      tokenTamanho: cfg.access_token.length,
+      numero: numJson?.error ? null : numJson,
+      respostaMeta: numJson,
+      templates,
+      templatesErro,
+      duracaoMs: Date.now() - inicio,
+    };
+  });
