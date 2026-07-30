@@ -60,7 +60,7 @@ function ClientePage() {
 
   useEffect(() => {
     if (!ready) return;
-    if (!session) navigate({ to: "/cliente/login", replace: true });
+    if (!session) navigate({ to: "/cliente/login", search: { redirect: undefined }, replace: true });
   }, [ready, session, navigate]);
 
   if (!ready || !session || !user) {
