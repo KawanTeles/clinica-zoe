@@ -150,20 +150,32 @@ function NotificacoesPage() {
   const mReenviar = useMutation({
     mutationFn: (id: string) => reenviarFn({ data: { id } }),
     onSuccess: (r: any) => {
-      if (r?.ok) toast.success("Notificação reenviada");
-      else toast.error(r?.error ?? "Falha ao reenviar");
+      if (r?.ok)
+        toast.success(
+          r?.providerId ? `Mensagem aceita pela Meta (ID ${String(r.providerId).slice(0, 24)}…)` : "Mensagem aceita pela Meta",
+        );
+      else toast.error(r?.error ?? "Falha ao reenviar", { duration: 12000 });
       qc.invalidateQueries({ queryKey: ["notificacoes"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message, { duration: 12000 }),
   });
   const mProcessar = useMutation({
     mutationFn: () => processarFn({ data: { limit: 20 } }),
     onSuccess: (r: any) => {
-      toast.success(`Fila processada (${r?.processed ?? 0} itens)`);
+      const total = r?.processed ?? 0;
+      const enviadas = r?.enviadas ?? 0;
+      const falhas = total - enviadas;
+      const primeiroErro = (r?.results ?? []).find((x: any) => !x.ok)?.error;
+      if (falhas > 0)
+        toast.error(`${enviadas}/${total} enviada(s). ${falhas} falha(s): ${primeiroErro ?? "erro desconhecido"}`, {
+          duration: 12000,
+        });
+      else toast.success(`${enviadas}/${total} mensagem(ns) aceita(s) pela Meta`);
       qc.invalidateQueries({ queryKey: ["notificacoes"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(e.message, { duration: 12000 }),
   });
+
   const mCancelar = useMutation({
     mutationFn: (id: string) => cancelarFn({ data: { id } }),
     onSuccess: () => {
