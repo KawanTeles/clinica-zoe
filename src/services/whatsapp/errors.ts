@@ -68,12 +68,41 @@ export function parseMetaApiError(rawResponse: any, httpStatus: number): MetaPar
       break;
 
     case 131047:
+      parsed.userMessage =
+        "Janela de 24h encerrada: a Meta só entrega mensagens de texto livre até 24h após a última mensagem do cliente. É necessário usar um template aprovado.";
+      parsed.technicalDiagnostic =
+        "Erro 131047: Re-engagement message. Fora da customer service window de 24 horas — apenas mensagens de template aprovado são entregues.";
+      parsed.actionRequired =
+        "Configure um template aprovado em WHATSAPP_FALLBACK_TEMPLATE ou peça ao destinatário para enviar uma mensagem ao número da clínica.";
+      parsed.retryable = false;
+      break;
+
     case 131048:
-      parsed.userMessage = "Limite de taxa (Rate Limit) da Meta excedido. A tentativa será refeita automaticamente em instantes.";
-      parsed.technicalDiagnostic = `Erro ${code}: Limite de envio de mensagens por segundo excedido na Meta Cloud API.`;
-      parsed.actionRequired = "Aguardando janela de envio e efetuando retry automático.";
+    case 130429:
+      parsed.userMessage = "Limite de envio (Rate Limit) da Meta excedido. A tentativa será refeita automaticamente.";
+      parsed.technicalDiagnostic = `Erro ${code}: limite de mensagens por segundo/qualidade excedido na Meta Cloud API.`;
+      parsed.actionRequired = "Retry automático com backoff exponencial.";
       parsed.retryable = true;
       break;
+
+    case 131051:
+      parsed.userMessage = "Tipo de mensagem não suportado pelo destinatário.";
+      parsed.technicalDiagnostic = "Erro 131051: Unsupported message type.";
+      parsed.retryable = false;
+      break;
+
+    case 132000:
+    case 132001:
+    case 132005:
+    case 132007:
+    case 132012:
+      parsed.userMessage = "Problema com o template utilizado (inexistente, não aprovado, idioma incorreto ou parâmetros inválidos).";
+      parsed.technicalDiagnostic = `Erro ${code}: falha de template — ${message}`;
+      parsed.actionRequired =
+        "Confira nome, idioma e status APPROVED do template no Meta Business Manager (WhatsApp Manager > Modelos de mensagem).";
+      parsed.retryable = false;
+      break;
+
 
     case 100:
       parsed.userMessage = "Parâmetros da mensagem inválidos ou estrutura JSON malformatada.";

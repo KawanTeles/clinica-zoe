@@ -4,7 +4,7 @@ import type { MetaCloudConfig, MetaApiStatus } from "@/lib/types/meta";
  * Service de Autenticação e Validação da Meta Cloud API (Graph API v20.0+)
  */
 export async function validateMetaAuth(config: MetaCloudConfig): Promise<MetaApiStatus> {
-  const version = config.graph_version || "v20.0";
+  const version = config.graph_version || "v23.0";
   const baseUrl = `https://graph.facebook.com/${version}`;
   const start = Date.now();
 

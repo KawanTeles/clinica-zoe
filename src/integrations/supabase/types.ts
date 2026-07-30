@@ -716,6 +716,96 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_message_logs: {
+        Row: {
+          agendamento_id: string | null
+          created_at: string
+          destinatario_telefone: string
+          duracao_ms: number | null
+          id: string
+          mensagem: string | null
+          mensagem_recebida: string | null
+          paciente_nome: string | null
+          payload: Json | null
+          profissional_nome: string | null
+          status_envio: string
+          template_name: string | null
+          ultimo_erro: string | null
+          wamid: string | null
+        }
+        Insert: {
+          agendamento_id?: string | null
+          created_at?: string
+          destinatario_telefone: string
+          duracao_ms?: number | null
+          id?: string
+          mensagem?: string | null
+          mensagem_recebida?: string | null
+          paciente_nome?: string | null
+          payload?: Json | null
+          profissional_nome?: string | null
+          status_envio?: string
+          template_name?: string | null
+          ultimo_erro?: string | null
+          wamid?: string | null
+        }
+        Update: {
+          agendamento_id?: string | null
+          created_at?: string
+          destinatario_telefone?: string
+          duracao_ms?: number | null
+          id?: string
+          mensagem?: string | null
+          mensagem_recebida?: string | null
+          paciente_nome?: string | null
+          payload?: Json | null
+          profissional_nome?: string | null
+          status_envio?: string
+          template_name?: string | null
+          ultimo_erro?: string | null
+          wamid?: string | null
+        }
+        Relationships: []
+      }
+      whatsapp_meta_config: {
+        Row: {
+          access_token: string | null
+          app_id: string | null
+          app_secret: string | null
+          business_account_id: string | null
+          created_at: string
+          graph_version: string
+          id: string
+          phone_number_id: string | null
+          updated_at: string
+          verify_token: string | null
+        }
+        Insert: {
+          access_token?: string | null
+          app_id?: string | null
+          app_secret?: string | null
+          business_account_id?: string | null
+          created_at?: string
+          graph_version?: string
+          id?: string
+          phone_number_id?: string | null
+          updated_at?: string
+          verify_token?: string | null
+        }
+        Update: {
+          access_token?: string | null
+          app_id?: string | null
+          app_secret?: string | null
+          business_account_id?: string | null
+          created_at?: string
+          graph_version?: string
+          id?: string
+          phone_number_id?: string | null
+          updated_at?: string
+          verify_token?: string | null
+        }
+        Relationships: []
+      }
       whatsapp_queue: {
         Row: {
           created_at: string
@@ -746,6 +836,24 @@ export type Database = {
           mensagem?: string
           status?: Database["public"]["Enums"]["wa_status"]
           tentativas?: number
+        }
+        Relationships: []
+      }
+      whatsapp_sessions: {
+        Row: {
+          last_inbound_at: string
+          telefone: string
+          updated_at: string
+        }
+        Insert: {
+          last_inbound_at?: string
+          telefone: string
+          updated_at?: string
+        }
+        Update: {
+          last_inbound_at?: string
+          telefone?: string
+          updated_at?: string
         }
         Relationships: []
       }

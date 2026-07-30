@@ -153,6 +153,12 @@ export async function handleWebhookPost(request: Request): Promise<Response> {
       if (ev.type === "message" && ev.fromPhone && ev.text) {
         console.log(`[whatsapp:webhook] Mensagem recebida de ${ev.fromPhone}: "${ev.text}" (wamid: ${ev.wamid})`);
 
+        // Abre/renova a janela de atendimento de 24h da Meta para este número.
+        const { registerInbound } = await import("./cloudApi");
+        await registerInbound(ev.fromPhone);
+
+
+
         // Chama RPC para interpretar resposta do profissional (CONFIRMAR, RECUSAR, REMARCAR)
         const { data: rpcRes, error: rpcErr } = await (supabaseAdmin as any).rpc(
           "processar_resposta_meta_profissional",
@@ -191,6 +197,13 @@ export async function handleWebhookPost(request: Request): Promise<Response> {
         else if (statusUpper === "FAILED") targetStatus = "ERRO";
         else if (statusUpper === "SENT") targetStatus = "ENVIADA";
 
+        // Motivo real de falha reportado pela Meta (ex.: 131047 fora da janela de 24h).
+        const falha = ev.raw?.errors?.[0];
+        const falhaMsg = falha
+          ? `Meta status=failed code=${falha.code} title=${falha.title ?? ""} details=${falha.error_data?.details ?? falha.message ?? ""}`
+          : null;
+        if (falhaMsg) console.error(`[whatsapp:webhook] Falha de entrega wamid=${ev.wamid}: ${falhaMsg}`);
+
         if (targetStatus) {
           console.log(`[whatsapp:webhook] Atualizando status wamid=${ev.wamid} -> ${targetStatus}`);
 
@@ -200,6 +213,9 @@ export async function handleWebhookPost(request: Request): Promise<Response> {
               status_envio: targetStatus,
               ...(targetStatus === "ENTREGUE" ? { entregue_em: new Date().toISOString() } : {}),
               ...(targetStatus === "LIDO" ? { lido_em: new Date().toISOString() } : {}),
+              ...(targetStatus === "ERRO"
+                ? { ultimo_erro: falhaMsg ?? "Falha de entrega reportada pela Meta", definitivo: true }
+                : {}),
             })
             .eq("provider_message_id", ev.wamid);
 
@@ -207,9 +223,11 @@ export async function handleWebhookPost(request: Request): Promise<Response> {
             .from("whatsapp_message_logs")
             .update({
               status_envio: targetStatus,
+              ...(falhaMsg ? { ultimo_erro: falhaMsg } : {}),
             })
             .eq("wamid", ev.wamid);
         }
+
       }
     }
 

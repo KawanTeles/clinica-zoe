@@ -4,7 +4,7 @@
  * Exclusively uses Meta WhatsApp Cloud API for WhatsApp messaging.
  */
 
-import { sendRawCloudApiMessage, loadWhatsAppConfig } from "@/services/whatsapp/cloudApi";
+import { sendSessionAwareText, loadWhatsAppConfig, GRAPH_VERSION_DEFAULT } from "@/services/whatsapp/cloudApi";
 
 export type OutboundChannel = "WHATSAPP" | "EMAIL";
 
@@ -61,17 +61,7 @@ class MetaCloudProvider implements MessageProvider {
     const textContent = msg.title && !msg.body.startsWith(msg.title) ? `${msg.title}\n\n${msg.body}` : msg.body;
     const agendamentoId = (msg.metadata?.agendamento_id as string) || undefined;
 
-    const result = await sendRawCloudApiMessage(
-      msg.to,
-      {
-        type: "text",
-        text: {
-          preview_url: true,
-          body: textContent,
-        },
-      },
-      { agendamentoId }
-    );
+    const result = await sendSessionAwareText(msg.to, textContent, { agendamentoId });
 
     return {
       ok: result.ok,
@@ -81,13 +71,14 @@ class MetaCloudProvider implements MessageProvider {
     };
   }
 
+
   async test(_cfg: ProviderConfig): Promise<DeliveryResult> {
     const waConfig = await loadWhatsAppConfig();
     if (!waConfig.access_token || !waConfig.phone_number_id) {
       return { ok: false, error: "Informe token e Phone Number ID da Meta Cloud API." };
     }
     try {
-      const version = waConfig.graph_version || "v20.0";
+      const version = waConfig.graph_version || GRAPH_VERSION_DEFAULT;
       const resp = await fetch(`https://graph.facebook.com/${version}/${waConfig.phone_number_id}`, {
         headers: { Authorization: `Bearer ${waConfig.access_token}` },
       });
@@ -106,7 +97,7 @@ export const PROVIDER_IDS = providers.map((p) => p.id);
 
 export const DEFAULT_CONFIG: ProviderConfig = {
   provider: "meta",
-  provider_url: "https://graph.facebook.com/v20.0",
+  provider_url: "https://graph.facebook.com/v23.0",
   provider_token: null,
   remetente: null,
   provider_instancia: null,

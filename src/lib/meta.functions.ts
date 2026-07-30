@@ -43,7 +43,7 @@ export async function loadMetaConfigServer(): Promise<MetaCloudConfig> {
       app_id: cfg.app_id ?? "",
       app_secret: cfg.app_secret ?? "",
       verify_token: cfg.verify_token ?? "clinica_zoe_verify_token_2026",
-      graph_version: cfg.graph_version ?? "v20.0",
+      graph_version: cfg.graph_version ?? "v23.0",
     };
   }
 
@@ -62,7 +62,7 @@ export async function loadMetaConfigServer(): Promise<MetaCloudConfig> {
     app_id: process.env.META_APP_ID ?? "",
     app_secret: process.env.META_APP_SECRET ?? "",
     verify_token: legacy?.webhook_secret ?? process.env.META_VERIFY_TOKEN ?? "clinica_zoe_verify_token_2026",
-    graph_version: "v20.0",
+    graph_version: "v23.0",
   };
 }
 
@@ -97,7 +97,7 @@ const metaConfigSchema = z.object({
   app_id: z.string().optional().default(""),
   app_secret: z.string().optional().default(""),
   verify_token: z.string().optional().default("clinica_zoe_verify_token_2026"),
-  graph_version: z.string().optional().default("v20.0"),
+  graph_version: z.string().optional().default("v23.0"),
 });
 
 export const saveMetaConfig = createServerFn({ method: "POST" })
