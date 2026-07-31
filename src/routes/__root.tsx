@@ -108,7 +108,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Organization",
-          name: "Clínica",
+          name: "Clínica Zoe",
           url: `${SITE_URL}/`,
         }),
       },
@@ -117,7 +117,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "Clínica",
+          name: "Clínica Zoe",
           url: `${SITE_URL}/`,
         }),
       },

@@ -29,7 +29,7 @@ export const Route = createFileRoute("/especialidades")({
           name: "Especialidades — Clínica Zoe",
           url: `${SITE_URL}/especialidades`,
           description: "Especialidades disponíveis para agendamento na Clínica.",
-          about: { "@type": "MedicalBusiness", name: "Clínica" },
+          about: { "@type": "MedicalBusiness", name: "Clínica Zoe" },
         }),
       },
     ],

@@ -28,7 +28,7 @@ export const Route = createFileRoute("/profissionais")({
           name: "Profissionais — Clínica Zoe",
           url: `${SITE_URL}/profissionais`,
           description: "Time de especialistas da Clínica.",
-          about: { "@type": "MedicalBusiness", name: "Clínica" },
+          about: { "@type": "MedicalBusiness", name: "Clínica Zoe" },
         }),
       },
     ],

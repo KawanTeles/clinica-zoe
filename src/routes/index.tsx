@@ -66,7 +66,7 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "MedicalBusiness",
-          name: "Clínica",
+          name: "Clínica Zoe",
           url: `${SITE_URL}/`,
           description:
             "Clínica Zoe: agenda inteligente, profissionais qualificados e uma experiência clínica premium.",
