@@ -13,9 +13,9 @@ export const Route = createFileRoute("/redefinir-senha")({
   }),
   head: () => ({
     meta: [
-      { title: "Redefinir senha — Clínica" },
+      { title: "Redefinir senha — Clínica Zoe" },
       { name: "description", content: "Crie uma nova senha para acessar sua conta na Clínica." },
-      { property: "og:title", content: "Redefinir senha — Clínica" },
+      { property: "og:title", content: "Redefinir senha — Clínica Zoe" },
       { property: "og:description", content: "Crie uma nova senha com segurança." },
       { name: "robots", content: "noindex" },
     ],

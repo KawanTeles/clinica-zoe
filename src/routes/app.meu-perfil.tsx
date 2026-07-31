@@ -18,9 +18,9 @@ import { SecurityCard } from "@/components/security/SecurityCard";
 export const Route = createFileRoute("/app/meu-perfil")({
   head: () => ({
     meta: [
-      { title: "Meu Perfil — Clínica" },
+      { title: "Meu Perfil — Clínica Zoe" },
       { name: "description", content: "Seus dados profissionais." },
-      { property: "og:title", content: "Meu Perfil — Clínica" },
+      { property: "og:title", content: "Meu Perfil — Clínica Zoe" },
       { property: "og:description", content: "Seus dados profissionais." },
       { name: "robots", content: "noindex" },
     ],

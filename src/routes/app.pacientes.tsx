@@ -25,9 +25,9 @@ import { PersonAvatar } from "@/lib/avatar";
 export const Route = createFileRoute("/app/pacientes")({
   head: () => ({
     meta: [
-      { title: "Pacientes — Clínica" },
+      { title: "Pacientes — Clínica Zoe" },
       { name: "description", content: "Cadastro de pacientes." },
-      { property: "og:title", content: "Pacientes — Clínica" },
+      { property: "og:title", content: "Pacientes — Clínica Zoe" },
       { property: "og:description", content: "Cadastro de pacientes." },
       { name: "robots", content: "noindex" },
     ],

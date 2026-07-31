@@ -4,9 +4,9 @@ import { ComingSoon } from "@/components/coming-soon";
 export const Route = createFileRoute("/app/meus-pacientes")({
   head: () => ({
     meta: [
-      { title: "Meus Pacientes — Clínica" },
+      { title: "Meus Pacientes — Clínica Zoe" },
       { name: "description", content: "Seus pacientes." },
-      { property: "og:title", content: "Meus Pacientes — Clínica" },
+      { property: "og:title", content: "Meus Pacientes — Clínica Zoe" },
       { property: "og:description", content: "Seus pacientes." },
       { name: "robots", content: "noindex" },
     ],

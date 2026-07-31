@@ -22,9 +22,9 @@ import { Plus, Loader2, Settings, Trash2, Building2, Save, Share2 } from "lucide
 export const Route = createFileRoute("/app/configuracoes")({
   head: () => ({
     meta: [
-      { title: "Configurações — Clínica" },
+      { title: "Configurações — Clínica Zoe" },
       { name: "description", content: "Configurações do sistema e do site público." },
-      { property: "og:title", content: "Configurações — Clínica" },
+      { property: "og:title", content: "Configurações — Clínica Zoe" },
       { property: "og:description", content: "Configurações do sistema e do site público." },
       { name: "robots", content: "noindex" },
     ],
