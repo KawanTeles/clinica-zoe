@@ -20,8 +20,8 @@ import {
   Navigation,
 } from "lucide-react";
 import { useState } from "react";
+import { SITE_URL } from "@/lib/site-url";
 
-const SITE_URL = "https://clinicazoe.lovable.app";
 
 const FAQ_ITEMS = [
   {

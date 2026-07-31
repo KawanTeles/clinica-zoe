@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/lib/auth-context";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider, themeInitScript } from "@/lib/theme";
+import { SITE_URL } from "../lib/site-url";
 
 function NotFoundComponent() {
   return (
@@ -108,7 +109,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@context": "https://schema.org",
           "@type": "Organization",
           name: "Clínica",
-          url: "https://clinicazoe.lovable.app/",
+          url: `${SITE_URL}/`,
         }),
       },
       {
@@ -117,7 +118,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@context": "https://schema.org",
           "@type": "WebSite",
           name: "Clínica",
-          url: "https://clinicazoe.lovable.app/",
+          url: `${SITE_URL}/`,
         }),
       },
     ],

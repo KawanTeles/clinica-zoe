@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteShell, Reveal } from "@/components/site/SiteShell";
 import { Loader2 } from "lucide-react";
 import { ProfissionalCard, useProfissionaisPublicos } from "@/lib/profissionais-public";
+import { SITE_URL } from "@/lib/site-url";
 
 export const Route = createFileRoute("/profissionais")({
   head: () => ({
@@ -14,10 +15,10 @@ export const Route = createFileRoute("/profissionais")({
       { property: "og:title", content: "Profissionais — Clínica" },
       { property: "og:description", content: "Nosso time de especialistas." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://clinicazoe.lovable.app/profissionais" },
+      { property: "og:url", content: `${SITE_URL}/profissionais` },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://clinicazoe.lovable.app/profissionais" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/profissionais` }],
     scripts: [
       {
         type: "application/ld+json",
@@ -25,7 +26,7 @@ export const Route = createFileRoute("/profissionais")({
           "@context": "https://schema.org",
           "@type": "CollectionPage",
           name: "Profissionais — Clínica",
-          url: "https://clinicazoe.lovable.app/profissionais",
+          url: `${SITE_URL}/profissionais`,
           description: "Time de especialistas da Clínica.",
           about: { "@type": "MedicalBusiness", name: "Clínica" },
         }),
