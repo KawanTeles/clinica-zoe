@@ -22,7 +22,6 @@ import {
 import { useState } from "react";
 import { SITE_URL } from "@/lib/site-url";
 
-const SITE_URL = `${SITE_URL}`;
 
 const FAQ_ITEMS = [
   {
