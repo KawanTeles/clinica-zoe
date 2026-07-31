@@ -46,9 +46,9 @@ import {
 export const Route = createFileRoute("/app/solicitacoes")({
   head: () => ({
     meta: [
-      { title: "Solicitações — Clínica" },
+      { title: "Solicitações — Clínica Zoe" },
       { name: "description", content: "Central de solicitações de agendamento." },
-      { property: "og:title", content: "Solicitações — Clínica" },
+      { property: "og:title", content: "Solicitações — Clínica Zoe" },
       { property: "og:description", content: "Central de solicitações de agendamento." },
       { name: "robots", content: "noindex" },
     ],

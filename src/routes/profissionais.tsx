@@ -7,12 +7,12 @@ import { SITE_URL } from "@/lib/site-url";
 export const Route = createFileRoute("/profissionais")({
   head: () => ({
     meta: [
-      { title: "Profissionais — Clínica" },
+      { title: "Profissionais — Clínica Zoe" },
       {
         name: "description",
         content: "Conheça os profissionais da Clínica e escolha o especialista ideal para você.",
       },
-      { property: "og:title", content: "Profissionais — Clínica" },
+      { property: "og:title", content: "Profissionais — Clínica Zoe" },
       { property: "og:description", content: "Nosso time de especialistas." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE_URL}/profissionais` },
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/profissionais")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-          name: "Profissionais — Clínica",
+          name: "Profissionais — Clínica Zoe",
           url: `${SITE_URL}/profissionais`,
           description: "Time de especialistas da Clínica.",
           about: { "@type": "MedicalBusiness", name: "Clínica" },

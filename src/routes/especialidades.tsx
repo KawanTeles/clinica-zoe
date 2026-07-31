@@ -9,12 +9,12 @@ import { SITE_URL } from "@/lib/site-url";
 export const Route = createFileRoute("/especialidades")({
   head: () => ({
     meta: [
-      { title: "Especialidades — Clínica" },
+      { title: "Especialidades — Clínica Zoe" },
       {
         name: "description",
         content: "Conheça todas as especialidades disponíveis na Clínica e agende sua consulta.",
       },
-      { property: "og:title", content: "Especialidades — Clínica" },
+      { property: "og:title", content: "Especialidades — Clínica Zoe" },
       { property: "og:description", content: "Especialidades disponíveis para agendamento." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE_URL}/especialidades` },
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/especialidades")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-          name: "Especialidades — Clínica",
+          name: "Especialidades — Clínica Zoe",
           url: `${SITE_URL}/especialidades`,
           description: "Especialidades disponíveis para agendamento na Clínica.",
           about: { "@type": "MedicalBusiness", name: "Clínica" },

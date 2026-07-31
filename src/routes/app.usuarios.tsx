@@ -53,9 +53,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/app/usuarios")({
   head: () => ({
     meta: [
-      { title: "Usuários — Clínica" },
+      { title: "Usuários — Clínica Zoe" },
       { name: "description", content: "Gerenciamento de usuários, permissões e auditoria." },
-      { property: "og:title", content: "Usuários — Clínica" },
+      { property: "og:title", content: "Usuários — Clínica Zoe" },
       { property: "og:description", content: "Gerenciamento de usuários e permissões." },
       { name: "robots", content: "noindex" },
     ],
