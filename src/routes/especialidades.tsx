@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { SiteShell, Reveal } from "@/components/site/SiteShell";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2 } from "lucide-react";
+import { SITE_URL } from "@/lib/site-url";
 
 export const Route = createFileRoute("/especialidades")({
   head: () => ({
@@ -16,9 +17,9 @@ export const Route = createFileRoute("/especialidades")({
       { property: "og:title", content: "Especialidades — Clínica" },
       { property: "og:description", content: "Especialidades disponíveis para agendamento." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://clinicazoe.lovable.app/especialidades" },
+      { property: "og:url", content: `${SITE_URL}/especialidades` },
     ],
-    links: [{ rel: "canonical", href: "https://clinicazoe.lovable.app/especialidades" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/especialidades` }],
     scripts: [
       {
         type: "application/ld+json",
@@ -26,7 +27,7 @@ export const Route = createFileRoute("/especialidades")({
           "@context": "https://schema.org",
           "@type": "CollectionPage",
           name: "Especialidades — Clínica",
-          url: "https://clinicazoe.lovable.app/especialidades",
+          url: `${SITE_URL}/especialidades`,
           description: "Especialidades disponíveis para agendamento na Clínica.",
           about: { "@type": "MedicalBusiness", name: "Clínica" },
         }),
