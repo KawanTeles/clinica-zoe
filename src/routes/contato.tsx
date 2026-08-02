@@ -7,12 +7,12 @@ import { MapPin, Phone, Mail, Clock, Navigation } from "lucide-react";
 export const Route = createFileRoute("/contato")({
   head: () => ({
     meta: [
-      { title: "Contato — Clínica" },
+      { title: "Contato — Clínica Zoe" },
       {
         name: "description",
         content: "Fale com a Clínica: endereço, telefone, e-mail e horário de funcionamento.",
       },
-      { property: "og:title", content: "Contato — Clínica" },
+      { property: "og:title", content: "Contato — Clínica Zoe" },
       { property: "og:description", content: "Endereço, telefone e horário de funcionamento." },
       { property: "og:type", content: "website" },
     ],

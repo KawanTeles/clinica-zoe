@@ -6,13 +6,13 @@ import { HeartHandshake, ShieldCheck, Sparkles, Users } from "lucide-react";
 export const Route = createFileRoute("/sobre")({
   head: () => ({
     meta: [
-      { title: "Sobre — Clínica" },
+      { title: "Sobre — Clínica Zoe" },
       {
         name: "description",
         content:
           "Conheça a história, a missão e os valores da Clínica: um espaço clínico premium dedicado ao cuidado humano e à excelência.",
       },
-      { property: "og:title", content: "Sobre — Clínica" },
+      { property: "og:title", content: "Sobre — Clínica Zoe" },
       { property: "og:description", content: "Nossa história, missão e valores." },
       { property: "og:type", content: "article" },
     ],

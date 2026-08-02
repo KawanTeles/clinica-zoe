@@ -45,16 +45,16 @@ const FAQ_ITEMS = [
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Clínica — Cuidado clínico premium" },
+      { title: "Clínica Zoe — Cuidado clínico premium" },
       {
         name: "description",
         content:
-          "Clínica: agenda inteligente, profissionais qualificados e uma experiência clínica premium. Agende sua consulta em minutos.",
+          "Clínica Zoe: agenda inteligente, profissionais qualificados e uma experiência clínica premium. Agende sua consulta em minutos.",
       },
-      { property: "og:title", content: "Clínica — Cuidado clínico premium" },
+      { property: "og:title", content: "Clínica Zoe — Cuidado clínico premium" },
       {
         property: "og:description",
-        content: "Clínica: agenda inteligente, profissionais qualificados e uma experiência clínica premium. Agende sua consulta em minutos.",
+        content: "Clínica Zoe: agenda inteligente, profissionais qualificados e uma experiência clínica premium. Agende sua consulta em minutos.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE_URL}/` },
@@ -66,10 +66,10 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "MedicalBusiness",
-          name: "Clínica",
+          name: "Clínica Zoe",
           url: `${SITE_URL}/`,
           description:
-            "Clínica: agenda inteligente, profissionais qualificados e uma experiência clínica premium.",
+            "Clínica Zoe: agenda inteligente, profissionais qualificados e uma experiência clínica premium.",
           medicalSpecialty: "MedicalClinic",
         }),
       },

@@ -10,9 +10,9 @@ import { Card, CardContent } from "@/components/ui/card";
 export const Route = createFileRoute("/app/minha-agenda")({
   head: () => ({
     meta: [
-      { title: "Minha Agenda — Clínica" },
+      { title: "Minha Agenda — Clínica Zoe" },
       { name: "description", content: "Sua agenda de atendimentos." },
-      { property: "og:title", content: "Minha Agenda — Clínica" },
+      { property: "og:title", content: "Minha Agenda — Clínica Zoe" },
       { property: "og:description", content: "Sua agenda de atendimentos." },
       { name: "robots", content: "noindex" },
     ],

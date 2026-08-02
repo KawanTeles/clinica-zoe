@@ -240,20 +240,21 @@ export function SiteShell({ children }: { children: ReactNode }) {
               </li>
             </ul>
           </div>
-          <div>
+          <div className="min-w-0">
             <h4 className="text-sm font-semibold">Contato</h4>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               {settings.endereco && (
-                <li className="flex gap-2"><MapPin className="h-4 w-4 shrink-0 text-primary" /><span>{settings.endereco}</span></li>
+                <li className="flex min-w-0 gap-2"><MapPin className="h-4 w-4 shrink-0 text-primary" /><span className="min-w-0 break-words">{settings.endereco}</span></li>
               )}
               {settings.telefone && (
-                <li className="flex gap-2"><Phone className="h-4 w-4 shrink-0 text-primary" /><span>{settings.telefone}</span></li>
+                <li className="flex min-w-0 gap-2"><Phone className="h-4 w-4 shrink-0 text-primary" /><span className="min-w-0 break-words">{settings.telefone}</span></li>
               )}
               {settings.email && (
-                <li className="flex gap-2"><Mail className="h-4 w-4 shrink-0 text-primary" /><span>{settings.email}</span></li>
+                <li className="flex min-w-0 gap-2"><Mail className="h-4 w-4 shrink-0 text-primary" /><span className="min-w-0 break-all">{settings.email}</span></li>
               )}
             </ul>
           </div>
+
         </div>
         <div className="border-t border-border">
           <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-muted-foreground sm:flex-row sm:px-6">

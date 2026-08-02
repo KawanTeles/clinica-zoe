@@ -42,9 +42,9 @@ import { SecurityCard } from "@/components/security/SecurityCard";
 export const Route = createFileRoute("/cliente/")({
   head: () => ({
     meta: [
-      { title: "Área do Cliente — Clínica" },
+      { title: "Área do Cliente — Clínica Zoe" },
       { name: "description", content: "Acompanhe suas consultas e dados na Clínica." },
-      { property: "og:title", content: "Área do Cliente — Clínica" },
+      { property: "og:title", content: "Área do Cliente — Clínica Zoe" },
       { property: "og:description", content: "Suas consultas e dados." },
       { name: "robots", content: "noindex" },
     ],
@@ -130,7 +130,7 @@ function ConsultasSection({ userId }: { userId: string }) {
       const { data, error } = await supabase
         .from("agendamentos")
         .select(
-          "id, data, hora_inicio, hora_fim, status, valor, forma_pagamento, observacoes, profissional:profissionais(id, nome, foto_url, duracao_consulta_min, especialidade:especialidades(nome))",
+          "id, data, hora_inicio, hora_fim, status, valor, forma_pagamento, observacoes, profissional:profissionais_public(id, nome, foto_url, duracao_consulta_min, especialidade:especialidades(nome))",
         )
         .eq("cliente_user_id", userId)
         .order("data", { ascending: false })

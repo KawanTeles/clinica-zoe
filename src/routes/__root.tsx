@@ -14,7 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/lib/auth-context";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider, themeInitScript } from "@/lib/theme";
-import { SITE_URL } from "../lib/site-url";
+import { SITE_URL, OG_IMAGE } from "../lib/site-url";
 
 function NotFoundComponent() {
   return (
@@ -81,16 +81,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Clínica — Painel Administrativo" },
-      { name: "description", content: "Clínica: agenda inteligente, profissionais qualificados e uma experiência clínica premium. Agende sua consulta em minutos." },
-      { property: "og:title", content: "Clínica — Painel Administrativo" },
-      { property: "og:description", content: "Clínica: agenda inteligente, profissionais qualificados e uma experiência clínica premium. Agende sua consulta em minutos." },
+      { title: "Clínica Zoe — Painel Administrativo" },
+      { name: "description", content: "Clínica Zoe: agenda inteligente, profissionais qualificados e uma experiência clínica premium. Agende sua consulta em minutos." },
+      { property: "og:title", content: "Clínica Zoe — Painel Administrativo" },
+      { property: "og:description", content: "Clínica Zoe: agenda inteligente, profissionais qualificados e uma experiência clínica premium. Agende sua consulta em minutos." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Clínica — Painel Administrativo" },
-      { name: "twitter:description", content: "Clínica: agenda inteligente, profissionais qualificados e uma experiência clínica premium. Agende sua consulta em minutos." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f57c5dff-9f67-4b73-8486-ae7afae92640/id-preview-97f70d79--5c9f3d68-f19f-4170-bea5-906a476fe79c.lovable.app-1784817240581.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f57c5dff-9f67-4b73-8486-ae7afae92640/id-preview-97f70d79--5c9f3d68-f19f-4170-bea5-906a476fe79c.lovable.app-1784817240581.png" },
+      { name: "twitter:title", content: "Clínica Zoe — Painel Administrativo" },
+      { name: "twitter:description", content: "Clínica Zoe: agenda inteligente, profissionais qualificados e uma experiência clínica premium. Agende sua consulta em minutos." },
+      { property: "og:image", content: OG_IMAGE },
+      { name: "twitter:image", content: OG_IMAGE },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -108,7 +108,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Organization",
-          name: "Clínica",
+          name: "Clínica Zoe",
           url: `${SITE_URL}/`,
         }),
       },
@@ -117,7 +117,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "Clínica",
+          name: "Clínica Zoe",
           url: `${SITE_URL}/`,
         }),
       },
