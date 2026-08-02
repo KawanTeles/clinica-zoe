@@ -13,9 +13,22 @@ export async function signInGuarded(
   email: string,
   password: string,
 ): Promise<{ ok: true } | { ok: false; message: string }> {
+  const cleanEmail = email.trim().toLowerCase();
   const supabase = getSupabaseFor(scope);
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error || !data.user) return { ok: false, message: GENERIC_ERROR };
+  const { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
+  if (error || !data.user) {
+    const msg = error?.message?.toLowerCase() || "";
+    if (msg.includes("email not confirmed") || msg.includes("email_not_confirmed")) {
+      return {
+        ok: false,
+        message: "E-mail não confirmado. Por favor, verifique sua caixa de entrada para confirmar o cadastro antes de entrar.",
+      };
+    }
+    if (msg.includes("invalid login credentials")) {
+      return { ok: false, message: "E-mail ou senha incorretos. Verifique suas credenciais." };
+    }
+    return { ok: false, message: error?.message || GENERIC_ERROR };
+  }
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -30,3 +43,4 @@ export async function signInGuarded(
 
   return { ok: true };
 }
+

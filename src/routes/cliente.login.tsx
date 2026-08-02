@@ -123,7 +123,8 @@ function LoginForm() {
       }
     }
     setBusy(true);
-    const result = await signInGuarded("client", email, password);
+    const cleanEmail = email.trim().toLowerCase();
+    const result = await signInGuarded("client", cleanEmail, password);
     setBusy(false);
     if (!result.ok) {
       toast.error(result.message);
@@ -171,21 +172,41 @@ function SignupForm({ onDone }: { onDone: () => void }) {
       }
     }
     setBusy(true);
-    const { error } = await supabase.auth.signUp({
-      email,
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanNome = nome.trim();
+
+    const { data, error } = await supabase.auth.signUp({
+      email: cleanEmail,
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/cliente`,
-        data: { nome },
+        data: { nome: cleanNome },
       },
     });
     setBusy(false);
     if (error) {
-      toast.error(error.message);
+      const msg = error.message.toLowerCase();
+      if (msg.includes("weak")) {
+        toast.error("Senha muito fraca ou comum. Escolha uma senha mais forte (com letras, números e símbolos).");
+      } else if (msg.includes("already registered") || msg.includes("already exists")) {
+        toast.error("Este e-mail já está cadastrado. Faça login ou recupere sua senha.");
+      } else {
+        toast.error(error.message);
+      }
       return;
     }
-    toast.success("Conta criada! Você já pode entrar.");
-    onDone();
+
+    if (data?.session) {
+      toast.success("Conta criada com sucesso! Redirecionando...");
+    } else if (data?.user && !data.user.email_confirmed_at) {
+      toast.success(
+        "Conta criada com sucesso! Enviamos um e-mail de confirmação. Por favor, confirme seu e-mail para ativar sua conta antes de fazer login."
+      );
+      onDone();
+    } else {
+      toast.success("Conta criada! Você já pode entrar.");
+      onDone();
+    }
   };
 
   return (

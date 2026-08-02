@@ -97,7 +97,8 @@ function LoginForm() {
       }
     }
     setBusy(true);
-    const result = await signInGuarded("staff", email, password);
+    const cleanEmail = email.trim().toLowerCase();
+    const result = await signInGuarded("staff", cleanEmail, password);
     setBusy(false);
     if (!result.ok) {
       toast.error(result.message);
