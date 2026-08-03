@@ -1116,6 +1116,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      profissional_atende_usuario: {
+        Args: { _paciente_user_id: string; _prof_user_id: string }
+        Returns: boolean
+      }
       resolve_valor_consulta: {
         Args: { _forma_pagamento: string; _profissional_id: string }
         Returns: number
