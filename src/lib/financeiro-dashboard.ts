@@ -122,7 +122,7 @@ export function useFinanceiroDashboard() {
       let receitaAno = 0;
 
       for (const r of pagosAno.data ?? []) {
-        const v = valorLiquido(r);
+        const v = valorLiquido(r as any);
         receitaAno += v;
 
         const pagoEmDia = (r as any).pago_em ? String((r as any).pago_em).slice(0, 10) : null;
@@ -163,7 +163,7 @@ export function useFinanceiroDashboard() {
       let qtdAberto = 0;
       let qtdParcial = 0;
       for (const r of abertosParciais.data ?? []) {
-        const v = valorLiquido(r);
+        const v = valorLiquido(r as any);
         const status = (r as any).status_pagamento;
         if (status === "PARCIAL") {
           totalParcial += v;
@@ -200,7 +200,7 @@ export function useFinanceiroDashboard() {
       }
 
       const receitaMesAnterior = (mesAnterior.data ?? []).reduce(
-        (s, r: any) => s + valorLiquido(r),
+        (s, r: any) => s + valorLiquido(r as any),
         0,
       );
       const variacaoMesPct =

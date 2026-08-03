@@ -236,7 +236,7 @@ function FinanceiroPage() {
     const porProf = new Map<string, FinanceiroDimensao>();
     const porEsp = new Map<string, FinanceiroDimensao>();
     for (const r of rows ?? []) {
-      const v = valorLiquido(r);
+      const v = valorLiquido(r as any);
       const status = (r as any).status_pagamento;
       const prof = (r as any).profissional;
       const esp = (r as any).profissional?.especialidade;
