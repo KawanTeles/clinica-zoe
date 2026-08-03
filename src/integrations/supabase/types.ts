@@ -1134,7 +1134,7 @@ export type Database = {
         | "REMARCADO"
         | "FINALIZADO"
       app_role: "ADMIN" | "RECEPCIONISTA" | "PROFISSIONAL" | "CLIENTE"
-      financeiro_status: "ABERTO" | "PAGO" | "CANCELADO"
+      financeiro_status: "ABERTO" | "PAGO" | "CANCELADO" | "PARCIAL"
       forma_pagamento:
         | "DINHEIRO"
         | "PIX"
@@ -1298,7 +1298,7 @@ export const Constants = {
         "FINALIZADO",
       ],
       app_role: ["ADMIN", "RECEPCIONISTA", "PROFISSIONAL", "CLIENTE"],
-      financeiro_status: ["ABERTO", "PAGO", "CANCELADO"],
+      financeiro_status: ["ABERTO", "PAGO", "CANCELADO", "PARCIAL"],
       forma_pagamento: [
         "DINHEIRO",
         "PIX",
