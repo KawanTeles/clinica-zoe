@@ -8,7 +8,8 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES
   ('profissionais', 'profissionais', false),
   ('clientes',      'clientes',      false),
-  ('clinica',       'clinica',       false)
+  ('clinica',       'clinica',       false),
+  ('financeiro',    'financeiro',    false)
 ON CONFLICT (id) DO UPDATE SET public = EXCLUDED.public;
 
 -- ---------- Políticas em storage.objects ----------
@@ -79,3 +80,43 @@ CREATE POLICY "clinica_admin_update" ON storage.objects
 CREATE POLICY "clinica_admin_delete" ON storage.objects
   FOR DELETE TO authenticated
   USING (bucket_id = 'clinica'::text AND public.has_role(auth.uid(), 'ADMIN'::public.app_role));
+
+-- ---------- Financeiro (Fase 1 — comprovantes de pagamento) ----------
+-- Convenção de path igual à de avatar.tsx: o valor salvo em
+-- financeiro_anexos.arquivo_path é "financeiro/<financeiro_id>/<arquivo>"
+-- (primeiro segmento = bucket). Dentro do bucket, o objeto fica em
+-- "<financeiro_id>/<arquivo>" — (storage.foldername(name))[1] é o
+-- financeiro_id, usado para restringir PROFISSIONAL aos próprios
+-- comprovantes, do mesmo jeito que a tabela financeiro_anexos já faz.
+DROP POLICY IF EXISTS "financeiro_read_staff"    ON storage.objects;
+DROP POLICY IF EXISTS "financeiro_admin_insert"  ON storage.objects;
+DROP POLICY IF EXISTS "financeiro_admin_update"  ON storage.objects;
+DROP POLICY IF EXISTS "financeiro_admin_delete"  ON storage.objects;
+
+CREATE POLICY "financeiro_read_staff" ON storage.objects
+  FOR SELECT TO authenticated
+  USING (
+    bucket_id = 'financeiro'::text
+    AND (
+      public.has_role(auth.uid(), 'ADMIN'::public.app_role)
+      OR EXISTS (
+        SELECT 1 FROM public.financeiro f
+        JOIN public.profissionais p ON p.id = f.profissional_id
+        WHERE f.id::text = (storage.foldername(name))[1]
+          AND p.user_id = auth.uid()
+      )
+    )
+  );
+
+CREATE POLICY "financeiro_admin_insert" ON storage.objects
+  FOR INSERT TO authenticated
+  WITH CHECK (bucket_id = 'financeiro'::text AND public.has_role(auth.uid(), 'ADMIN'::public.app_role));
+
+CREATE POLICY "financeiro_admin_update" ON storage.objects
+  FOR UPDATE TO authenticated
+  USING (bucket_id = 'financeiro'::text AND public.has_role(auth.uid(), 'ADMIN'::public.app_role))
+  WITH CHECK (bucket_id = 'financeiro'::text AND public.has_role(auth.uid(), 'ADMIN'::public.app_role));
+
+CREATE POLICY "financeiro_admin_delete" ON storage.objects
+  FOR DELETE TO authenticated
+  USING (bucket_id = 'financeiro'::text AND public.has_role(auth.uid(), 'ADMIN'::public.app_role));

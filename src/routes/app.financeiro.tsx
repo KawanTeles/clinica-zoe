@@ -4,17 +4,6 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertDialog,
@@ -26,21 +15,23 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { FinanceiroKpis } from "@/components/financeiro/FinanceiroKpis";
+import { FinanceiroGraficos } from "@/components/financeiro/FinanceiroGraficos";
 import {
-  DollarSign,
-  CheckCircle2,
-  XCircle,
-  Clock,
-  Loader2,
-  TrendingUp,
-  Wallet,
-  CalendarDays,
-  User,
-  Stethoscope,
-  RotateCcw,
-} from "lucide-react";
-import { fmtHora } from "@/lib/agenda-utils";
-import { PersonAvatar } from "@/lib/avatar";
+  FinanceiroFiltros,
+  type FinanceiroFiltrosState,
+} from "@/components/financeiro/FinanceiroFiltros";
+import { TabelaLancamentos, type ParcelasResumo } from "@/components/financeiro/TabelaLancamentos";
+import { RelatorioPorDimensaoCard } from "@/components/financeiro/RelatorioPorDimensaoCard";
+import {
+  RegistrarPagamentoDialog,
+  type LancamentoParaPagamento,
+} from "@/components/financeiro/RegistrarPagamentoDialog";
+import { ParcelarDialog } from "@/components/financeiro/ParcelarDialog";
+import { HistoricoLancamentoDialog } from "@/components/financeiro/HistoricoLancamentoDialog";
+import { exportarLancamentosCSV } from "@/lib/financeiro-export";
+import { firstDayOfMonthISO, todayISO, valorLiquido } from "@/lib/financeiro-utils";
+import type { FinanceiroDimensao } from "@/lib/financeiro-dashboard";
 
 export const Route = createFileRoute("/app/financeiro")({
   head: () => ({
@@ -55,42 +46,11 @@ export const Route = createFileRoute("/app/financeiro")({
   component: FinanceiroPage,
 });
 
-const FORMA_LABEL: Record<string, string> = {
-  DINHEIRO: "Dinheiro",
-  PIX: "PIX",
-  CARTAO_DEBITO: "Cartão de Débito",
-  CARTAO_CREDITO: "Cartão de Crédito",
-  OUTRO: "Outro",
-};
-
-const STATUS_LABEL: Record<string, string> = {
-  ABERTO: "Aberto",
-  PAGO: "Pago",
-  CANCELADO: "Cancelado",
-};
-
-const STATUS_COLOR: Record<string, string> = {
-  ABERTO: "bg-amber-500/15 text-amber-700 border-amber-500/30 dark:text-amber-300",
-  PAGO: "bg-emerald-500/15 text-emerald-700 border-emerald-500/30 dark:text-emerald-300",
-  CANCELADO: "bg-muted text-muted-foreground border-border",
-};
-
-function firstDayOfMonthISO() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
-}
-function todayISO() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-function brl(n: number) {
-  return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
-function valorLancamento(row: any) {
-  const valorCongelado = row?.agendamento?.valor;
-  return valorCongelado == null ? Number(row?.valor ?? 0) : Number(valorCongelado) || 0;
-}
+const SELECT_COM_RELACOES =
+  "id, valor, desconto, juros, multa, status_pagamento, forma_pagamento, pago_em, observacoes, vencimento, created_at, " +
+  "agendamento:agendamentos(id, data, hora_inicio, hora_fim, valor), " +
+  "paciente:pacientes(id, nome, foto_url), " +
+  "profissional:profissionais(id, nome, foto_url, especialidade_id, especialidade:especialidades(id, nome))";
 
 function FinanceiroPage() {
   const { loading, user, hasRole, hasAnyRole } = useAuth();
@@ -106,15 +66,36 @@ function FinanceiroPage() {
   const isAdmin = hasRole("ADMIN");
   const isProfissional = hasRole("PROFISSIONAL") && !isAdmin;
 
-  // Filters
-  const [status, setStatus] = useState<string>("TODOS");
-  const [forma, setForma] = useState<string>("TODAS");
-  const [profissionalId, setProfissionalId] = useState<string>("TODOS");
-  const [especialidadeId, setEspecialidadeId] = useState<string>("TODAS");
-  const [dataDe, setDataDe] = useState<string>(firstDayOfMonthISO());
-  const [dataAte, setDataAte] = useState<string>(todayISO());
+  const [filtros, setFiltros] = useState<FinanceiroFiltrosState>({
+    status: "TODOS",
+    forma: "TODAS",
+    profissionalId: "TODOS",
+    especialidadeId: "TODAS",
+    dataDe: firstDayOfMonthISO(),
+    dataAte: todayISO(),
+    busca: "",
+  });
 
-  const [confirmReabrir, setConfirmReabrir] = useState<string | null>(null);
+  const [pagamentoItem, setPagamentoItem] = useState<LancamentoParaPagamento | null>(null);
+  const [parcelarItem, setParcelarItem] = useState<{ id: string; valor: number } | null>(null);
+  const [historicoId, setHistoricoId] = useState<string | null>(null);
+  const [confirmReabrir, setConfirmReabrir] = useState<any | null>(null);
+
+  const setFiltro = <K extends keyof FinanceiroFiltrosState>(
+    campo: K,
+    valor: FinanceiroFiltrosState[K],
+  ) => setFiltros((f) => ({ ...f, [campo]: valor }));
+
+  const resetFiltros = () =>
+    setFiltros({
+      status: "TODOS",
+      forma: "TODAS",
+      profissionalId: "TODOS",
+      especialidadeId: "TODAS",
+      dataDe: firstDayOfMonthISO(),
+      dataAte: todayISO(),
+      busca: "",
+    });
 
   // Dropdown data
   const { data: profissionais } = useQuery({
@@ -136,129 +117,161 @@ function FinanceiroPage() {
 
   // Main list
   const { data: rows, isLoading } = useQuery({
-    queryKey: ["financeiro", status, forma, profissionalId, especialidadeId, dataDe, dataAte, isProfissional],
+    queryKey: ["financeiro", filtros, isProfissional],
     queryFn: async () => {
       let q = supabase
         .from("financeiro")
-        .select(
-          "id, valor, status_pagamento, forma_pagamento, pago_em, created_at, agendamento:agendamentos(id, data, hora_inicio, hora_fim, valor), paciente:pacientes(id, nome, foto_url), profissional:profissionais(id, nome, foto_url, especialidade_id, especialidade:especialidades(id, nome))",
-        )
+        .select(SELECT_COM_RELACOES)
         .order("created_at", { ascending: false });
-      if (status !== "TODOS") q = q.eq("status_pagamento", status as any);
-      if (forma !== "TODAS") q = q.eq("forma_pagamento", forma as any);
-      if (profissionalId !== "TODOS") q = q.eq("profissional_id", profissionalId);
+      if (filtros.status !== "TODOS") q = q.eq("status_pagamento", filtros.status as any);
+      if (filtros.forma !== "TODAS") q = q.eq("forma_pagamento", filtros.forma as any);
+      if (filtros.profissionalId !== "TODOS") q = q.eq("profissional_id", filtros.profissionalId);
       const { data, error } = await q;
       if (error) throw error;
       let list = data ?? [];
-      // period filter on consultation date (fallback to created_at when no agendamento)
+
       list = list.filter((r: any) => {
         const d = r.agendamento?.data ?? (r.created_at ? String(r.created_at).slice(0, 10) : null);
         if (!d) return true;
-        if (dataDe && d < dataDe) return false;
-        if (dataAte && d > dataAte) return false;
+        if (filtros.dataDe && d < filtros.dataDe) return false;
+        if (filtros.dataAte && d > filtros.dataAte) return false;
         return true;
       });
-      if (especialidadeId !== "TODAS") {
+      if (filtros.especialidadeId !== "TODAS") {
         list = list.filter(
-          (r: any) => r.profissional?.especialidade_id === especialidadeId,
+          (r: any) => r.profissional?.especialidade_id === filtros.especialidadeId,
         );
+      }
+      if (filtros.busca.trim()) {
+        const termo = filtros.busca.trim().toLowerCase();
+        list = list.filter((r: any) => {
+          const alvo =
+            `${r.paciente?.nome ?? ""} ${r.profissional?.nome ?? ""} ${r.observacoes ?? ""}`.toLowerCase();
+          return alvo.includes(termo);
+        });
       }
       return list;
     },
     enabled: !!user,
   });
 
-  const mut = useMutation({
-    mutationFn: async ({ id, novo }: { id: string; novo: "ABERTO" | "PAGO" | "CANCELADO" }) => {
-      const patch: any = { status_pagamento: novo };
-      patch.pago_em = novo === "PAGO" ? new Date().toISOString() : null;
-      const { error } = await supabase.from("financeiro").update(patch).eq("id", id);
+  const financeiroIds = useMemo(() => (rows ?? []).map((r: any) => r.id), [rows]);
+
+  const { data: parcelasPorLancamento } = useQuery({
+    queryKey: ["financeiro-parcelas-resumo", financeiroIds],
+    enabled: financeiroIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("financeiro_parcelas")
+        .select("financeiro_id, status_pagamento")
+        .in("financeiro_id", financeiroIds);
       if (error) throw error;
+      const map = new Map<string, ParcelasResumo>();
+      for (const p of data ?? []) {
+        const cur = map.get(p.financeiro_id) ?? { total: 0, pagas: 0 };
+        cur.total += 1;
+        if (p.status_pagamento === "PAGO") cur.pagas += 1;
+        map.set(p.financeiro_id, cur);
+      }
+      return map;
     },
-    onSuccess: (_, v) => {
-      const msg = v.novo === "PAGO" ? "Marcado como pago" : v.novo === "CANCELADO" ? "Lançamento cancelado" : "Reaberto";
-      toast.success(msg);
-      qc.invalidateQueries({ queryKey: ["financeiro"] });
-      qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
-    },
-    onError: (e: any) => toast.error(e?.message ?? "Falha ao atualizar"),
   });
 
-  // Stats — over filtered rows
-  const stats = useMemo(() => {
-    const acc = {
-      recebido: 0,
-      aberto: 0,
-      cancelado: 0,
-      mes: 0,
-      dia: 0,
-      qtdPagas: 0,
-      qtdAbertas: 0,
-    };
-    const hoje = todayISO();
-    const mesRef = firstDayOfMonthISO().slice(0, 7);
-    for (const r of rows ?? []) {
-      const v = valorLancamento(r);
-      const s = (r as any).status_pagamento;
-      const pagoEm = (r as any).pago_em ? String((r as any).pago_em).slice(0, 10) : null;
-      if (s === "PAGO") {
-        acc.recebido += v;
-        acc.qtdPagas++;
-        if (pagoEm && pagoEm.startsWith(mesRef)) acc.mes += v;
-        if (pagoEm === hoje) acc.dia += v;
-      } else if (s === "ABERTO") {
-        acc.aberto += v;
-        acc.qtdAbertas++;
-      } else if (s === "CANCELADO") {
-        acc.cancelado += v;
-      }
-    }
-    return acc;
-  }, [rows]);
+  const invalidarTudo = () => {
+    qc.invalidateQueries({ queryKey: ["financeiro"] });
+    qc.invalidateQueries({ queryKey: ["financeiro-dashboard"] });
+    qc.invalidateQueries({ queryKey: ["financeiro-evolucao-mensal"] });
+    qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
+    qc.invalidateQueries({ queryKey: ["financeiro-parcelas-resumo"] });
+  };
 
-  // Reports: totals by professional / specialty
+  const cancelarMut = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("financeiro")
+        .update({ status_pagamento: "CANCELADO" })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Lançamento cancelado");
+      invalidarTudo();
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Falha ao cancelar"),
+  });
+
+  // "Reabrir": lançamento PAGO/PARCIAL -> estorna as baixas ativas (o trigger recalcula o status);
+  // lançamento CANCELADO -> volta direto para ABERTO (nunca teve baixa a estornar).
+  const reabrirMut = useMutation({
+    mutationFn: async (row: any) => {
+      if (row.status_pagamento === "CANCELADO") {
+        const { error } = await supabase
+          .from("financeiro")
+          .update({ status_pagamento: "ABERTO" })
+          .eq("id", row.id);
+        if (error) throw error;
+        return;
+      }
+      const { data: auth } = await supabase.auth.getUser();
+      const { error } = await supabase
+        .from("financeiro_pagamentos")
+        .update({
+          estornado: true,
+          estornado_em: new Date().toISOString(),
+          estornado_por: auth.user?.id ?? null,
+        })
+        .eq("financeiro_id", row.id)
+        .eq("estornado", false);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Lançamento reaberto");
+      invalidarTudo();
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Falha ao reabrir"),
+  });
+
+  // Relatórios sobre os lançamentos filtrados (distinto dos KPIs fixos do ano corrente no topo).
   const relatorios = useMemo(() => {
-    const porProf = new Map<string, { nome: string; pago: number; aberto: number; qtd: number }>();
-    const porEsp = new Map<string, { nome: string; pago: number; aberto: number; qtd: number }>();
+    const porProf = new Map<string, FinanceiroDimensao>();
+    const porEsp = new Map<string, FinanceiroDimensao>();
     for (const r of rows ?? []) {
-      const v = valorLancamento(r);
-      const s = (r as any).status_pagamento;
+      const v = valorLiquido(r);
+      const status = (r as any).status_pagamento;
       const prof = (r as any).profissional;
       const esp = (r as any).profissional?.especialidade;
       if (prof) {
-        const k = prof.id;
-        const cur = porProf.get(k) ?? { nome: prof.nome, pago: 0, aberto: 0, qtd: 0 };
+        const cur = porProf.get(prof.id) ?? {
+          id: prof.id,
+          nome: prof.nome,
+          recebido: 0,
+          aberto: 0,
+          qtd: 0,
+        };
         cur.qtd++;
-        if (s === "PAGO") cur.pago += v;
-        if (s === "ABERTO") cur.aberto += v;
-        porProf.set(k, cur);
+        if (status === "PAGO") cur.recebido += v;
+        if (status === "ABERTO" || status === "PARCIAL") cur.aberto += v;
+        porProf.set(prof.id, cur);
       }
       if (esp) {
-        const k = esp.id;
-        const cur = porEsp.get(k) ?? { nome: esp.nome, pago: 0, aberto: 0, qtd: 0 };
+        const cur = porEsp.get(esp.id) ?? {
+          id: esp.id,
+          nome: esp.nome,
+          recebido: 0,
+          aberto: 0,
+          qtd: 0,
+        };
         cur.qtd++;
-        if (s === "PAGO") cur.pago += v;
-        if (s === "ABERTO") cur.aberto += v;
-        porEsp.set(k, cur);
+        if (status === "PAGO") cur.recebido += v;
+        if (status === "ABERTO" || status === "PARCIAL") cur.aberto += v;
+        porEsp.set(esp.id, cur);
       }
     }
     return {
-      profissionais: Array.from(porProf.values()).sort((a, b) => b.pago - a.pago),
-      especialidades: Array.from(porEsp.values()).sort((a, b) => b.pago - a.pago),
+      profissionais: Array.from(porProf.values()).sort((a, b) => b.recebido - a.recebido),
+      especialidades: Array.from(porEsp.values()).sort((a, b) => b.recebido - a.recebido),
     };
   }, [rows]);
-
-  const dataLabel = (iso?: string | null) =>
-    iso ? new Date(iso + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }) : "—";
-
-  const resetFiltros = () => {
-    setStatus("TODOS");
-    setForma("TODAS");
-    setProfissionalId("TODOS");
-    setEspecialidadeId("TODAS");
-    setDataDe(firstDayOfMonthISO());
-    setDataAte(todayISO());
-  };
 
   return (
     <div className="space-y-6">
@@ -267,247 +280,90 @@ function FinanceiroPage() {
           <h1 className="text-3xl font-bold tracking-tight">Financeiro</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {isProfissional
-              ? "Seus recebimentos e valores em aberto."
-              : "Controle de recebimentos, lançamentos em aberto e relatórios."}
+              ? "Seus recebimentos, valores em aberto e histórico de pagamentos."
+              : "Dashboard, contas a receber, parcelamento e relatórios da clínica."}
           </p>
         </div>
-        <Button variant="outline" onClick={resetFiltros} className="gap-2">
-          <RotateCcw className="h-4 w-4" /> Limpar filtros
-        </Button>
       </div>
 
-      {/* KPIs */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KPI icon={<CheckCircle2 className="h-5 w-5" />} label="Recebido" value={brl(stats.recebido)} tone="emerald" />
-        <KPI icon={<Wallet className="h-5 w-5" />} label="Em aberto" value={brl(stats.aberto)} tone="amber" />
-        <KPI icon={<TrendingUp className="h-5 w-5" />} label="Receita do mês" value={brl(stats.mes)} tone="primary" />
-        <KPI icon={<DollarSign className="h-5 w-5" />} label="Receita do dia" value={brl(stats.dia)} tone="primary" />
-      </div>
-      <div className="grid gap-4 sm:grid-cols-3">
-        <MiniStat label="Consultas pagas" value={stats.qtdPagas} />
-        <MiniStat label="Consultas em aberto" value={stats.qtdAbertas} />
-        <MiniStat label="Cancelados (valor)" value={brl(stats.cancelado)} />
-      </div>
+      <FinanceiroKpis />
+      <FinanceiroGraficos />
 
-      {/* Filters */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Filtros</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-2 lg:grid-cols-6">
-          <div className="lg:col-span-1">
-            <label className="mb-1 block text-xs text-muted-foreground">De</label>
-            <Input type="date" value={dataDe} onChange={(e) => setDataDe(e.target.value)} />
-          </div>
-          <div className="lg:col-span-1">
-            <label className="mb-1 block text-xs text-muted-foreground">Até</label>
-            <Input type="date" value={dataAte} onChange={(e) => setDataAte(e.target.value)} />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs text-muted-foreground">Status</label>
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="TODOS">Todos</SelectItem>
-                <SelectItem value="ABERTO">Aberto</SelectItem>
-                <SelectItem value="PAGO">Pago</SelectItem>
-                <SelectItem value="CANCELADO">Cancelado</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <label className="mb-1 block text-xs text-muted-foreground">Forma de pagamento</label>
-            <Select value={forma} onValueChange={setForma}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="TODAS">Todas</SelectItem>
-                {Object.entries(FORMA_LABEL).map(([k, v]) => (
-                  <SelectItem key={k} value={k}>{v}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          {isAdmin && (
-            <>
-              <div>
-                <label className="mb-1 block text-xs text-muted-foreground">Profissional</label>
-                <Select value={profissionalId} onValueChange={setProfissionalId}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="TODOS">Todos</SelectItem>
-                    {profissionais?.map((p: any) => (
-                      <SelectItem key={p.id} value={p.id}>{p.nome}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="mb-1 block text-xs text-muted-foreground">Especialidade</label>
-                <Select value={especialidadeId} onValueChange={setEspecialidadeId}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="TODAS">Todas</SelectItem>
-                    {especialidades?.map((e: any) => (
-                      <SelectItem key={e.id} value={e.id}>{e.nome}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
+      <FinanceiroFiltros
+        filtros={filtros}
+        onChange={setFiltro}
+        onReset={resetFiltros}
+        onExport={() => exportarLancamentosCSV(rows ?? [])}
+        isAdmin={isAdmin}
+        profissionais={profissionais ?? []}
+        especialidades={especialidades ?? []}
+      />
 
-      {/* Status tabs shortcut */}
-      <Tabs value={status} onValueChange={setStatus}>
+      <Tabs value={filtros.status} onValueChange={(v) => setFiltro("status", v)}>
         <TabsList>
           <TabsTrigger value="TODOS">Todos</TabsTrigger>
           <TabsTrigger value="ABERTO">Em aberto</TabsTrigger>
+          <TabsTrigger value="PARCIAL">Parcial</TabsTrigger>
           <TabsTrigger value="PAGO">Pagos</TabsTrigger>
           <TabsTrigger value="CANCELADO">Cancelados</TabsTrigger>
         </TabsList>
       </Tabs>
 
-      {/* List */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base font-medium text-muted-foreground">
-            {rows?.length ?? 0} lançamento{(rows?.length ?? 0) === 1 ? "" : "s"}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="grid place-items-center py-16">
-              <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            </div>
-          ) : (rows?.length ?? 0) === 0 ? (
-            <div className="flex flex-col items-center gap-3 py-16 text-center">
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-primary/10 text-primary">
-                <DollarSign className="h-5 w-5" />
-              </div>
-              <p className="text-base font-medium">Nenhum lançamento</p>
-              <p className="max-w-sm text-sm text-muted-foreground">
-                Consultas aprovadas geram automaticamente um lançamento em aberto.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {rows?.map((r: any) => (
-                <div
-                  key={r.id}
-                  className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 shadow-soft transition hover:shadow-elegant md:flex-row md:items-center"
-                >
-                  <div className="flex w-full items-center gap-3 md:w-auto">
-                    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
-                      <DollarSign className="h-5 w-5" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold">{brl(valorLancamento(r))}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {r.forma_pagamento ? FORMA_LABEL[r.forma_pagamento] ?? r.forma_pagamento : "Forma não definida"}
-                      </p>
-                    </div>
-                  </div>
+      <TabelaLancamentos
+        rows={rows ?? []}
+        isLoading={isLoading}
+        isAdmin={isAdmin}
+        parcelasPorLancamento={parcelasPorLancamento ?? new Map()}
+        onRegistrarPagamento={(row) => setPagamentoItem(row)}
+        onParcelar={(row) => setParcelarItem({ id: row.id, valor: valorLiquido(row) })}
+        onHistorico={(id) => setHistoricoId(id)}
+        onCancelar={(id) => cancelarMut.mutate(id)}
+        onReabrir={(row) => setConfirmReabrir(row)}
+      />
 
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="flex items-center gap-2 text-sm font-medium">
-                        <PersonAvatar size="xs" nome={r.paciente?.nome} fotoUrl={r.paciente?.foto_url} />
-                        {r.paciente?.nome ?? "Sem paciente"}
-                      </span>
-                      <Badge variant="outline" className={STATUS_COLOR[r.status_pagamento]}>
-                        {STATUS_LABEL[r.status_pagamento]}
-                      </Badge>
-                    </div>
-                    <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Stethoscope className="h-3 w-3" />
-                        {r.profissional?.nome ?? "—"}
-                        {r.profissional?.especialidade?.nome ? ` • ${r.profissional.especialidade.nome}` : ""}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <CalendarDays className="h-3 w-3" />
-                        Consulta: {dataLabel(r.agendamento?.data)}
-                        {r.agendamento?.hora_inicio ? ` • ${fmtHora(r.agendamento.hora_inicio)}` : ""}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        Pagamento: {r.pago_em ? new Date(r.pago_em).toLocaleDateString("pt-BR") : "—"}
-                      </span>
-                    </p>
-                  </div>
-
-                  {isAdmin && (
-                    <div className="flex w-full flex-wrap gap-2 md:w-auto">
-                      {r.status_pagamento === "ABERTO" && (
-                        <>
-                          <Button
-                            className="flex-1 gap-2 md:flex-none"
-                            onClick={() => mut.mutate({ id: r.id, novo: "PAGO" })}
-                            disabled={mut.isPending}
-                          >
-                            <CheckCircle2 className="h-4 w-4" /> Marcar como pago
-                          </Button>
-                          <Button
-                            variant="outline"
-                            className="flex-1 gap-2 border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive md:flex-none"
-                            onClick={() => mut.mutate({ id: r.id, novo: "CANCELADO" })}
-                            disabled={mut.isPending}
-                          >
-                            <XCircle className="h-4 w-4" /> Cancelar
-                          </Button>
-                        </>
-                      )}
-                      {r.status_pagamento === "PAGO" && (
-                        <Button
-                          variant="outline"
-                          className="flex-1 gap-2 md:flex-none"
-                          onClick={() => setConfirmReabrir(r.id)}
-                          disabled={mut.isPending}
-                        >
-                          <RotateCcw className="h-4 w-4" /> Reabrir
-                        </Button>
-                      )}
-                      {r.status_pagamento === "CANCELADO" && (
-                        <Button
-                          variant="outline"
-                          className="flex-1 gap-2 md:flex-none"
-                          onClick={() => mut.mutate({ id: r.id, novo: "ABERTO" })}
-                          disabled={mut.isPending}
-                        >
-                          <RotateCcw className="h-4 w-4" /> Reabrir
-                        </Button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Reports */}
       {isAdmin && (
         <div className="grid gap-4 lg:grid-cols-2">
-          <ReportCard title="Totais por profissional" rows={relatorios.profissionais} />
-          <ReportCard title="Totais por especialidade" rows={relatorios.especialidades} />
+          <RelatorioPorDimensaoCard
+            title="Totais por profissional (período filtrado)"
+            rows={relatorios.profissionais}
+          />
+          <RelatorioPorDimensaoCard
+            title="Totais por especialidade (período filtrado)"
+            rows={relatorios.especialidades}
+          />
         </div>
       )}
+
+      <RegistrarPagamentoDialog
+        item={pagamentoItem}
+        onOpenChange={(o) => !o && setPagamentoItem(null)}
+      />
+      <ParcelarDialog
+        financeiroId={parcelarItem?.id ?? null}
+        valorTotal={parcelarItem?.valor ?? 0}
+        onOpenChange={(o) => !o && setParcelarItem(null)}
+      />
+      <HistoricoLancamentoDialog
+        financeiroId={historicoId}
+        onOpenChange={(o) => !o && setHistoricoId(null)}
+        isAdmin={isAdmin}
+      />
 
       <AlertDialog open={!!confirmReabrir} onOpenChange={(o) => !o && setConfirmReabrir(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Reabrir lançamento pago?</AlertDialogTitle>
+            <AlertDialogTitle>Reabrir lançamento?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação exige confirmação administrativa. O lançamento voltará para o status <b>Aberto</b> e a data de pagamento será removida.
+              {confirmReabrir?.status_pagamento === "CANCELADO"
+                ? "O lançamento voltará para o status Aberto."
+                : "Os pagamentos registrados serão estornados (preservados no histórico) e o lançamento voltará para Aberto."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                if (confirmReabrir) mut.mutate({ id: confirmReabrir, novo: "ABERTO" });
+                if (confirmReabrir) reabrirMut.mutate(confirmReabrir);
                 setConfirmReabrir(null);
               }}
             >
@@ -517,74 +373,5 @@ function FinanceiroPage() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  );
-}
-
-function KPI({
-  icon,
-  label,
-  value,
-  tone,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  tone: "emerald" | "amber" | "primary";
-}) {
-  const toneClass =
-    tone === "emerald"
-      ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-      : tone === "amber"
-        ? "bg-amber-500/10 text-amber-700 dark:text-amber-300"
-        : "bg-primary/10 text-primary";
-  return (
-    <Card>
-      <CardContent className="flex items-center gap-4 py-5">
-        <div className={`grid h-12 w-12 place-items-center rounded-xl ${toneClass}`}>{icon}</div>
-        <div className="min-w-0">
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
-          <p className="truncate text-xl font-semibold">{value}</p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function MiniStat({ label, value }: { label: string; value: string | number }) {
-  return (
-    <Card>
-      <CardContent className="flex items-center justify-between py-4">
-        <span className="text-sm text-muted-foreground">{label}</span>
-        <span className="text-lg font-semibold">{value}</span>
-      </CardContent>
-    </Card>
-  );
-}
-
-function ReportCard({ title, rows }: { title: string; rows: { nome: string; pago: number; aberto: number; qtd: number }[] }) {
-  return (
-    <Card>
-      <CardHeader><CardTitle className="text-base">{title}</CardTitle></CardHeader>
-      <CardContent>
-        {rows.length === 0 ? (
-          <p className="py-6 text-center text-sm text-muted-foreground">Sem dados no período.</p>
-        ) : (
-          <div className="space-y-2">
-            {rows.map((r) => (
-              <div key={r.nome} className="flex items-center justify-between rounded-lg border border-border/60 bg-card px-3 py-2">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">{r.nome}</p>
-                  <p className="text-xs text-muted-foreground">{r.qtd} lançamento{r.qtd === 1 ? "" : "s"}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{brl(r.pago)}</p>
-                  <p className="text-xs text-amber-700 dark:text-amber-300">Aberto: {brl(r.aberto)}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
   );
 }

@@ -20,12 +20,12 @@ import {
   Check,
 } from "lucide-react";
 import { toast } from "sonner";
-import { getWhatsAppUrl, formatPatientConfirmationMsg, openWhatsAppLink } from "@/lib/whatsapp-link";
-
-function valorLancamento(row: any) {
-  const valorCongelado = row?.agendamento?.valor;
-  return valorCongelado == null ? Number(row?.valor ?? 0) : Number(valorCongelado) || 0;
-}
+import {
+  getWhatsAppUrl,
+  formatPatientConfirmationMsg,
+  openWhatsAppLink,
+} from "@/lib/whatsapp-link";
+import { valorLiquido as valorLancamento } from "@/lib/financeiro-utils";
 
 export const Route = createFileRoute("/app/")({
   head: () => ({
@@ -50,23 +50,54 @@ function Dashboard() {
     queryKey: ["dashboard-stats"],
     queryFn: async () => {
       const today = new Date().toISOString().slice(0, 10);
-      const [profs, pacs, agHoje, agPend, agConfirmHoje, agCancHoje, finAberto, agHojeLista, pendentesLista] = await Promise.all([
+      const [
+        profs,
+        pacs,
+        agHoje,
+        agPend,
+        agConfirmHoje,
+        agCancHoje,
+        finAberto,
+        agHojeLista,
+        pendentesLista,
+      ] = await Promise.all([
         supabase.from("profissionais").select("id", { count: "exact", head: true }),
         supabase.from("pacientes").select("id", { count: "exact", head: true }),
-        supabase.from("agendamentos").select("id", { count: "exact", head: true }).eq("data", today),
-        supabase.from("agendamentos").select("id", { count: "exact", head: true }).eq("status", "PENDENTE"),
-        supabase.from("agendamentos").select("id", { count: "exact", head: true }).eq("data", today).eq("status", "APROVADO"),
-        supabase.from("agendamentos").select("id", { count: "exact", head: true }).eq("data", today).in("status", ["RECUSADO", "CANCELADO"]),
-        supabase.from("financeiro").select("valor, agendamento:agendamentos(valor)").eq("status_pagamento", "ABERTO"),
         supabase
           .from("agendamentos")
-          .select("id, data, hora_inicio, hora_fim, status, paciente:pacientes(nome, telefone), profissional:profissionais(nome)")
+          .select("id", { count: "exact", head: true })
+          .eq("data", today),
+        supabase
+          .from("agendamentos")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "PENDENTE"),
+        supabase
+          .from("agendamentos")
+          .select("id", { count: "exact", head: true })
+          .eq("data", today)
+          .eq("status", "APROVADO"),
+        supabase
+          .from("agendamentos")
+          .select("id", { count: "exact", head: true })
+          .eq("data", today)
+          .in("status", ["RECUSADO", "CANCELADO"]),
+        supabase
+          .from("financeiro")
+          .select("valor, desconto, juros, multa, agendamento:agendamentos(valor)")
+          .eq("status_pagamento", "ABERTO"),
+        supabase
+          .from("agendamentos")
+          .select(
+            "id, data, hora_inicio, hora_fim, status, paciente:pacientes(nome, telefone), profissional:profissionais(nome)",
+          )
           .eq("data", today)
           .order("hora_inicio")
           .limit(6),
         supabase
           .from("agendamentos")
-          .select("id, data, hora_inicio, hora_fim, status, profissional_id, paciente:pacientes(nome, telefone), profissional:profissionais(nome, especialidade:especialidades(nome))")
+          .select(
+            "id, data, hora_inicio, hora_fim, status, profissional_id, paciente:pacientes(nome, telefone), profissional:profissionais(nome, especialidade:especialidades(nome))",
+          )
           .eq("status", "PENDENTE")
           .order("created_at", { ascending: false })
           .limit(5),
@@ -110,13 +141,14 @@ function Dashboard() {
         aprovado_em: new Date().toISOString(),
       };
 
-      const { error } = await supabase
-        .from("agendamentos")
-        .update(payload)
-        .eq("id", item.id);
+      const { error } = await supabase.from("agendamentos").update(payload).eq("id", item.id);
 
       if (error) {
-        if (error.message?.includes("schema cache") || error.message?.includes("aprovado") || (error as any).code === "PGRST204") {
+        if (
+          error.message?.includes("schema cache") ||
+          error.message?.includes("aprovado") ||
+          (error as any).code === "PGRST204"
+        ) {
           const { error: fallbackErr } = await supabase
             .from("agendamentos")
             .update({ status: "APROVADO" })
@@ -155,7 +187,9 @@ function Dashboard() {
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Olá, {nome?.split(" ")[0] ?? "seja bem-vindo(a)"}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Olá, {nome?.split(" ")[0] ?? "seja bem-vindo(a)"}
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {isAdmin
               ? "Aqui está o resumo executivo da clínica hoje."
@@ -184,10 +218,30 @@ function Dashboard() {
 
       {/* Grid de Indicadores em Tempo Real */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={Clock} label="Solicitações Pendentes" value={stats?.pendentes ?? 0} accent="gold" />
-        <StatCard icon={CheckCircle2} label="Confirmadas Hoje" value={stats?.confirmadasHoje ?? 0} accent="emerald" />
-        <StatCard icon={XCircle} label="Canceladas Hoje" value={stats?.canceladasHoje ?? 0} accent="red" />
-        <StatCard icon={CalendarDays} label="Total Agendados Hoje" value={stats?.agendamentosHoje ?? 0} accent="primary" />
+        <StatCard
+          icon={Clock}
+          label="Solicitações Pendentes"
+          value={stats?.pendentes ?? 0}
+          accent="gold"
+        />
+        <StatCard
+          icon={CheckCircle2}
+          label="Confirmadas Hoje"
+          value={stats?.confirmadasHoje ?? 0}
+          accent="emerald"
+        />
+        <StatCard
+          icon={XCircle}
+          label="Canceladas Hoje"
+          value={stats?.canceladasHoje ?? 0}
+          accent="red"
+        />
+        <StatCard
+          icon={CalendarDays}
+          label="Total Agendados Hoje"
+          value={stats?.agendamentosHoje ?? 0}
+          accent="primary"
+        />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -198,31 +252,49 @@ function Dashboard() {
               <CardTitle className="text-base font-semibold flex items-center gap-2">
                 <Clock className="h-4 w-4 text-amber-600" /> Novas Solicitações Pendentes
               </CardTitle>
-              <p className="text-xs text-muted-foreground mt-0.5">Pedidos aguardando confirmação da recepção</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Pedidos aguardando confirmação da recepção
+              </p>
             </div>
-            <Link to="/app/solicitacoes" className="text-xs font-medium text-primary hover:underline flex items-center gap-1">
+            <Link
+              to="/app/solicitacoes"
+              className="text-xs font-medium text-primary hover:underline flex items-center gap-1"
+            >
               Ver Central de Solicitações <ArrowRight className="h-3 w-3" />
             </Link>
           </CardHeader>
           <CardContent>
-            {(!stats?.solicitacoesPendentes || stats.solicitacoesPendentes.length === 0) ? (
+            {!stats?.solicitacoesPendentes || stats.solicitacoesPendentes.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-center text-muted-foreground">
                 <CheckCircle2 className="h-8 w-8 text-emerald-500 mb-2 opacity-60" />
                 <p className="text-sm font-medium text-foreground">Tudo limpo!</p>
-                <p className="text-xs text-muted-foreground">Não há solicitações pendentes no momento.</p>
+                <p className="text-xs text-muted-foreground">
+                  Não há solicitações pendentes no momento.
+                </p>
               </div>
             ) : (
               <div className="divide-y divide-border/60">
                 {stats.solicitacoesPendentes.map((item: any) => (
-                  <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between py-3 gap-3 text-sm">
+                  <div
+                    key={item.id}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between py-3 gap-3 text-sm"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-amber-500/10 text-amber-600 font-semibold text-xs">
                         {String(item.hora_inicio).slice(0, 5)}
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">{item.paciente?.nome ?? "Paciente"}</p>
+                        <p className="font-semibold text-foreground">
+                          {item.paciente?.nome ?? "Paciente"}
+                        </p>
                         <p className="text-xs text-muted-foreground">
-                          {item.profissional?.nome} • {item.profissional?.especialidade?.nome ?? "Consulta"} ({new Date(item.data + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })})
+                          {item.profissional?.nome} •{" "}
+                          {item.profissional?.especialidade?.nome ?? "Consulta"} (
+                          {new Date(item.data + "T12:00:00").toLocaleDateString("pt-BR", {
+                            day: "2-digit",
+                            month: "2-digit",
+                          })}
+                          )
                         </p>
                       </div>
                     </div>
@@ -265,9 +337,13 @@ function Dashboard() {
             <CardContent className="space-y-4">
               <div>
                 <p className="text-3xl font-bold text-foreground">
-                  {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(stats?.aberto ?? 0)}
+                  {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
+                    stats?.aberto ?? 0,
+                  )}
                 </p>
-                <p className="mt-1 text-xs text-muted-foreground">Total pendente de liquidação de consultas agendadas.</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Total pendente de liquidação de consultas agendadas.
+                </p>
               </div>
 
               <Link
@@ -286,7 +362,9 @@ function Dashboard() {
             <CardContent className="space-y-3 text-sm">
               <div className="flex justify-between items-center py-1.5 border-b border-border">
                 <span className="text-muted-foreground">Confirmadas hoje:</span>
-                <span className="font-semibold text-emerald-600">{stats?.confirmadasHoje ?? 0}</span>
+                <span className="font-semibold text-emerald-600">
+                  {stats?.confirmadasHoje ?? 0}
+                </span>
               </div>
               <div className="flex justify-between items-center py-1.5 border-b border-border">
                 <span className="text-muted-foreground">Canceladas hoje:</span>
@@ -329,7 +407,9 @@ function StatCard({
           <Icon className="h-5 w-5" />
         </div>
         <div className="min-w-0">
-          <p className="truncate text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
+          <p className="truncate text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            {label}
+          </p>
           <p className="text-2xl font-bold text-foreground">{value}</p>
         </div>
       </CardContent>

@@ -56,7 +56,8 @@ CREATE TYPE public.app_role AS ENUM (
 CREATE TYPE public.financeiro_status AS ENUM (
     'ABERTO',
     'PAGO',
-    'CANCELADO'
+    'CANCELADO',
+    'PARCIAL'
 );
 
 
@@ -915,7 +916,12 @@ CREATE TABLE public.financeiro (
     forma_pagamento public.forma_pagamento,
     pago_em timestamp with time zone,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    desconto numeric(10,2) DEFAULT 0 NOT NULL,
+    juros numeric(10,2) DEFAULT 0 NOT NULL,
+    multa numeric(10,2) DEFAULT 0 NOT NULL,
+    observacoes text,
+    vencimento date
 );
 
 
@@ -2778,6 +2784,425 @@ GRANT ALL ON TABLE public.whatsapp_templates TO service_role;
 --
 
 
+
+-- =====================================================================
+-- Financeiro — Fase 1 (Fundação): Contas a Receber completo
+-- (parcelamento, baixas/pagamento parcial, desconto/juros/multa, anexos,
+-- auditoria). Ver supabase/migrations/20260803160000_financeiro_enum_parcial.sql
+-- e 20260803160100_financeiro_contas_a_receber.sql para o histórico
+-- incremental — este bloco reflete o estado final para provisionar um
+-- projeto novo do zero.
+-- =====================================================================
+
+--
+-- Name: financeiro_parcelas; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.financeiro_parcelas (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    financeiro_id uuid NOT NULL,
+    numero smallint NOT NULL,
+    valor numeric(10,2) NOT NULL,
+    vencimento date NOT NULL,
+    status_pagamento public.financeiro_status DEFAULT 'ABERTO'::public.financeiro_status NOT NULL,
+    pago_em timestamp with time zone,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT financeiro_parcelas_numero_check CHECK ((numero > 0)),
+    CONSTRAINT financeiro_parcelas_valor_check CHECK ((valor > (0)::numeric))
+);
+
+ALTER TABLE ONLY public.financeiro_parcelas
+    ADD CONSTRAINT financeiro_parcelas_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.financeiro_parcelas
+    ADD CONSTRAINT financeiro_parcelas_financeiro_id_numero_key UNIQUE (financeiro_id, numero);
+
+ALTER TABLE ONLY public.financeiro_parcelas
+    ADD CONSTRAINT financeiro_parcelas_financeiro_id_fkey FOREIGN KEY (financeiro_id) REFERENCES public.financeiro(id) ON DELETE CASCADE;
+
+CREATE INDEX financeiro_parcelas_financeiro_id_idx ON public.financeiro_parcelas USING btree (financeiro_id);
+CREATE INDEX financeiro_parcelas_vencimento_idx ON public.financeiro_parcelas USING btree (vencimento);
+
+--
+-- Name: financeiro_pagamentos; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.financeiro_pagamentos (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    financeiro_id uuid NOT NULL,
+    parcela_id uuid,
+    valor_pago numeric(10,2) NOT NULL,
+    forma_pagamento public.forma_pagamento NOT NULL,
+    pago_em timestamp with time zone DEFAULT now() NOT NULL,
+    registrado_por uuid DEFAULT auth.uid() NOT NULL,
+    observacoes text,
+    estornado boolean DEFAULT false NOT NULL,
+    estornado_em timestamp with time zone,
+    estornado_por uuid,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT financeiro_pagamentos_valor_pago_check CHECK ((valor_pago > (0)::numeric))
+);
+
+ALTER TABLE ONLY public.financeiro_pagamentos
+    ADD CONSTRAINT financeiro_pagamentos_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.financeiro_pagamentos
+    ADD CONSTRAINT financeiro_pagamentos_financeiro_id_fkey FOREIGN KEY (financeiro_id) REFERENCES public.financeiro(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.financeiro_pagamentos
+    ADD CONSTRAINT financeiro_pagamentos_parcela_id_fkey FOREIGN KEY (parcela_id) REFERENCES public.financeiro_parcelas(id) ON DELETE SET NULL;
+
+ALTER TABLE ONLY public.financeiro_pagamentos
+    ADD CONSTRAINT financeiro_pagamentos_registrado_por_fkey FOREIGN KEY (registrado_por) REFERENCES auth.users(id);
+
+ALTER TABLE ONLY public.financeiro_pagamentos
+    ADD CONSTRAINT financeiro_pagamentos_estornado_por_fkey FOREIGN KEY (estornado_por) REFERENCES auth.users(id);
+
+CREATE INDEX financeiro_pagamentos_financeiro_id_idx ON public.financeiro_pagamentos USING btree (financeiro_id);
+CREATE INDEX financeiro_pagamentos_parcela_id_idx ON public.financeiro_pagamentos USING btree (parcela_id);
+
+--
+-- Name: financeiro_anexos; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.financeiro_anexos (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    financeiro_id uuid NOT NULL,
+    arquivo_path text NOT NULL,
+    nome_arquivo text NOT NULL,
+    enviado_por uuid DEFAULT auth.uid() NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+ALTER TABLE ONLY public.financeiro_anexos
+    ADD CONSTRAINT financeiro_anexos_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.financeiro_anexos
+    ADD CONSTRAINT financeiro_anexos_financeiro_id_fkey FOREIGN KEY (financeiro_id) REFERENCES public.financeiro(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.financeiro_anexos
+    ADD CONSTRAINT financeiro_anexos_enviado_por_fkey FOREIGN KEY (enviado_por) REFERENCES auth.users(id);
+
+CREATE INDEX financeiro_anexos_financeiro_id_idx ON public.financeiro_anexos USING btree (financeiro_id);
+
+--
+-- Name: financeiro_auditoria; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.financeiro_auditoria (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    financeiro_id uuid NOT NULL,
+    actor_id uuid,
+    actor_nome text,
+    acao text NOT NULL,
+    valor_anterior jsonb,
+    valor_novo jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+ALTER TABLE ONLY public.financeiro_auditoria
+    ADD CONSTRAINT financeiro_auditoria_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY public.financeiro_auditoria
+    ADD CONSTRAINT financeiro_auditoria_financeiro_id_fkey FOREIGN KEY (financeiro_id) REFERENCES public.financeiro(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.financeiro_auditoria
+    ADD CONSTRAINT financeiro_auditoria_actor_id_fkey FOREIGN KEY (actor_id) REFERENCES auth.users(id);
+
+CREATE INDEX financeiro_auditoria_financeiro_id_idx ON public.financeiro_auditoria USING btree (financeiro_id);
+
+--
+-- Name: recalcular_status_financeiro(uuid); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.recalcular_status_financeiro(p_financeiro_id uuid) RETURNS void
+    LANGUAGE plpgsql SECURITY DEFINER
+    SET search_path TO 'public'
+    AS $$
+DECLARE
+  v_devido numeric(10,2);
+  v_pago numeric(10,2);
+  v_status_atual public.financeiro_status;
+BEGIN
+  SELECT (f.valor - f.desconto + f.juros + f.multa), f.status_pagamento
+    INTO v_devido, v_status_atual
+    FROM public.financeiro f WHERE f.id = p_financeiro_id;
+
+  IF v_status_atual IS NULL THEN
+    RETURN;
+  END IF;
+
+  SELECT COALESCE(SUM(p.valor_pago), 0) INTO v_pago
+    FROM public.financeiro_pagamentos p
+    WHERE p.financeiro_id = p_financeiro_id AND p.estornado = false;
+
+  UPDATE public.financeiro
+     SET status_pagamento = CASE
+           WHEN v_status_atual = 'CANCELADO' THEN 'CANCELADO'::public.financeiro_status
+           WHEN v_pago <= 0 THEN 'ABERTO'::public.financeiro_status
+           WHEN v_devido > 0 AND v_pago < v_devido THEN 'PARCIAL'::public.financeiro_status
+           ELSE 'PAGO'::public.financeiro_status
+         END,
+         pago_em = CASE
+           WHEN v_status_atual != 'CANCELADO' AND v_devido > 0 AND v_pago >= v_devido THEN (
+             SELECT MAX(p.pago_em) FROM public.financeiro_pagamentos p
+              WHERE p.financeiro_id = p_financeiro_id AND p.estornado = false
+           )
+           ELSE NULL
+         END
+   WHERE id = p_financeiro_id;
+
+  IF EXISTS (SELECT 1 FROM public.financeiro_parcelas WHERE financeiro_id = p_financeiro_id) THEN
+    UPDATE public.financeiro_parcelas fp
+       SET status_pagamento = CASE
+             WHEN COALESCE((
+               SELECT SUM(p.valor_pago) FROM public.financeiro_pagamentos p
+                WHERE p.parcela_id = fp.id AND p.estornado = false
+             ), 0) <= 0 THEN 'ABERTO'::public.financeiro_status
+             WHEN COALESCE((
+               SELECT SUM(p.valor_pago) FROM public.financeiro_pagamentos p
+                WHERE p.parcela_id = fp.id AND p.estornado = false
+             ), 0) < fp.valor THEN 'PARCIAL'::public.financeiro_status
+             ELSE 'PAGO'::public.financeiro_status
+           END,
+           pago_em = (
+             SELECT MAX(p.pago_em) FROM public.financeiro_pagamentos p
+              WHERE p.parcela_id = fp.id AND p.estornado = false
+           )
+     WHERE fp.financeiro_id = p_financeiro_id;
+  END IF;
+END;
+$$;
+
+--
+-- Name: trg_financeiro_pagamentos_recalc(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.trg_financeiro_pagamentos_recalc() RETURNS trigger
+    LANGUAGE plpgsql
+    SET search_path TO 'public'
+    AS $$
+BEGIN
+  PERFORM public.recalcular_status_financeiro(COALESCE(NEW.financeiro_id, OLD.financeiro_id));
+  RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
+CREATE TRIGGER trg_financeiro_pagamentos_recalc
+  AFTER INSERT OR UPDATE OR DELETE ON public.financeiro_pagamentos
+  FOR EACH ROW EXECUTE FUNCTION public.trg_financeiro_pagamentos_recalc();
+
+CREATE TRIGGER trg_financeiro_parcelas_updated
+  BEFORE UPDATE ON public.financeiro_parcelas
+  FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+--
+-- Name: bloquear_edicao_financeiro_pago(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.bloquear_edicao_financeiro_pago() RETURNS trigger
+    LANGUAGE plpgsql
+    SET search_path TO 'public'
+    AS $$
+BEGIN
+  IF OLD.status_pagamento = 'PAGO' AND (
+       NEW.valor IS DISTINCT FROM OLD.valor OR
+       NEW.desconto IS DISTINCT FROM OLD.desconto OR
+       NEW.juros IS DISTINCT FROM OLD.juros OR
+       NEW.multa IS DISTINCT FROM OLD.multa
+     ) THEN
+    RAISE EXCEPTION 'Lançamento já pago não pode ter valor/desconto/juros/multa alterado diretamente. Registre um estorno da baixa em vez disso.';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trg_bloquear_edicao_financeiro_pago
+  BEFORE UPDATE ON public.financeiro
+  FOR EACH ROW EXECUTE FUNCTION public.bloquear_edicao_financeiro_pago();
+
+--
+-- Name: log_financeiro_auditoria(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.log_financeiro_auditoria() RETURNS trigger
+    LANGUAGE plpgsql SECURITY DEFINER
+    SET search_path TO 'public'
+    AS $$
+DECLARE
+  v_actor_nome text;
+  v_acao text;
+BEGIN
+  SELECT nome INTO v_actor_nome FROM public.profiles WHERE id = auth.uid();
+
+  IF TG_OP = 'UPDATE' AND TG_TABLE_NAME = 'financeiro' THEN
+    IF NEW.status_pagamento IS DISTINCT FROM OLD.status_pagamento THEN
+      v_acao := CASE
+        WHEN NEW.status_pagamento = 'CANCELADO' THEN 'CANCELADO'
+        WHEN OLD.status_pagamento = 'PAGO' AND NEW.status_pagamento IN ('ABERTO','PARCIAL') THEN 'REABERTO'
+        ELSE 'STATUS_ALTERADO'
+      END;
+      INSERT INTO public.financeiro_auditoria (financeiro_id, actor_id, actor_nome, acao, valor_anterior, valor_novo)
+      VALUES (
+        NEW.id, auth.uid(), v_actor_nome, v_acao,
+        jsonb_build_object('status_pagamento', OLD.status_pagamento, 'valor', OLD.valor, 'desconto', OLD.desconto, 'juros', OLD.juros, 'multa', OLD.multa),
+        jsonb_build_object('status_pagamento', NEW.status_pagamento, 'valor', NEW.valor, 'desconto', NEW.desconto, 'juros', NEW.juros, 'multa', NEW.multa)
+      );
+    ELSIF NEW.desconto IS DISTINCT FROM OLD.desconto OR NEW.juros IS DISTINCT FROM OLD.juros
+       OR NEW.multa IS DISTINCT FROM OLD.multa OR NEW.observacoes IS DISTINCT FROM OLD.observacoes THEN
+      INSERT INTO public.financeiro_auditoria (financeiro_id, actor_id, actor_nome, acao, valor_anterior, valor_novo)
+      VALUES (
+        NEW.id, auth.uid(), v_actor_nome, 'EDITADO',
+        jsonb_build_object('desconto', OLD.desconto, 'juros', OLD.juros, 'multa', OLD.multa, 'observacoes', OLD.observacoes),
+        jsonb_build_object('desconto', NEW.desconto, 'juros', NEW.juros, 'multa', NEW.multa, 'observacoes', NEW.observacoes)
+      );
+    END IF;
+    RETURN NEW;
+  END IF;
+
+  IF TG_TABLE_NAME = 'financeiro_pagamentos' THEN
+    IF TG_OP = 'INSERT' THEN
+      INSERT INTO public.financeiro_auditoria (financeiro_id, actor_id, actor_nome, acao, valor_novo)
+      VALUES (NEW.financeiro_id, auth.uid(), v_actor_nome, 'BAIXA_REGISTRADA',
+        jsonb_build_object('valor_pago', NEW.valor_pago, 'forma_pagamento', NEW.forma_pagamento, 'pago_em', NEW.pago_em));
+      RETURN NEW;
+    ELSIF TG_OP = 'UPDATE' AND NEW.estornado = true AND OLD.estornado = false THEN
+      INSERT INTO public.financeiro_auditoria (financeiro_id, actor_id, actor_nome, acao, valor_anterior)
+      VALUES (NEW.financeiro_id, auth.uid(), v_actor_nome, 'BAIXA_ESTORNADA',
+        jsonb_build_object('valor_pago', NEW.valor_pago, 'forma_pagamento', NEW.forma_pagamento));
+      RETURN NEW;
+    END IF;
+  END IF;
+
+  RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
+CREATE TRIGGER trg_financeiro_auditoria
+  AFTER UPDATE ON public.financeiro
+  FOR EACH ROW EXECUTE FUNCTION public.log_financeiro_auditoria();
+
+CREATE TRIGGER trg_financeiro_pagamentos_auditoria
+  AFTER INSERT OR UPDATE ON public.financeiro_pagamentos
+  FOR EACH ROW EXECUTE FUNCTION public.log_financeiro_auditoria();
+
+--
+-- Name: financeiro_evolucao_mensal(integer); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.financeiro_evolucao_mensal(p_meses integer DEFAULT 12)
+RETURNS TABLE(mes date, recebido numeric, aberto numeric, qtd integer)
+    LANGUAGE plpgsql STABLE SECURITY DEFINER
+    SET search_path TO 'public'
+    AS $$
+DECLARE
+  v_is_admin boolean := public.has_role(auth.uid(), 'ADMIN'::public.app_role);
+  v_profissional_id uuid;
+BEGIN
+  IF NOT v_is_admin THEN
+    SELECT p.id INTO v_profissional_id FROM public.profissionais p WHERE p.user_id = auth.uid();
+    IF v_profissional_id IS NULL THEN
+      RETURN;
+    END IF;
+  END IF;
+
+  RETURN QUERY
+  SELECT
+    date_trunc('month', COALESCE(f.pago_em, f.created_at))::date AS mes,
+    SUM(CASE WHEN f.status_pagamento = 'PAGO' THEN (f.valor - f.desconto + f.juros + f.multa) ELSE 0 END) AS recebido,
+    SUM(CASE WHEN f.status_pagamento IN ('ABERTO','PARCIAL') THEN (f.valor - f.desconto + f.juros + f.multa) ELSE 0 END) AS aberto,
+    COUNT(*)::integer AS qtd
+  FROM public.financeiro f
+  WHERE COALESCE(f.pago_em, f.created_at) >= (date_trunc('month', now()) - (p_meses - 1) * interval '1 month')
+    AND (v_is_admin OR f.profissional_id = v_profissional_id)
+  GROUP BY 1
+  ORDER BY 1;
+END;
+$$;
+
+--
+-- Name: financeiro_parcelas Row Security; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.financeiro_parcelas ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY parcelas_read ON public.financeiro_parcelas FOR SELECT TO authenticated USING ((public.has_role(auth.uid(), 'ADMIN'::public.app_role) OR (EXISTS ( SELECT 1
+   FROM (public.financeiro f
+     JOIN public.profissionais p ON ((p.id = f.profissional_id)))
+  WHERE ((f.id = financeiro_parcelas.financeiro_id) AND (p.user_id = auth.uid()))))));
+
+CREATE POLICY parcelas_admin_write ON public.financeiro_parcelas FOR INSERT TO authenticated WITH CHECK (public.has_role(auth.uid(), 'ADMIN'::public.app_role));
+
+CREATE POLICY parcelas_admin_update ON public.financeiro_parcelas FOR UPDATE TO authenticated USING (public.has_role(auth.uid(), 'ADMIN'::public.app_role)) WITH CHECK (public.has_role(auth.uid(), 'ADMIN'::public.app_role));
+
+CREATE POLICY parcelas_admin_delete ON public.financeiro_parcelas FOR DELETE TO authenticated USING (public.has_role(auth.uid(), 'ADMIN'::public.app_role));
+
+--
+-- Name: financeiro_pagamentos Row Security; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.financeiro_pagamentos ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY pagamentos_read ON public.financeiro_pagamentos FOR SELECT TO authenticated USING ((public.has_role(auth.uid(), 'ADMIN'::public.app_role) OR (EXISTS ( SELECT 1
+   FROM (public.financeiro f
+     JOIN public.profissionais p ON ((p.id = f.profissional_id)))
+  WHERE ((f.id = financeiro_pagamentos.financeiro_id) AND (p.user_id = auth.uid()))))));
+
+CREATE POLICY pagamentos_admin_write ON public.financeiro_pagamentos FOR INSERT TO authenticated WITH CHECK ((public.has_role(auth.uid(), 'ADMIN'::public.app_role) AND (registrado_por = auth.uid())));
+
+CREATE POLICY pagamentos_admin_update ON public.financeiro_pagamentos FOR UPDATE TO authenticated USING (public.has_role(auth.uid(), 'ADMIN'::public.app_role)) WITH CHECK (public.has_role(auth.uid(), 'ADMIN'::public.app_role));
+
+--
+-- Name: financeiro_anexos Row Security; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.financeiro_anexos ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY anexos_read ON public.financeiro_anexos FOR SELECT TO authenticated USING ((public.has_role(auth.uid(), 'ADMIN'::public.app_role) OR (EXISTS ( SELECT 1
+   FROM (public.financeiro f
+     JOIN public.profissionais p ON ((p.id = f.profissional_id)))
+  WHERE ((f.id = financeiro_anexos.financeiro_id) AND (p.user_id = auth.uid()))))));
+
+CREATE POLICY anexos_admin_write ON public.financeiro_anexos FOR INSERT TO authenticated WITH CHECK ((public.has_role(auth.uid(), 'ADMIN'::public.app_role) AND (enviado_por = auth.uid())));
+
+CREATE POLICY anexos_admin_delete ON public.financeiro_anexos FOR DELETE TO authenticated USING (public.has_role(auth.uid(), 'ADMIN'::public.app_role));
+
+--
+-- Name: financeiro_auditoria Row Security; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.financeiro_auditoria ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY auditoria_admin_read ON public.financeiro_auditoria FOR SELECT TO authenticated USING (public.has_role(auth.uid(), 'ADMIN'::public.app_role));
+
+--
+-- Name: TABLE financeiro_parcelas; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON TABLE public.financeiro_parcelas TO authenticated;
+GRANT ALL ON TABLE public.financeiro_parcelas TO service_role;
+
+--
+-- Name: TABLE financeiro_pagamentos; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON TABLE public.financeiro_pagamentos TO authenticated;
+GRANT ALL ON TABLE public.financeiro_pagamentos TO service_role;
+
+--
+-- Name: TABLE financeiro_anexos; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON TABLE public.financeiro_anexos TO authenticated;
+GRANT ALL ON TABLE public.financeiro_anexos TO service_role;
+
+--
+-- Name: TABLE financeiro_auditoria; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON TABLE public.financeiro_auditoria TO authenticated;
+GRANT ALL ON TABLE public.financeiro_auditoria TO service_role;
 
 --
 -- PostgreSQL database dump complete
