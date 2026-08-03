@@ -179,42 +179,57 @@ export type Database = {
         Row: {
           agendamento_id: string | null
           created_at: string
+          desconto: number
           forma_pagamento: Database["public"]["Enums"]["forma_pagamento"] | null
           id: string
+          juros: number
+          multa: number
+          observacoes: string | null
           paciente_id: string | null
           pago_em: string | null
           profissional_id: string | null
           status_pagamento: Database["public"]["Enums"]["financeiro_status"]
           updated_at: string
           valor: number
+          vencimento: string | null
         }
         Insert: {
           agendamento_id?: string | null
           created_at?: string
+          desconto?: number
           forma_pagamento?:
             | Database["public"]["Enums"]["forma_pagamento"]
             | null
           id?: string
+          juros?: number
+          multa?: number
+          observacoes?: string | null
           paciente_id?: string | null
           pago_em?: string | null
           profissional_id?: string | null
           status_pagamento?: Database["public"]["Enums"]["financeiro_status"]
           updated_at?: string
           valor?: number
+          vencimento?: string | null
         }
         Update: {
           agendamento_id?: string | null
           created_at?: string
+          desconto?: number
           forma_pagamento?:
             | Database["public"]["Enums"]["forma_pagamento"]
             | null
           id?: string
+          juros?: number
+          multa?: number
+          observacoes?: string | null
           paciente_id?: string | null
           pago_em?: string | null
           profissional_id?: string | null
           status_pagamento?: Database["public"]["Enums"]["financeiro_status"]
           updated_at?: string
           valor?: number
+          vencimento?: string | null
         }
         Relationships: [
           {
@@ -243,6 +258,177 @@ export type Database = {
             columns: ["profissional_id"]
             isOneToOne: false
             referencedRelation: "profissionais_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      financeiro_anexos: {
+        Row: {
+          arquivo_path: string
+          created_at: string
+          enviado_por: string | null
+          financeiro_id: string
+          id: string
+          nome_arquivo: string
+        }
+        Insert: {
+          arquivo_path: string
+          created_at?: string
+          enviado_por?: string | null
+          financeiro_id: string
+          id?: string
+          nome_arquivo: string
+        }
+        Update: {
+          arquivo_path?: string
+          created_at?: string
+          enviado_por?: string | null
+          financeiro_id?: string
+          id?: string
+          nome_arquivo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financeiro_anexos_financeiro_id_fkey"
+            columns: ["financeiro_id"]
+            isOneToOne: false
+            referencedRelation: "financeiro"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      financeiro_auditoria: {
+        Row: {
+          acao: string
+          actor_id: string | null
+          actor_nome: string | null
+          created_at: string
+          financeiro_id: string
+          id: string
+          valor_anterior: number | null
+          valor_novo: number | null
+        }
+        Insert: {
+          acao: string
+          actor_id?: string | null
+          actor_nome?: string | null
+          created_at?: string
+          financeiro_id: string
+          id?: string
+          valor_anterior?: number | null
+          valor_novo?: number | null
+        }
+        Update: {
+          acao?: string
+          actor_id?: string | null
+          actor_nome?: string | null
+          created_at?: string
+          financeiro_id?: string
+          id?: string
+          valor_anterior?: number | null
+          valor_novo?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financeiro_auditoria_financeiro_id_fkey"
+            columns: ["financeiro_id"]
+            isOneToOne: false
+            referencedRelation: "financeiro"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      financeiro_pagamentos: {
+        Row: {
+          created_at: string
+          estornado: boolean
+          estornado_em: string | null
+          estornado_por: string | null
+          financeiro_id: string
+          forma_pagamento: Database["public"]["Enums"]["forma_pagamento"] | null
+          id: string
+          observacoes: string | null
+          pago_em: string
+          registrado_por: string | null
+          valor_pago: number
+        }
+        Insert: {
+          created_at?: string
+          estornado?: boolean
+          estornado_em?: string | null
+          estornado_por?: string | null
+          financeiro_id: string
+          forma_pagamento?:
+            | Database["public"]["Enums"]["forma_pagamento"]
+            | null
+          id?: string
+          observacoes?: string | null
+          pago_em?: string
+          registrado_por?: string | null
+          valor_pago: number
+        }
+        Update: {
+          created_at?: string
+          estornado?: boolean
+          estornado_em?: string | null
+          estornado_por?: string | null
+          financeiro_id?: string
+          forma_pagamento?:
+            | Database["public"]["Enums"]["forma_pagamento"]
+            | null
+          id?: string
+          observacoes?: string | null
+          pago_em?: string
+          registrado_por?: string | null
+          valor_pago?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financeiro_pagamentos_financeiro_id_fkey"
+            columns: ["financeiro_id"]
+            isOneToOne: false
+            referencedRelation: "financeiro"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      financeiro_parcelas: {
+        Row: {
+          created_at: string
+          financeiro_id: string
+          id: string
+          numero: number
+          pago_em: string | null
+          status_pagamento: Database["public"]["Enums"]["financeiro_status"]
+          valor: number
+          vencimento: string
+        }
+        Insert: {
+          created_at?: string
+          financeiro_id: string
+          id?: string
+          numero: number
+          pago_em?: string | null
+          status_pagamento?: Database["public"]["Enums"]["financeiro_status"]
+          valor: number
+          vencimento: string
+        }
+        Update: {
+          created_at?: string
+          financeiro_id?: string
+          id?: string
+          numero?: number
+          pago_em?: string | null
+          status_pagamento?: Database["public"]["Enums"]["financeiro_status"]
+          valor?: number
+          vencimento?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financeiro_parcelas_financeiro_id_fkey"
+            columns: ["financeiro_id"]
+            isOneToOne: false
+            referencedRelation: "financeiro"
             referencedColumns: ["id"]
           },
         ]
@@ -1069,6 +1255,15 @@ export type Database = {
         }
         Returns: string
       }
+      financeiro_evolucao_mensal: {
+        Args: { p_meses?: number }
+        Returns: {
+          aberto: number
+          mes: string
+          qtd: number
+          recebido: number
+        }[]
+      }
       gerar_lembretes: { Args: never; Returns: number }
       has_role: {
         Args: {
@@ -1116,6 +1311,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      profissional_atende_usuario: {
+        Args: { _paciente_user_id: string; _prof_user_id: string }
+        Returns: boolean
+      }
       resolve_valor_consulta: {
         Args: { _forma_pagamento: string; _profissional_id: string }
         Returns: number
@@ -1130,7 +1329,7 @@ export type Database = {
         | "REMARCADO"
         | "FINALIZADO"
       app_role: "ADMIN" | "RECEPCIONISTA" | "PROFISSIONAL" | "CLIENTE"
-      financeiro_status: "ABERTO" | "PAGO" | "CANCELADO"
+      financeiro_status: "ABERTO" | "PAGO" | "CANCELADO" | "PARCIAL"
       forma_pagamento:
         | "DINHEIRO"
         | "PIX"
@@ -1294,7 +1493,7 @@ export const Constants = {
         "FINALIZADO",
       ],
       app_role: ["ADMIN", "RECEPCIONISTA", "PROFISSIONAL", "CLIENTE"],
-      financeiro_status: ["ABERTO", "PAGO", "CANCELADO"],
+      financeiro_status: ["ABERTO", "PAGO", "CANCELADO", "PARCIAL"],
       forma_pagamento: [
         "DINHEIRO",
         "PIX",
